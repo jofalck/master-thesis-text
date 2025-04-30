@@ -1,10 +1,10 @@
 \documentclass[british,titlepage]{ntnuthesis}
 
-\title{An NTNU Thesis \LaTeX{} Document Class}
-\shorttitle{An NTNU Thesis Document Class}
-\author{Community of Practice in Computer Science Education at NTNU}
-\shortauthor{CoPCSE$@$NTNU}
-\date{CC-BY \ntnuthesisdate}
+\title{Leveraging MAMBA for Action Spotting in Football}
+\shorttitle{MAMBA for Action Spotting in Football}
+\author{Jo Falck-Ytter}
+\shortauthor{J. Falck-Ytter}
+\date{\today}
 
 \addbibresource{thesis.bib}
 
@@ -14,6 +14,7 @@
 
 \input{chapters/0a-abstract.tex}
 \input{chapters/0b-sammendrag.tex}
+\input{chapters/0c-preface}
 
 \tableofcontents
 \listoffigures
@@ -24,9 +25,11 @@
 \printglossary                    % Print glossary
 
 \input{chapters/1-introduction}
-\input{chapters/2-usage.tex}
-\input{chapters/3-structure.tex}
-\input{chapters/4-conclusion.tex}
+\input{chapters/2-background}
+\input{chapters/3-methodology}
+\input{chapters/4-experiments}
+\input{chapters/5-discussion}
+\input{chapters/6-conclusion}
 
 \chapter*{\bibname}
 \printbibliography[heading=none]
