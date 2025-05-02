@@ -1,27 +1,26 @@
 \chapter{Introduction}
 \label{chap:intro}
 
-The sports industry is a cornerstone of the global entertainment sector. The betting sector of sports generated 242 \$ billion revenue in 2023 (https://www.statista.com/topics/8468/global-sports-market/). The prize money in football is also very high. both from the clubs perspective and the analytics firms there is a wish to automate and analyze football games to increase their chances to win. liverpool have been an international forerunner with the implementation of AI in their games. In Norway Bodø/Glimt in co-operation with fokus.ing has achieved great results on player recruitment using AI. 
+The global sports industry is a major part of the entertainment sector. In 2023, sports betting alone generated over 242 billion USD in revenue (Statista, 2023). At the same time, top‐level football clubs and analytics firms invest heavily in data and technology to gain a competitive edge. For example, Liverpool FC has integrated advanced AI tools into their corner preparation \cite{wang_tactic_ai_2024}. In Norway, Bodø/Glimt together with \hyperlink{https://fokus.ing}{fokus.ing} has improved player recruitment through machine learning.
 
-Annotation in football is a costly manual labor process controlled by a monopoly. This hinders the possibility of creating a competetive advantage, because all clubs access to the same data. In a modern era where data is labeled the new oil, it is understandable from both a compteteive and financial perspective that a club would like to own their data. 
+Despite these advances, most football annotation remains a manual, costly process handled by a few specialized companies. This limits clubs’ ability to build and own their own datasets—yet in today’s “data‐driven” world, exclusive access to high‐quality labels can create a decisive advantage. To stimulate progress, SoccerNet hosts annual challenges on tasks such as ball action spotting, providing public benchmarks and annotated video for the research community.
 
-To tackle this challenge SoccerNet host annual competitions to push the \acrfull{sota} benchmarks on these challenges. They provide annotated data, and focus their research on computer vision. something something ball action spotting
-
-The thesis aims to utilize novel techniques from other diciplines of \acrlong{cv} in the football domain, to see if they are applicable in this domain. 
+This thesis investigates whether recent methods from other areas of computer vision (\acrlong{cv}) – in particular masked autoencoders – can improve temporal action localization in football video. I propose a simple yet effective pipeline that extracts spatio‐temporal features from raw footage, and evaluate it against state‐of‐the‐art (\acrfull{sota}) baselines in terms of accuracy, runtime, and robustness to different action types.
 
 \section{Motivation}
-Inspired or maybe not by the movie moneyball, football has recently adopted a data driven approach to stratergy both on and off the field. From Origi's "corner taken quickly" which ulitmately was the result of a collaberation between liverpool and google to the positive transfer record of Bodø glimt. A data driven approach has shown to create big value for clubs. 
+Football has entered a new era in which data-driven decision making is no longer a novelty but a necessity. With the global sports betting market alone accounting for over 242 \$ billion in revenue in 2023, clubs and analytics firms alike are under immense pressure to extract every possible competitive edge. Traditionally, on‐field performance data has been captured through GPS vests and manual video annotation—both of which have significant drawbacks. GPS vests only profile the players who wear them and remain unpopular among many teams, while manual annotation is slow, expensive, and often monopolized by a few vendors.  
 
-Football players wear GPS vests to gather data, but the vests are unpopular among \acrshort{rbk}s players and only gather limited statistics. The potential for using video data is therefore much greater. One can gather stats for both teams, and extract extended data rather than just pace and distance. GPS data are just available for the respective team that owns it. To extract data from opposing teams the videos must be utilized, and here the need for video analysis comes in. 
+Video data, by contrast, is abundant and impartial. Every match is filmed from multiple angles and stored indefinitely—presenting a vast, underutilized resource for extracting rich spatio‐temporal features. Automated video analysis can unlock insights into player positioning, tactical patterns, and event dynamics for both home and away teams, democratizing access to high‑quality data. This is critical in a field where “data is the new oil,” and owning proprietary datasets can translate directly into on‑pitch success and financial return.  
 
-The volume of sports that exists is huge. There are too many hours of football played compared to the time it takes to review. Players like Youssuf Paulsen, Jamie Vardy and others played on a low level in adult age before achieving great success at high age. An automatic tool can help analyze the ecuadorian first division, or any game in any divison to find undervalued players. 
+Competitions such as SoccerNet’s annual challenges have driven progress in temporal action spotting by providing standardized benchmarks and annotated corpora. Yet the state of the art still struggles with fine‐grained action localization under real‐world conditions: varied camera motions, crowded scenes, and subtle player interactions that define the beautiful game. Developing more robust, generalizable methods will not only advance the academic field of computer vision but also deliver practical tools for clubs, scouts, and broadcasters.  
+
+This thesis is motivated by the opportunity to bridge advances in masked autoencoding and self‐supervised learning with the specific demands of football video analysis. By leveraging large video corpora without manual labels, I aim to (1) reduce annotation costs, (2) improve the accuracy and speed of action spotting, and (3) enable clubs of all sizes to harness video analytics for player recruitment, tactical preparation, and fan engagement.  
 
 \section{Goals and Research Questions}
 
 \begin{itemize}
-    \item \textbf{RQ1:} How does my proposed models accuracy compare to other existing models.
-    \item \textbf{RQ2:} Runtime
-    \item \textbf{RQ3:} What actions are the most challenging to spot?
+    \item \textbf{RQ1:} How does the accuracy of the proposed masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
+    \item \textbf{RQ2:} What are the model’s inference speed and computational requirements under realistic operating conditions?
 \end{itemize}
 
 \section{Research Method}
