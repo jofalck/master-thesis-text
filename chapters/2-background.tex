@@ -1,13 +1,13 @@
 \chapter{Background and Related Work}
 \label{chap:background}
 
-This chapter introduces the theoretical foundation and specialized terminology in deep learning and computer vision that underpin this thesis. By defining core architectures, \acrlong{cnn}, \acrlong{rnn} , and transformer variants, the chapter establishes the methodological basis for experiments. Next, it outlines standard evaluation metrics, \acrfull{map} and temporal intersection‑over‑union (IoU), to ensure reproducible performance assessment. The chapter then examines advanced video‑analysis methodologies, including spatiotemporal convolutions, state‑space models, and masked autoencoder frameworks. Finally, it reviews recent football‑event‑spotting research—such as COMEDIAN and VideoMAMBA, to identify specific limitations that motivate our proposed approach. % ait
+This chapter introduces the theoretical foundation and specialized terminology in deep learning and computer vision that underpin this thesis. By defining core architectures, \acrlong{cnn}, \acrlong{rnn} , and transformer variants, the chapter establishes the methodological basis for experiments. Next, it outlines standard evaluation metrics, \acrfull{map} and temporal intersection‑over‑union (IoU), to ensure reproducible performance assessment. The chapter then examines advanced video‑analysis methodologies, including spatiotemporal convolutions, state‑space models, and masked autoencoder frameworks. Finally, it reviews recent football‑event‑spotting research—such as COMEDIAN and VideoMAMBA, to identify specific limitations that motivate our proposed approach.
 
 \section{Football Analytics}
 \label{sec:football_analytics}
 
 \subsection{Continuous Nature of Football}
-Football presents a continuous, dynamic domain unlike sports with discrete plays such as baseball or cricket. For example, a goalkeeper’s pass occurs during uninterrupted action and results in numerous possible temporal sequences and starting conditions. This constant flow challenges both event-based models, which identify individual occurrences and sequence-based models—which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual information across continuous match sequences. % ait
+Football presents a continuous, dynamic domain unlike sports with discrete plays such as baseball or cricket. For example, a goalkeeper’s pass occurs during uninterrupted action and results in numerous possible temporal sequences and starting conditions. This constant flow challenges both event-based models, which identify individual occurrences and sequence-based models—which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual information across continuous match sequences. 
 
 \subsection{Data Sources and Key Metrics}
 Football analytics rely on two primary data streams:
@@ -32,13 +32,13 @@ Football analytics rely on two primary data streams:
     \end{itemize}
 \end{itemize}
 
-\textcite{wang_tactic_ai_2024} applies deep graph neural networks to corners, a discrete sub-event of play. They deliver strong predictive and generalizable performance and have helped Liverpool FC succeed. % ait
+\textcite{wang_tactic_ai_2024} applies deep graph neural networks to corners, a discrete sub-event of play. They deliver strong predictive and generalizable performance and have helped Liverpool FC succeed. 
 
 \section{Deep Learning}
 \label{sec:deep_learning}
 
 Deep learning comprises multilayer neural networks that automatically learn hierarchical data representations. By contrast, classical methods rely on handcrafted features; deep architectures instead discover interesting patterns from raw inputs. They stack linear transformations and non‑linear activations to extract meaningful features at each layer \cite{lecun_deep_learning_2015}. 
-Early layers capture low‑level primitives, while deeper layers combine these primitives into high‑level concepts. Model training uses backpropagation to compute loss gradients with respect to millions of parameters. % to cv related, the second part?
+Early layers capture low‑level primitives, while deeper layers combine these primitives into high‑level concepts. Model training uses backpropagation to compute loss gradients with respect to millions of parameters. \unsure{to cv related, the second part?}
 
 \subsection{Forward pass}
 For a network with two hidden layers, the forward pass can be written as:
@@ -52,9 +52,10 @@ Here, \(x\in\mathbb{R}^d\) is the input, \(W^{(l)},b^{(l)}\) are weights and bia
 \begin{figure}[ht]
     \centering 
     \includegraphics[width=0.6\linewidth]{figures/neural_net.jpg}
-    \caption{Feedforward pass of a neural network with two hidden layers.} % there was an equation here but it is better in the figure?
+    \caption{Feedforward pass of a neural network with two hidden layers.} 
     \label{fig:forward_pass}
 \end{figure}
+\unsure{there was an equation here but it is better in the figure?}
 
 \subsection{Backward pass}
 Training minimizes a loss \(E(\hat y, y^\star)\), using e.g. cross-entropy. Gradients are computed via the chain rule:
@@ -72,6 +73,7 @@ Weight and bias gradients follow:
 \end{align}
 with \(y^{(0)}\equiv x\). Figure~\ref{fig:backward_pass} shows the backpropagation flow.
 \unsure{bad caption on figure below?}
+\unsure{Big enough equations?}
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.6\linewidth]{figures/neural_net_back_prop.jpg}
@@ -80,7 +82,7 @@ with \(y^{(0)}\equiv x\). Figure~\ref{fig:backward_pass} shows the backpropagati
 \end{figure}
 
 \subsection{Optimization}
-Parameters are updated with stochastic gradient descent (SGD) or adaptive variants (Adam, RMSProp). For learning rate \(\eta\),
+Parameters are updated with stochastic gradient descent (SGD) or adaptive variants (Adam, RMSprop). For learning rate \(\eta\),
 \[
 W^{(l)} \leftarrow W^{(l)} - \eta\,\nabla_{W^{(l)}}E,
 \quad
@@ -96,14 +98,14 @@ In the most basic scenario, when there is a layer with input dimensions of \( (N
 
 \[out(N_i, C_{out_j}=bias(C_{out_j})+\sum_{k=0}^{C_{in}-1}weight(C_{out_j},k)\star input(N_i,k)\]
 
-In this expression, the symbol \(\star\) represents the valid 2D cross-correlation operation. Here, \textit{\textbf{N}} refers to the batch size, \textit{\textbf{C}} indicates the number of channels, \textit{\textbf{H}} represents the height of the input planes measured in pixels, and \textit{\textbf{W}} denotes the width measured in pixels. \unsure{this is from pytorch, but everyone says the same, should I cite?}
+In this expression, the symbol \(\star\) represents the valid 2D cross-correlation operation. Here, \textit{\textbf{N}} refers to the batch size, \textit{\textbf{C}} indicates the number of channels, \textit{\textbf{H}} represents the height of the input planes measured in pixels, and \textit{\textbf{W}} denotes the width measured in pixels. \unsure{this is from PyTorch, but everyone says the same, should I cite?}
 
 Key components:
 \begin{itemize}
     \item \textbf{Stride}, \textbf{padding}, and \textbf{dilation} control the receptive field and output resolution.
     \item \textbf{Pooling} (max or average) reduces spatial dimensions and enforces translational invariance.
     \item \textbf{Batch normalization} stabilizes learning by normalizing activations per mini-batch.
-    \item Non-linear activations (ReLU, LeakyReLU, etc.). \unsure{pointless and redundant?}
+    \item Non-linear activations (ReLU, Leaky-ReLU, etc.). \unsure{pointless and redundant?}
 \end{itemize}
 
 \begin{figure}
@@ -191,8 +193,6 @@ Limitations of vision transformers include:
     \item Model complexity—large parameter counts increase overfitting risk \cite{lee_enhancing_mamba_s6_2024}.
 \end{itemize}
 
-% \acrfull{sam} \cite{kirillov_segment_2023} employs a ViT backbone augmented with mask-attend-segment heads to enable promptable segmentation in both images. \acrlong{sam}-2 \cite{ravi_sam_nodate} extended its use to videos. In football analytics, transformer-based approaches such as COMEDIAN \cite{denize_comedian_2024} and real-time optimizations \cite{sarraf_optimal_2023} demonstrate strong performance in action-spotting tasks.
-
 
 \subsubsection{META Segment Anything Model 2}
 \label{ssec:meta_sam2}
@@ -262,7 +262,7 @@ In supervised learning, models are trained on labeled data comprising input–ou
 where \(\eta\) is the learning rate. Updates continue over the dataset until a stopping condition is met (e.g., maximum epochs, target loss, or early stopping).
 
 \paragraph{Unsupervised Learning}
-Unsupervised learning discovers structure from unlabeled data without explicit targets. Common tasks include clustering, association rule mining, and dimensionality reduction. \improvement{does this need to be longer?}\unsure{should I write just about supervised learning?}
+Unsupervised learning discovers structure from unlabeled data without explicit targets. Common tasks include clustering, association rule learning, and dimensionality reduction. \improvement{does this need to be longer?}\unsure{should I write just about supervised learning?}
 
 \subsubsection{Masking}
 
@@ -298,7 +298,7 @@ Encoding and masking techniques are used with video data because of their inhere
 \subsubsection{VideoMAE-V2}
 \label{sssec:videomae_v2}
 
-\info{I want to have this section because it is relevant for my feature extraction. But I see it overlapps with general VideoMAE}
+\info{I want to have this section because it is relevant for my feature extraction. But I see it overlaps with general VideoMAE}
 VideoMAE‑V2 \cite{wang_videomae_2023} is a self‑supervised masked autoencoder designed specifically to preprocess and compress large‑scale video data before downstream experiments. Building on the original VideoMAE, it introduces a dual‑stage masking schedule: 
 \begin{itemize}
     \item \emph{Sparse spatiotemporal masking} in early epochs to encourage global context learning over long clips,
@@ -339,7 +339,7 @@ However, distillation also has limitations:
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{figures/Pedestrian_gradient.jpg}
-    \caption{An image of a pedestrian and his gradient}
+    \caption{An image of a pedestrian and his gradient calculated by \acrshort{hog}.}
     \label{fig:pedestrian_gradient}
 \end{figure}
 
@@ -362,7 +362,6 @@ These approaches enable extraction of features such as joint angles, stride leng
     \item Varying camera angles, resolutions and lens distortions.
     \item Fast motions causing motion blur and tracking drift\cite{survey_of_survey}.
 \end{itemize} 
-% Recent advances leverage multi-view fusion, temporal consistency constraints and weakly supervised learning to enhance robustness under challenging match conditions.
 
 
 \section{Datasets}
@@ -494,19 +493,12 @@ Measure time lol. But we already know that MAMBA is faster \unsure{is this a nec
 
 COMEDIAN \cite{denize_comedian_2024} combines self-supervised learning and knowledge distillation to initialize a transformer for action-spotting on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}. The contributions from Denize et al. are a three-step training pipeline and \acrshort{sota} performance. The first step is to use self-supervised pretraining on a spatial transformer. The second step is to initialize a temporal transformer by using knowledge distillation to enrich the spatial transformers output. The last step is the training on the relevant action spotting task, in this case the SoccerNet-V2 \cite{deliege_soccernet-v2_dataset_2021}.
 
-T-DEED \cite{xarles_t-deed_2024} is a Temporal-Discriminability Enhancer Encoder-Decoder, which won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability is making sure each frame of the video is distinct. Encoder-decoder refers to compressing and expanding the video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. This is useful because sports actions can appear similar. 
+T-DEED \cite{xarles_t-deed_2024} is a Temporal-Discriminability Enhancer Encoder-Decoder, which won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability is making sure each frame of the video is distinct. Encoder-decoder refers to compressing and expanding the video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. This is useful because sports actions can appear similar. \todo{write more?}
 
 In 2021 Gerats et al\cite{gerats_individual_same_task_2021} worked with a single static panorama camera for action-spotting and activity recognition. They use player snippets as model input. Inflated 3D \acrshort{cnn} is used to extract spatio-temporal features from the snippets. A graph attention network is used to analyze the relationship between players and their activities and actions. 
 \improvement{Change \textit{"This thesis"} to something else.}
 \improvement{Check pronouns}
 \unsure{Check spelling}
 \unsure{To move all related work to the end or keep them together with their section}
-
-% TODO
-% Replace this thesis
-% check pronouns
-% write more about sgp
-% spelling
-% talk about metrics
-
-% separate related work? or have them inside
+\improvement{what sections to move to the method part}
+\improvement{A subsection about rdfa-s6}

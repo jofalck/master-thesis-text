@@ -1,7 +1,7 @@
 \chapter{Introduction}
 \label{chap:intro}
 
-The global sports industry is a major part of the entertainment sector. In 2023, sports betting alone generated over 242 billion USD in revenue (Statista, 2023). At the same time, top‐level football clubs and analytics firms invest heavily in data and technology to gain a competitive edge. For example, Liverpool FC has integrated advanced AI tools into their corner preparation \cite{wang_tactic_ai_2024}. In Norway, Bodø/Glimt together with \hyperlink{https://fokus.ing}{fokus.ing} has improved player recruitment through machine learning.
+The global sports industry is a major part of the entertainment sector. In 2023, sports betting alone generated over 242 billion USD in revenue (Statista, 2023). At the same time, top‐level football clubs and analytics firms invest heavily in data and technology to gain a competitive edge. For example, Liverpool FC has integrated advanced AI tools into their corner preparation \cite{wang_tactic_ai_2024}. In Norway, Bodø/Glimt together with \hyperlink{https://fokus.ing}{fokus.ing} has improved player recruitment through machine learning.
 
 Despite these advances, most football annotation remains a manual, costly process handled by a few specialized companies. This limits clubs’ ability to build and own their own datasets—yet in today’s “data‐driven” world, exclusive access to high‐quality labels can create a decisive advantage. To stimulate progress, SoccerNet hosts annual challenges on tasks such as ball action spotting, providing public benchmarks and annotated video for the research community.
 
@@ -16,11 +16,12 @@ Competitions such as SoccerNet’s annual challenges have driven progress in tem
 
 This thesis is motivated by the opportunity to bridge advances in masked autoencoding and self‐supervised learning with the specific demands of football video analysis. By leveraging large video corpora without manual labels, I aim to (1) reduce annotation costs, (2) improve the accuracy and speed of action spotting, and (3) enable clubs of all sizes to harness video analytics for player recruitment, tactical preparation, and fan engagement.  
 
-\section{Goals and Research Questions}
+\section{Research Questions}
 
 \begin{itemize}
-    \item \textbf{RQ1:} How does the accuracy of the proposed masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
-    \item \textbf{RQ2:} What are the model’s inference speed and computational requirements under realistic operating conditions?
+    \item \textbf{RQ1:} How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
+    \item \textbf{RQ2:} What are the model’s inference speed and computational requirements compared to T-DEED?
+    \item possible adoptation of MAMBA to increase its prediction
 \end{itemize}
 
 \section{Research Method}
