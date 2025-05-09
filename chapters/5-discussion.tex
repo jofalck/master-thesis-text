@@ -2,11 +2,20 @@
 \label{chap:discussion}
 
 \section{Addressing the Research Questions Based on the Experiments}
+\info{– Quantitative results vs. baselines}
+\info{Ablations on clip length, masking ratio, MAMBA variants}
+\info{Error analysis / qualitative examples}
+
 
 \subsection{RQ1:} 
 How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
 \subsection{RQ2:} 
 What are the model’s inference speed and computational requirements compared to T-DEED?
+\subsection{RQ3:}
+Which types of adaptation can be made to the MAMBA model to increase its precision?
+
+Hyperparameters configured from before, quite well. 
+They might be suited to the feature extracted and not mamba directly. Experiment with this
 
 
 \section{Shortcomings}
@@ -19,7 +28,11 @@ no pretraining
 mamba should be explored more in the sports action recognition based on litareture review and results. 
 a lot of time was spent debugging and setting up the project to run with mamba. 
 registered for the competition
-asked for too little help
+asked for too little help. didnt use either github nor discord nor supervisors very much
+should have designed a math formula for hyperparameter optimalization
+had daily standups with myself, those were useful. especially to see what took a lot of time, what blocked me.
+trying to make my own model from scratch was a waste of time
+could it be erronous that all clips have the same size because of the last clips in each game not having
 
 \subsection{Sustainability}
 VideoMAE is not very good. MAMBA in itself is nice. if you calculate power. i can do something similar with power need as done in visual intelligence, but i do not have all the data in wandb now. 

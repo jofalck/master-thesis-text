@@ -4,32 +4,120 @@
 \section{Tools and Resources}
 
 \subsection{IDUN}
-i used Idun from NTNU and GPUs
-had to use newer GPUs because of hardware constraints in mamba. what constraints, memory and software/hardware code
+Video data require large neural networks and computational capacity. \acrfull{idun} is not \acrshort{ntnu}s supercomputer, but a project by the faculties. As of \date{2024-04-24}\footnote{\url{https://www.hpc.ntnu.no/idun/}} it contains 234 \acrfull{gpu}s. \acrshort{gpu}s are very important in accelerated environments such as \acrshort{s6}. 
+
+had to use newer GPUs because of hardware constraints in mamba. what constraints, memory and software/hardware code. but also it sometimes worked. i think for the most cases memory was a problem. 
 
 \subsection{draw.io}
 I use this to draw for the PDF, do I talk about that?
 
-\section{Environment}
+\subsection{wandb}
+organize experiments and runs. i started using this late on vms. a feature by default on sn teamspotting. i am unsure if this is a useful section. maybe it belongs in background/theory
+
+\subsection{conda}
+
+didnt use very much, just created python environments then installed everything with pip. during the autumn pytorch suggested not using conda anymore, thats the reason i used pip inside conda. 
+
+\section{Data Preprocessing \& Feature Extraction}
+\label{sec:preprocessing}
+
+Instead of writing a new model from scratch to fit the input data provided out of the box by soccernet, the data was changed instead. 
+thumos14 was picked as goal for data format. 
+
+30\% validation 70\% training
+
+\unsure{simplify the code and make it shorter. only post relevant sections? (remove classes, try except}
+\info{This code listing is very long. Maybe appendix?}
+\lstinputlisting[
+    caption={Script to change the label-file to the THUMOS-14 format.},
+    label=lst:jsonfile,
+    language=Python
+]{listings/sn_to_json.py}
+the next section is how the raw videos are transformed. 
+
+\unsure{the code uses random.random to create a train/val split. to reproduce, should I upload the used data for reproducibility?}
+
+We split each full‐match video into non‐overlapping clips of fixed duration (60 s). Clips are sampled at 25 fps and stored as input sequences $V_k=\{x_t\}_{t=1}^{T_c}$ where $T_c=60\times25$. \todo{edge cases(end of game)}. The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration} which sets a default value if the duration is not explicitly set. 
+
+\lstinputlisting[
+    caption={Part of \acrshort{vms} code used to determine duration to be pointless. },
+    label=lst:uselessduration,
+    language=Python
+]{listings/useless_duration.py}
+
+The .json file does not differentiate between full minutes and the edge cases at the end of games. This does not matter
+
+Each clip $V_k$ is fed through the pre‐trained VideoMAE-V2 encoder (\autoref{ssec:videomae_v2}) to extract a feature embedding
+\[
+z_k = \mathrm{VideoMAE\text{-}V2}(V_k)\;\in\;\mathbb{R}^D.
+\]
+These $D$‐dimensional vectors serve as inputs to all downstream temporal models.
+
+I have to check how I treat the edge cases in the end of the game. The model I use handles inputs of variable length, but doing it this way was a simplificiaton. Also I had no way of knowing a better way to split the videos or any sources on that. 
+Future work could be that, or to use overlaps etc. 
+
+VMAE2 is very computationally heavy.
+
+VMAE2 is pretrained on the kinetics dataset, and not customized for football data but rather that type. \todo{write about kinetics dataset in background}
+
+Internvideo which is the base of an experiment where i compare x,1408 vectors from the kinetics model to x,3302 vectors from an bigger masked autoencoder. Same author on VMAE2 and InterVideo. 
+
+The weights from nternvieo 2 is available for download from huggingface, link is findable. 
+
+\section{Model Architectures}
+\label{sec:model_architectures}
+% … only describe the RNN/TCN/Transformer variants you actually implement 
+
+\subsection{VideoMAE-V2}
+\label{ssec:videomae_v2}
+
+VideoMAE‑V2 \cite{wang_videomae_2023} is a self‑supervised masked autoencoder designed specifically to preprocess and compress large‑scale video data before downstream experiments. Building on the original VideoMAE, it introduces a dual‑stage masking schedule: 
+
+\info{feature extractor (hyperparams, masking schedule)}
+\begin{itemize}
+    \item \emph{Sparse spatiotemporal masking} in early epochs to encourage global context learning over long clips,
+    \item \emph{Dense tube masking} in later epochs to refine local motion representations.
+\end{itemize}
+Each frame is first partitioned into non‑overlapping $P\times P$ patches and tokenized; a binary mask tensor $M\in\{0,1\}^{T\times H/P\times W/P}$ with masking ratio up to 90\% is then generated according to the dual schedule. The visible tokens $x_{\rm vis}=x\odot(1-M)$ are encoded by a standard ViT backbone, while a lightweight three‑layer transformer decoder reconstructs only the masked patches. 
+
+By dynamically varying the masking granularity, VideoMAE‑V2 achieves:
+\begin{itemize}
+    \item 2× faster convergence compared to VideoMAE,
+    \item linear scaling to billion‑parameter models,
+    \item robust transferability across action recognition, temporal localization and segmentation tasks.
+\end{itemize}
+
+preprocessing wth videomae provides quicker training because features are saved and they are smaller than videos in size
+
+\subsection{mamba}
+\label{ssec:mamba}
+
+video mamba suite pretty much sota on papers with code
+rdfa26 slitghly better
+hardware issues and poor documentation compared to vms prevented it from running
+
+% description of data preprocessing or augmentation (clip length, masking ratios, train/val splits) belongs in Methods
+
+default feature extraction with vmae2
+
+\section{Training Details}
+% optimizer, learning rates, augmentation, early‐stopping, etc.
+
+talk about model selection? vms was easier than rdfa-s6 to implement, even though rdfa-s6 perform slightly better. but just slightly. vms had a better backbone, example it included annotations from thumos data. provided better download links. more functional and understandable run file. 
+
+there are config files that show the details. i dont think mamba has early stopping, but that is something im looking to fix. no real agumentation but some in the config
+
+\section{Temporal model architectures under test (only the ones you implement}
+
+there are some very fancy graphs on wandb i dont understand with gradients
+
+\section{Evaluation protocols (mAP $\Delta$, IoU, runtime measurement)}
+
+both 
+
+\section{Environment} 
+
 multiple environments
 i used python, but environments also had CUDA code, and c++ code. 
 different repositories for different experiments
 
-\section{Data}
-SoccerNet data
-transformed the json file to fit THUMOS constraints
-
-then what, something about action spotting and evaluation?
-
-should i talk about the method to my literature search
-
-tried different models but they were unhappy with hardware
-
-split videos into minute clips
-
-extracted features from custom video with VideoMAE
-tried to extract with InternVideo but took to long time(and didn't work)
-
-rdfa s6 took a lot of time but never worked
-
-i plan to change the output json back to the original
