@@ -26,7 +26,7 @@ thumos14 was picked as goal for data format.
 
 30\% validation 70\% training
 
-\unsure{simplify the code and make it shorter. only post relevant sections? (remove classes, try except}
+\unsure{simplify the code and make it shorter. only post relevant sections? (remove classes, try except, imports etc}
 \info{This code listing is very long. Maybe appendix?}
 \lstinputlisting[
     caption={Script to change the label-file to the THUMOS-14 format.},
@@ -34,6 +34,7 @@ thumos14 was picked as goal for data format.
     language=Python
 ]{listings/sn_to_json.py}
 the next section is how the raw videos are transformed. 
+\todo{also trained with 0.8 split and got better result}
 
 \unsure{the code uses random.random to create a train/val split. to reproduce, should I upload the used data for reproducibility?}
 
@@ -45,7 +46,7 @@ We split each full‐match video into non‐overlapping clips of fixed duration 
     language=Python
 ]{listings/useless_duration.py}
 
-The .json file does not differentiate between full minutes and the edge cases at the end of games. This does not matter
+The .json file does not differentiate between full minutes and the edge cases at the end of games. This does not matter because duration parameter doesnt happen. feels like this is repetition. 
 
 Each clip $V_k$ is fed through the pre‐trained VideoMAE-V2 encoder (\autoref{ssec:videomae_v2}) to extract a feature embedding
 \[
@@ -58,7 +59,7 @@ Future work could be that, or to use overlaps etc.
 
 VMAE2 is very computationally heavy.
 
-VMAE2 is pretrained on the kinetics dataset, and not customized for football data but rather that type. \todo{write about kinetics dataset in background}
+VMAE2 is pretrained on the kinetics dataset, and not customized for football data but rather that type (sports). \todo{write about kinetics dataset in background}
 
 Internvideo which is the base of an experiment where i compare x,1408 vectors from the kinetics model to x,3302 vectors from an bigger masked autoencoder. Same author on VMAE2 and InterVideo. 
 
@@ -100,24 +101,36 @@ hardware issues and poor documentation compared to vms prevented it from running
 
 default feature extraction with vmae2
 
+\subsection{\acrfull{tdeed}}
+
 \section{Training Details}
 % optimizer, learning rates, augmentation, early‐stopping, etc.
 
 talk about model selection? vms was easier than rdfa-s6 to implement, even though rdfa-s6 perform slightly better. but just slightly. vms had a better backbone, example it included annotations from thumos data. provided better download links. more functional and understandable run file. 
 
-there are config files that show the details. i dont think mamba has early stopping, but that is something im looking to fix. no real agumentation but some in the config
+there are config files that show the details. early stopping is implemented. no real agumentation but some in the config.
 
 \section{Temporal model architectures under test (only the ones you implement}
 
 there are some very fancy graphs on wandb i dont understand with gradients
 
-\section{Evaluation protocols (mAP $\Delta$, IoU, runtime measurement)}
+\section{somewhere there should be a section about bayesian hyperparameter search}
+i also should really learn this because i've just used it
 
-both 
+\section{visualisation}
+
+idk if this deserves a section or subsection but last year the boys had it. i might define more visualisations while I write discussion and results
+
+\section{Evaluation protocols (mAP $\Delta$, runtime measurement)}
+
+mAP 50\% from vms with the mAP from sn. 
+
+runtime I can just calculate from wandb logs, it actually gives the measurement directly. but it depends on gpu.
+calculate power used? if thats a metric, or just use the same gpu. 
 
 \section{Environment} 
 
 multiple environments
 i used python, but environments also had CUDA code, and c++ code. 
 different repositories for different experiments
-
+is vms environment or tool?

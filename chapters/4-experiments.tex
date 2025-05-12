@@ -2,13 +2,59 @@
 \label{chap:experiments}
 
 \section{Experiment 1: Compare accuracy between tdeed and mamba}
+
+The first experiment compares accuracy from \acrshort{tdeed} and \acrshort{vms}. 
+
+\subsection{Setup}
+\label{ssec:ex1_setup}
+
+One model was trained with \acrshort{tdeed} and three with \acrlong{vms}. Both models are trained on the same raw data and their results are compared. The team parameter is ignored, as it is only the \acrshort{tdeed} model that predicts this. The models use different processed data. 
+% The \acrshort{vms} models differ in:
+% \begin{enumerate}
+%     \item train/val split
+%     \item hyperparameter optimization
+% \end{enumerate}
+
+I will call the \acrshort{vms} model which uses an 80/20 split and optimized hyperparameters for \textbf{\acrshort{vms}-1}. The second \acrshort{vms} model, \textbf{\acrshort{vms}-2}, uses optimized hyperparameters and a 70/30 split. \textbf{\acrshort{vms}-3} uses default hyperparameters, those that were suggested by the original repo, and a 70/30 split. 
+
+\subsection{Results}
+
+
+\begin{table}
+    \centering
+    \begin{tabular}{ccc}
+         & average mAP & mAP@50\\
+        \textbf{\acrshort{tdeed}} &  & \\
+        \textbf{\acrshort{vms}-80\_20} & 48.73 & 46.46 \\
+        \textbf{\acrshort{vms}-70\_30} &  & \\
+    \end{tabular}
+    \caption{Results on the first experiment}
+    \label{tab:results_ex1}
+\end{table}
+
+
 \section{Experiment 2: Compare runtime}
+\subsection{Setup}
+\label{ssec:ex2_setup}
+
 We know mamba is faster than the vit based tdeed
+
+MAMBA training took <3 hours, but data extraction was slow. However also image extraction on tdeed was slow. can say i ignore data preprocessing and just look at 
 \section{Experiment 3: compare mamba with 1408 features with 3300 features(internvideo)}
 because i didn't manage to extract intervideo features
+\subsection{Setup}
+\label{ssec:ex3_setup}
+
 \section{Experiment 4: Hyperparameter search}
+\subsection{Setup}
+\label{ssec:ex4_setup}
+
 did with wandb
-lower learning rate because football is homogenous
+lower learning rate because football is homogeneous
 \section{Experiment 5: T-DEED with and without joint training}
+\subsection{Setup}
+\label{ssec:ex5_setup}
+
+
 \section{Summary}
 

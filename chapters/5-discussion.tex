@@ -11,18 +11,23 @@
 How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
 \subsection{RQ2:} 
 What are the model’s inference speed and computational requirements compared to T-DEED?
+
+add video-mae to the time is fair, as it contributes to the results
 \subsection{RQ3:}
 Which types of adaptation can be made to the MAMBA model to increase its precision?
 
 Hyperparameters configured from before, quite well. 
-They might be suited to the feature extracted and not mamba directly. Experiment with this
+They might be suited to the feature extracted and not mamba directly. 
+future Experiment with this
 
+
+plot to check if it predicts equal amount of actions at all times, eg doesnt ignore first and last second 
 
 \section{Shortcomings}
 didnt fine tune the feature extractor
 didnt test on rbk data
 no pretraining
-
+1 second fail margin of sn doesnt apply to actions in edge cases, but they are stricter. 
 
 \section{Reflections}
 mamba should be explored more in the sports action recognition based on litareture review and results. 
@@ -33,6 +38,7 @@ should have designed a math formula for hyperparameter optimalization
 had daily standups with myself, those were useful. especially to see what took a lot of time, what blocked me.
 trying to make my own model from scratch was a waste of time
 could it be erronous that all clips have the same size because of the last clips in each game not having
+i want to build my own simpler model :) and understand the whole process
 
 \subsection{Sustainability}
 VideoMAE is not very good. MAMBA in itself is nice. if you calculate power. i can do something similar with power need as done in visual intelligence, but i do not have all the data in wandb now. 
