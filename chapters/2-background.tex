@@ -253,30 +253,30 @@ Together, the original \acrshort{sam} and its video-centric successor exemplify 
 \subsection{State-Space Models}
 \label{ssec:state_space_models}
 \improvement{Temporal Modeling Techniques” (RNN, TCN, TSN, Transformers) can be summarized in Background—only the variants you actually implement/test (e.g. your MAMBA variant, TSN baseline) get full detail in Methods}
-\acrfull{ssm} offer a continuous-time representation of sequential data via a latent state \(h(t)\in\mathbb{R}^N\):
-\begin{align}
-    \frac{\mathrm{d}h(t)}{\mathrm{d}t} &= A\,h(t) + B\,x(t),  \label{eq:ssm_continuous1}\\
-    y(t) &= C\,h(t),                                    \label{eq:ssm_continuous2}
-\end{align}
-where \(x(t)\in\mathbb{R}^d\) is the input, \(y(t)\in\mathbb{R}^m\) the output, and \(A\in\mathbb{R}^{N\times N}, B\in\mathbb{R}^{N\times d}, C\in\mathbb{R}^{m\times N}\) are learned parameters.  Discretizing these equations with step size \(\Delta\) yields
-\begin{align}
-    \bar A &= \exp(\Delta\,A), 
-    & 
-    \bar B &= \bigl(\exp(\Delta\,A)-I\bigr)A^{-1}B,\\
-    h_k &= \bar A\,h_{k-1} + \bar B\,x_k, 
-    &
-    y_k &= C\,h_k,
-    \quad k=1,2,\dots
-\end{align}
-\unsure{Do I have to reference equations in the same way figures must be referenced in a text}
-VideoMamba \cite{li_videomamba_2024} builds on this framework with a \emph{Selective Scan} (\acrshort{s6}) core.  Its parameters \((\Delta, A,B,C)\) control:
-\begin{itemize}
-    \item \(\Delta\): temporal resolution of the recurrence,
-    \item \(A\): continuous dynamics matrix,
-    \item \(B,C\): input and output mappings.
-\end{itemize}
+% \acrfull{ssm} offer a continuous-time representation of sequential data via a latent state \(h(t)\in\mathbb{R}^N\):
+% \begin{align}
+%     \frac{\mathrm{d}h(t)}{\mathrm{d}t} &= A\,h(t) + B\,x(t),  \label{eq:ssm_continuous1}\\
+%     y(t) &= C\,h(t),                                    \label{eq:ssm_continuous2}
+% \end{align}
+% where \(x(t)\in\mathbb{R}^d\) is the input, \(y(t)\in\mathbb{R}^m\) the output, and \(A\in\mathbb{R}^{N\times N}, B\in\mathbb{R}^{N\times d}, C\in\mathbb{R}^{m\times N}\) are learned parameters.  Discretizing these equations with step size \(\Delta\) yields
+% \begin{align}
+%     \bar A &= \exp(\Delta\,A), 
+%     & 
+%     \bar B &= \bigl(\exp(\Delta\,A)-I\bigr)A^{-1}B,\\
+%     h_k &= \bar A\,h_{k-1} + \bar B\,x_k, 
+%     &
+%     y_k &= C\,h_k,
+%     \quad k=1,2,\dots
+% \end{align}
+% \unsure{Do I have to reference equations in the same way figures must be referenced in a text}
+% VideoMamba \cite{li_videomamba_2024} builds on this framework with a \emph{Selective Scan} (\acrshort{s6}) core.  Its parameters \((\Delta, A,B,C)\) control:
+% \begin{itemize}
+%     \item \(\Delta\): temporal resolution of the recurrence,
+%     \item \(A\): continuous dynamics matrix,
+%     \item \(B,C\): input and output mappings.
+% \end{itemize}
 
-By preserving a compact hidden state, Mamba approximates long-range dependencies akin to self-attention but with only \(\mathcal{O}(L)\) time/memory cost rather than \(\mathcal{O}(L^2)\).  
+% By preserving a compact hidden state, Mamba approximates long-range dependencies akin to self-attention but with only \(\mathcal{O}(L)\) time/memory cost rather than \(\mathcal{O}(L^2)\).  
 
 VideoMAMBA extends \acrshort{s6} to spatiotemporal video features: each frame is first embedded (e.g.\ via convolutional or patch-based encoders) into \(x_k\), then processed through the discrete SSM along the temporal dimension.  Prior studies \cite{lee_enhancing_mamba_s6_2024, li_videomamba_2024} report that VideoMAMBA matches transformer-based action recognition on common benchmarks while reducing inference overhead.
 
@@ -329,7 +329,6 @@ High masking ratios (e.g.\ 75-90\%) force the encoder to capture global context,
 Encoding and masking techniques are used with video data because of their inherent large size. Encoding encapsulates the process of compressing video files to reduce size while keeping a satisfactory quality. Video masking is the technique used to discard uninteresting regions and patches to focus on more meaningful features. This motivates the model to learn meaningful representations, rather than predicting based on redundant data \cite{tong_videomae_2022}. The most prominent masking variant used on \acrshort{sota} benchmarks on Papers with Code' in the category \textit{Action Recognition}\footnote{\url{https://paperswithcode.com/task/action-recognition-in-videos}} is the VideoMAE V2 \cite{wang_videomae_2023} and its highly related InternVideo2 \cite{wang_internvideo2_2024}. 
 
 \textcite{tong_videomae_2022} address the problem of training video transformers from scratch. The aim is to use self-supervised learning to capture meaningful representations which enables the model to decode data into the original representations. The contributions of the masked autoencoder \cite{tong_videomae_2022} are the ability to train \acrshort{vit}s on smaller datasets. VideoMAE \cite{tong_videomae_2022} also tackle the problems of temporal relations in video-data and suggests a high masking ratio. VideoMAE-V2 \cite{wang_videomae_2023} improves the VideoMAE-models training time. It is still a very computationally expensive approach. 
-
 
 
 \subsubsection{Knowledge Distillation}

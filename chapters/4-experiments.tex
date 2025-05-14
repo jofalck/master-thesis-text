@@ -25,8 +25,8 @@ I will call the \acrshort{vms} model which uses an 80/20 split and optimized hyp
     \begin{tabular}{ccc}
          & average mAP & mAP@50\\
         \textbf{\acrshort{tdeed}} &  & \\
-        \textbf{\acrshort{vms}-80\_20} & 48.73 & 46.46 \\
-        \textbf{\acrshort{vms}-70\_30} &  & \\
+        \textbf{\acrshort{vms}-80\_20} & 51.42 & 49.38 \\
+        \textbf{\acrshort{vms}-70\_30} & 48.73 & 46.46\\
     \end{tabular}
     \caption{Results on the first experiment}
     \label{tab:results_ex1}
@@ -40,8 +40,12 @@ I will call the \acrshort{vms} model which uses an 80/20 split and optimized hyp
 We know mamba is faster than the vit based tdeed
 
 MAMBA training took <3 hours, but data extraction was slow. However also image extraction on tdeed was slow. can say i ignore data preprocessing and just look at 
+
+
 \section{Experiment 3: compare mamba with 1408 features with 3300 features(internvideo)}
-because i didn't manage to extract intervideo features
+because i didn't manage to extract intervideo features this is an experiment
+
+
 \subsection{Setup}
 \label{ssec:ex3_setup}
 
@@ -51,10 +55,15 @@ because i didn't manage to extract intervideo features
 
 did with wandb
 lower learning rate because football is homogeneous
+only tune dataset variables
+negative/neutral results. why? i think its because features are trained to match the preprocessing timeline. some really good runs
+something funny is up with the learning rate
+
 \section{Experiment 5: T-DEED with and without joint training}
 \subsection{Setup}
 \label{ssec:ex5_setup}
 
+another experiment where I just run array jobs with different train/val splits
 
 \section{Summary}
 
