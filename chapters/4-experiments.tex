@@ -18,22 +18,24 @@ We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_d
 
 All models used default hyperparameters from their original papers. Performance was measured by mean Average Precision (mAP) and mAP@50 under a \(\pm 1\) s tolerance window.
 
-\paragraph{Results}
-\begin{table}[h]
+\subsection{Results}
+\label{ssec_ex1_results}
+\begin{table}[ht]
     \centering
     \begin{tabular}{lcc}
         \toprule
-        Model                   & mAP (\%)  & mAP@50 (\%) \\
+        Model                   & average \acrshort{map} (\%)  & \acrshort{map}@50 (\%) \\
         \midrule
-        T-DEED                  &  \textemdash      & 46.00       \\
-        VMS-80\_20 (Mamba-S6)   &  \textbf{51.42}   & \textbf{49.38} \\
-        VMS-70\_30 (Mamba-S6)   & 48.73            & 46.46       \\
+        \acrshort{tdeed}                  &  \textemdash      & 43.00       \\
+        \acrshort{vms}-80\_20 (Mamba-S6)   &  \textbf{51.42}   & \textbf{49.38} \\
+        \acrshort{vms}-70\_30 (Mamba-S6)   & 48.73            & 46.46       \\
         \bottomrule
     \end{tabular}
     \caption{Accuracy comparison on SoccerNet-V2.}
     \label{tab:results_ex1}
 \end{table}
 \todo{fill in correct values of tdeed}
+\todo{values for vms might be incorrect, run new training to get numbers}
 
 \subsection{Discussion}
 \label{ssec:ex1_discussion}
@@ -43,7 +45,7 @@ task is made to fit the tdeed model, by fine grained low tolerance for error
 \section{Experiment 2: Compare runtime}
 \label{sec:experiment2}
 
-Wall-clock training time for each model on a Tesla A100 GPU was recorded. Feature extraction was also timed, but separated from the time. \unsure{should I use identical epoch count and batch size?}
+Wall-clock training time for each model on a Tesla A100 \acrshort{gpu} was recorded. Feature extraction was also timed, but separated from the time. \unsure{should I use identical epoch count and batch size?}
 \todo{same number of epochs? normalize for number of epochs?} 
 
 \subsection{Setup}
@@ -71,13 +73,6 @@ Both models trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
 
 \subsection{Results}
 \label{ssec:ex3_results}
-
-\subsection{Discussion}
-\label{ssec:ex3_discussion}
-
-
-\subsection{Results}
-\label{ssec:ex3_results}
 The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min, respectively.
 
 \todo{add wandb plots}
@@ -96,17 +91,26 @@ The goal is to find the best hyperparameters for the \acrshort{vms} model on the
 \subsection{Setup}
 \label{ssec:ex4_setup}
 
-\acrlong{wandb} is used to track the hyperparameters and the results. 
-A bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters.
-The dataset hyperparameters are the ones that were optimized. 
-Full details about the hyperparameters can be found in \autoref{label:app_sweep}.
+\acrlong{wandb} is used to track the hyperparameters and the results for the \acrshort{vms} model trained on SoccerNet-V2 dataset with a 70 \(\%\)-30\(\%\) validation split. A Bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters. The hyperparameters related to the dataset are the only ones modified. Full details about the hyperparameters can be found in \autoref{label:app_sweep}.
+
+A total of 210 runs across three sweeps of 70 runs each were completed. Because of the fast convergence of \acrshort{vms}--models hyperparameter search was an efficient process. 
 
 
-did with wandb
 \subsection{Results}
 \label{ssec:ex4_results}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figures/sweep_two_best.png}
+    \caption{The hyperparameters of the two best results(yellow) compared to all runs(grey) in the thrid sweep. }
+    \label{fig:sweep_best_two}
+\end{figure}
 
+The sweeps showed a slight improvement to the model. 
+
+Trying to translate the sweep into a single better configration didn't prove useful, but some configurations performed exceptionally better than the rest. But these configurations that worked well, had quite different parameters and was hard to differ. As seen in \autoref{fig:sweep_best_two}, the hyperparameters of the best and second best run in the last sweep differed significantly in their hyperparameters. 
+
+Interpreting the results to create a hyperparameter configuration, as explained in the \autoref{app:sweep_3} the resulting average \acrshort{map} was \(46.77\%\). 
 
 \subsection{Discussion}
 \label{ssec:ex4_discussion}
