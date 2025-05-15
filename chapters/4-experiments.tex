@@ -1,33 +1,51 @@
 \chapter{Experiments and Results}
 \label{chap:experiments}
+This chapter presents a series of experiments designed to answer the research questions posed in Chapter~\ref{chap:intro}, focusing on the evaluation of the Mamba-S6 (\acrshort{vms}) model for temporal event spotting in football video. The accuracy and runtime is compared against the \acrshort{tdeed} baseline, investigate the impact of feature dimensionality, and perform a Bayesian hyperparameter sweep to optimize performance.
+
 
 \section{Experiment 1: Compare accuracy between tdeed and mamba}
-
+\label{sec:experiment1}
 The first experiment compares accuracy from \acrshort{tdeed} and \acrshort{vms}. 
 
 \subsection{Setup}
 \label{ssec:ex1_setup}
+We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}:  
+\begin{itemize}
+    \item \acrshort{vms}-80\_20 using an 80\%/20\% train/val split,  
+    \item \acrshort{vms}-70\_30 using a 70\%/30\% split, and  
+    \item \acrshort{tdeed} with four matches for training and one for validation (equivalent to 80\%/20\%).  
+\end{itemize}
 
-One model was trained with \acrshort{tdeed} and three with \acrlong{vms}. Both models are trained on the same raw data and their results are compared. The team parameter is ignored, as it is only the \acrshort{tdeed} model that predicts this. The models use different processed data. 
+All models used default hyperparameters from their original papers. Performance was measured by mean Average Precision (mAP) and mAP@50 under a \(\pm 1\) s tolerance window.
 
-
-\subsection{Results}
-
-
-\begin{table}
+\paragraph{Results}
+\begin{table}[h]
     \centering
-    \begin{tabular}{ccc}
-         & average \acrshort{map} & \acrshort{map}@50\\
-        \acrshort{tdeed} & - & 32.44 \\
-        \acrshort{vms}-80\_20 & 51.42 & 49.38 \\
-        \acrshort{vms}-70\_30 & 48.73 & 46.46 \\
+    \begin{tabular}{lcc}
+        \toprule
+        Model                   & mAP (\%)  & mAP@50 (\%) \\
+        \midrule
+        T-DEED                  &  \textemdash      & 46.00       \\
+        VMS-80\_20 (Mamba-S6)   &  \textbf{51.42}   & \textbf{49.38} \\
+        VMS-70\_30 (Mamba-S6)   & 48.73            & 46.46       \\
+        \bottomrule
     \end{tabular}
-    \caption{Results on the first experiment}
+    \caption{Accuracy comparison on SoccerNet-V2.}
     \label{tab:results_ex1}
 \end{table}
 \todo{fill in correct values of tdeed}
 
+\subsection{Discussion}
+\label{ssec:ex1_discussion}
+
+task is made to fit the tdeed model, by fine grained low tolerance for error 
+
 \section{Experiment 2: Compare runtime}
+\label{sec:experiment2}
+
+Wall-clock training time for each model on a Tesla A100 GPU was recorded. Feature extraction was also timed, but separated from the time. \unsure{should I use identical epoch count and batch size?}
+\todo{same number of epochs? normalize for number of epochs?} 
+
 \subsection{Setup}
 \label{ssec:ex2_setup}
 
@@ -36,22 +54,68 @@ We know mamba is faster than the vit based tdeed
 MAMBA training took <3 hours, but data extraction was slow. However also image extraction on tdeed was slow. can say i ignore data preprocessing and just look at 
 
 
-\section{Experiment 3: compare mamba with 1408 features with 3300 features(internvideo)}
-because i didn't manage to extract intervideo features this is an experiment
+\section{Experiment 3: Feature increase}
+\label{sec:experiment3}
+To find out how much the size if the feature vector matters, a model with 1408 features and one with 3200 features is trained on the THUMOS-14 dataset.
+InternVideo features have a size of 3200, and is the backbone of the \acrshort{sota} models on paperswithcode.
+The \acrshort{vms} models trained on soccernet use 1408 features. 
 
 
 \subsection{Setup}
 \label{ssec:ex3_setup}
 
-\section{Experiment 4: Hyperparameter search}
+To assess the effect of embedding size, two \acrshort{vms} instances were trained on THUMOS-14 \cite{dataset:thumos}: one using 1,408-dimensional VideoMAE features and one using 3,200-dimensional InternVideo embeddings. All other settings, annotations and hyperparameters, remained identical.
+
+The metrics are tracked using \acrlong{wandb} and console logs.
+Both models trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
+
+\subsection{Results}
+\label{ssec:ex3_results}
+
+\subsection{Discussion}
+\label{ssec:ex3_discussion}
+
+
+\subsection{Results}
+\label{ssec:ex3_results}
+The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min, respectively.
+
+\todo{add wandb plots}
+
+\subsection{Discussion}
+\label{ssec:ex3_discussion}
+hyperparameters could favor the newer weights
+
+
+\section{Experiment 4: Hyperparameter optimization}
+\label{sec:experiment4}
+
+The fourth experiment is a hyperparameter optimization experiment.
+The goal is to find the best hyperparameters for the \acrshort{vms} model on the soccernet dataset.
+
 \subsection{Setup}
 \label{ssec:ex4_setup}
 
+\acrlong{wandb} is used to track the hyperparameters and the results. 
+A bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters.
+The dataset hyperparameters are the ones that were optimized. 
+Full details about the hyperparameters can be found in \autoref{label:app_sweep}.
+
+
 did with wandb
+\subsection{Results}
+\label{ssec:ex4_results}
+
+
+
+\subsection{Discussion}
+\label{ssec:ex4_discussion}
 lower learning rate because football is homogeneous
 only tune dataset variables
 negative/neutral results. why? i think its because features are trained to match the preprocessing timeline. some really good runs
 something funny is up with the learning rate
+
+
 
 \section{Experiment 5: T-DEED with and without joint training}
 \subsection{Setup}
@@ -60,4 +124,4 @@ something funny is up with the learning rate
 another experiment where I just run array jobs with different train/val splits
 
 \section{Summary}
-
+vms runs on any GPU, but tdeed needs a lot of memory and only runs on premium GPUs.

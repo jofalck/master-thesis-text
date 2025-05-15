@@ -21,6 +21,24 @@ Due to the high memory requirements of the \acrlong{tdeed} and software requirem
 \label{ssec:wandb}
 To streamline the management and reproducibility of the training experiments, I used the \acrlong{wandb} platform. Using \acrshort{wandb}’s Python client, hyperparameters are logged automatically. As is training and validation metrics, model checkpoints, and GPU utilization statistics. The centralized dashboard enabled real-time monitoring and direct comparison of concurrent runs. Crucially, \acrshort{wandb}’s automated hyperparameter sweep feature was used to conduct systematic searches over predefined parameter distributions. These sweeps coordinated parallel trials, performance metrics, and ranked configurations based on validation outcomes. By integrating \acrshort{wandb} into the workflow, it significantly enhanced the transparency, comparability, and reproducibility of the experimental pipeline.
 
+\subsection{Bayesian Hyperparameter Search}
+
+Bayesian optimization is a probabilistic approach to hyperparameter tuning that efficiently explores the search space by balancing **exploration** (trying new regions) and **exploitation** (focusing on promising regions). It builds a **surrogate model**, typically a **Gaussian Process**, to approximate the objective function and predict both the mean and variance of the function.
+
+The optimization process follows these steps:
+\begin{itemize}
+    \item \textbf{Surrogate Model}: A probabilistic model estimates the objective function based on previous evaluations.
+    \item \textbf{Acquisition Function}: Determines the next hyperparameter set to evaluate by optimizing a function such as **Expected Improvement (EI)** or **Upper Confidence Bound (UCB)**.
+    \item \textbf{Evaluation and Update}: The chosen hyperparameters are tested, and the surrogate model is updated with new information.
+    \item \textbf{Iteration}: The process repeats until convergence or a stopping criterion is met.
+\end{itemize}
+
+Bayesian optimization is particularly useful for tuning hyperparameters in deep learning models, where evaluating each configuration is computationally expensive. By leveraging probabilistic modeling, it efficiently identifies optimal hyperparameter values while minimizing unnecessary evaluations.
+
+\subsection{Comparing Correlation and Importance}
+
+While correlation identifies linear dependencies, importance accounts for complex interactions among multiple hyperparameters. This distinction helps researchers make informed decisions when designing hyperparameter search strategies. Bayesian optimization further enhances this process by intelligently selecting hyperparameters based on probabilistic predictions, leading to improved model performance and faster convergence.
+
 \subsection{Anaconda and pip}
 \label{ssec:conda_pip}
 Python environments were managed using conda, but all packages—including CUDA-enabled PyTorch builds—were installed via pip to follow recent PyTorch recommendations favoring pip over conda for GPU support.

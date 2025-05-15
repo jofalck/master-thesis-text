@@ -464,6 +464,12 @@ A segment is correct if $\mathrm{IoU}\!\ge\theta$ and $\hat c_j=c_i$.
 Measure time lol. But we already know that MAMBA is faster \unsure{is this a necessary topic, to talk about how to measure time}
 \todo{write if necessary}
 
+\subsection{Metrics Correlation and Importance}
+
+Hyperparameter correlation measures the linear relationship between a hyperparameter and a selected metric, such as validation loss. A high correlation implies that an increase or decrease in the hyperparameter value leads to a similar change in the metric. However, correlation alone does not capture second-order interactions or non-linear dependencies.
+
+To address these limitations, importance metrics are derived using a tree-based model, specifically a **random forest**, trained on hyperparameters as inputs and the performance metric as the target output. Feature importance values from this model provide deeper insights into which hyperparameters significantly impact results. Unlike linear models, tree-based approaches are more robust to categorical data and non-normalized values.
+
 \section{Related Work in Football Event Spotting}
 \label{sec:fw_work}
 
