@@ -3,7 +3,7 @@
 This chapter presents a series of experiments designed to answer the research questions posed in Chapter~\ref{chap:intro}, focusing on the evaluation of the Mamba-S6 (\acrshort{vms}) model for temporal event spotting in football video. The accuracy and runtime is compared against the \acrshort{tdeed} baseline, investigate the impact of feature dimensionality, and perform a Bayesian hyperparameter sweep to optimize performance.
 
 
-\section{Experiment 1: Compare accuracy between tdeed and mamba}
+\section{Experiment 1: Compare accuracy between \acrshort{tdeed} and mamba}
 \label{sec:experiment1}
 The first experiment compares accuracy from \acrshort{tdeed} and \acrshort{vms}. 
 
@@ -16,7 +16,9 @@ We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_d
     \item \acrshort{tdeed} with four matches for training and one for validation (equivalent to 80\%/20\%).  
 \end{itemize}
 
-All models used default hyperparameters from their original papers. Performance was measured by mean Average Precision (mAP) and mAP@50 under a \(\pm 1\) s tolerance window.
+All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm 1\) s tolerance window.
+
+\todo{talk about annotation edit? mentioned in method}
 
 \subsection{Results}
 \label{ssec_ex1_results}
@@ -24,11 +26,11 @@ All models used default hyperparameters from their original papers. Performance 
     \centering
     \begin{tabular}{lcc}
         \toprule
-        Model                   & average \acrshort{map} (\%)  & \acrshort{map}@50 (\%) \\
+        Model & average \acrshort{map} (\%)  & \acrshort{map}@50 (\%) \\
         \midrule
-        \acrshort{tdeed}                  &  \textemdash      & 43.00       \\
-        \acrshort{vms}-80\_20 (Mamba-S6)   &  \textbf{51.42}   & \textbf{49.38} \\
-        \acrshort{vms}-70\_30 (Mamba-S6)   & 48.73            & 46.46       \\
+        \acrshort{tdeed} &  \textemdash & 47.65\\
+        \acrshort{vms}-80\_20 (Mamba-\acrshort{s6})   &  \textbf{51.42}   & \textbf{49.38} \\
+        \acrshort{vms}-70\_30 (Mamba-\acrshort{s6})   & 48.73 & 46.46 \\
         \bottomrule
     \end{tabular}
     \caption{Accuracy comparison on SoccerNet-V2.}
@@ -36,6 +38,7 @@ All models used default hyperparameters from their original papers. Performance 
 \end{table}
 \todo{fill in correct values of tdeed}
 \todo{values for vms might be incorrect, run new training to get numbers}
+\todo{vms is trained on the test data from tdeed, unfair}
 
 \subsection{Discussion}
 \label{ssec:ex1_discussion}
@@ -59,8 +62,7 @@ MAMBA training took <3 hours, but data extraction was slow. However also image e
 \section{Experiment 3: Feature increase}
 \label{sec:experiment3}
 To find out how much the size if the feature vector matters, a model with 1408 features and one with 3200 features is trained on the THUMOS-14 dataset.
-InternVideo features have a size of 3200, and is the backbone of the \acrshort{sota} models on paperswithcode.
-The \acrshort{vms} models trained on soccernet use 1408 features. 
+InternVideo features have a size of 3200, and is the backbone of the \acrshort{sota} models on paperswithcode. The \acrshort{vms} models trained on soccernet use 1408 features. Both models are trained with a Tesla V100-PCIE-32GB.
 
 
 \subsection{Setup}
@@ -73,7 +75,14 @@ Both models trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
 
 \subsection{Results}
 \label{ssec:ex3_results}
-The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min, respectively.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{figures/1408_3200_val.png}
+    \caption{Validation per epoch for 3200 features (red) and 1408 features(grey). }
+    \label{fig:ex3_val}
+\end{figure}
+The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min respectively, which is an increase of \(\approx11\%\). \autoref{fig:ex3_val} 
 
 \todo{add wandb plots}
 
@@ -91,7 +100,7 @@ The goal is to find the best hyperparameters for the \acrshort{vms} model on the
 \subsection{Setup}
 \label{ssec:ex4_setup}
 
-\acrlong{wandb} is used to track the hyperparameters and the results for the \acrshort{vms} model trained on SoccerNet-V2 dataset with a 70 \(\%\)-30\(\%\) validation split. A Bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters. The hyperparameters related to the dataset are the only ones modified. Full details about the hyperparameters can be found in \autoref{label:app_sweep}.
+\acrlong{wandb} is used to track the hyperparameters and the results for the \acrshort{vms} model trained on SoccerNet-V2 dataset with a 70 \(\%\)-30\(\%\) validation split. All 7 videos of the SoccerNet-V2-format is considered in this approach, including the train, the validation and the testing videos. A Bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters. The hyperparameters related to the dataset are the only ones modified. Full details about the hyperparameters can be found in \autoref{label:app_sweep}.
 
 A total of 210 runs across three sweeps of 70 runs each were completed. Because of the fast convergence of \acrshort{vms}--models hyperparameter search was an efficient process. 
 
