@@ -1,6 +1,6 @@
 \chapter{Experiments and Results}
 \label{chap:experiments}
-This chapter presents a series of experiments designed to answer the research questions posed in Chapter~\ref{chap:intro}, focusing on the evaluation of the Mamba-S6 (\acrshort{vms}) model for temporal event spotting in football video. The accuracy and runtime is compared against the \acrshort{tdeed} baseline, investigate the impact of feature dimensionality, and perform a Bayesian hyperparameter sweep to optimize performance.
+This chapter presents a series of experiments designed to answer the research questions posed in \autoref{chap:intro}, focusing on the evaluation of the Mamba-\acrshort{s6} (\acrshort{vms}) model for temporal event spotting in football video. The accuracy and runtime are compared against the \acrshort{tdeed} baseline, I investigate the impact of feature dimensionality, and perform a Bayesian hyperparameter sweep to optimize performance.
 
 
 \section{Experiment 1: Compare accuracy between \acrshort{tdeed} and mamba}
@@ -68,34 +68,40 @@ InternVideo features have a size of 3200, and is the backbone of the \acrshort{s
 \subsection{Setup}
 \label{ssec:ex3_setup}
 
-To assess the effect of embedding size, two \acrshort{vms} instances were trained on THUMOS-14 \cite{dataset:thumos}: one using 1,408-dimensional VideoMAE features and one using 3,200-dimensional InternVideo embeddings. All other settings, annotations and hyperparameters, remained identical.
+To assess the effect of embedding size, two \acrshort{vms} instances were trained on THUMOS-14\cite{dataset:thumos}: one using 1,408-dimensional VideoMAE features and one using 3,200-dimensional InternVideo embeddings. All other settings, annotations, and hyperparameters remained identical.
 
 The metrics are tracked using \acrlong{wandb} and console logs.
-Both models trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
+Both models were trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
 
 \subsection{Results}
 \label{ssec:ex3_results}
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/1408_3200_val.png}
+    \includegraphics[width=0.75\linewidth]{figures/1408_3200_val.png}
     \caption{Validation per epoch for 3200 features (red) and 1408 features(grey). }
     \label{fig:ex3_val}
 \end{figure}
 The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min respectively, which is an increase of \(\approx11\%\). \autoref{fig:ex3_val} 
 
-\todo{add wandb plots}
 
 \subsection{Discussion}
 \label{ssec:ex3_discussion}
+
+blessing of dimensionality. extra important in football or less important. More features => more probable for them to be linearly separable
+
+favorable trade off(in time)
+
 hyperparameters could favor the newer weights
+
+both seem to hit a ceiling at epoch ~32
 
 
 \section{Experiment 4: Hyperparameter optimization}
 \label{sec:experiment4}
 
 The fourth experiment is a hyperparameter optimization experiment.
-The goal is to find the best hyperparameters for the \acrshort{vms} model on the soccernet dataset.
+The goal is to find the best hyperparameters for the \acrshort{vms} model on the SoccerNet dataset.
 
 \subsection{Setup}
 \label{ssec:ex4_setup}
@@ -111,7 +117,7 @@ A total of 210 runs across three sweeps of 70 runs each were completed. Because 
 \begin{figure}
     \centering
     \includegraphics[width=1\linewidth]{figures/sweep_two_best.png}
-    \caption{The hyperparameters of the two best results(yellow) compared to all runs(grey) in the thrid sweep. }
+    \caption{The hyperparameters of the two best results(yellow) compared to all runs (grey) in the thrid sweep. }
     \label{fig:sweep_best_two}
 \end{figure}
 
@@ -123,18 +129,37 @@ Interpreting the results to create a hyperparameter configuration, as explained 
 
 \subsection{Discussion}
 \label{ssec:ex4_discussion}
-lower learning rate because football is homogeneous
+
+Multiple local optima in the search space. 
+
+\improvement{image displaying local optima}
+
+lower learning rate because football is homogeneous. many events are very similar
 only tune dataset variables
 negative/neutral results. why? i think its because features are trained to match the preprocessing timeline. some really good runs
 something funny is up with the learning rate
+overfit on 30 percent validation
 
 
 
 \section{Experiment 5: T-DEED with and without joint training}
 \subsection{Setup}
 \label{ssec:ex5_setup}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/500_7_val_compare.png}
+    \caption{Validation per epoch for the model trained with joint training (507 videos) in brown and the model trained without joint training (purple).}
+    \label{fig:500_7_val_compare}
+\end{figure}
+\subsection{Results}
+\label{ssec:ex5_results}
+
 
 another experiment where I just run array jobs with different train/val splits
+
+\subsection{Discussion}
+\label{ssec:ex5_discussion}
+
 
 \section{Summary}
 vms runs on any GPU, but tdeed needs a lot of memory and only runs on premium GPUs.

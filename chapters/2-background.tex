@@ -34,25 +34,22 @@ Football analytics rely on two primary data streams:
 
 \textcite{wang_tactic_ai_2024} applies deep graph neural networks to corners, a discrete sub-event of play. They deliver strong predictive and generalizable performance and have helped Liverpool FC succeed. 
 
-\improvement{mention other datasets}
-\improvement{move datasets used to method}
-\unsure{maybe just a bullet list of existing sets}
 \section{Datasets}
 \label{sec:datasets}
 
-\textcite{survey_of_survey} present comprehensive tables of sports action datasets. \textcite{seweryn_survey_2023} detail football‐specific collections.
+\textcite{survey_of_survey} presents comprehensive tables of sports action datasets. \textcite{seweryn_survey_2023} detail football‐specific collections.
 
 \subsection{SoccerNet}
 
-\textcite{deliege_soccernet-v2_dataset_2021} introduce SoccerNet-V2, offering 500 match recordings annotated with 17 football events action spotting.
+\textcite{deliege_soccernet-v2_dataset_2021} introduces SoccerNet-V2, offering 500 match recordings annotated with 17 football events.
 
-In 2024 \textcite{deliege_soccernet-v2_dataset_2021} released 7 new games annotated with 12 ball events and team annotation. There are about 6 times the events in these 7 videos per video compared to the original 500. 
+In 2024, \textcite{deliege_soccernet-v2_dataset_2021} released 7 new games annotated with 12 ball events and team annotations. There are about 6 times as many events in these 7 videos per video compared to the original 500. 
 
 \subsection{UCF101}
-UCF101 \cite{dataset:UCF101} comprises 13 320 YouTube clips spanning 101 human action categories. It serves as a standard benchmark for trimmed action recognition.
+UCF101 \cite{dataset:UCF101} comprises 13,320 YouTube clips spanning 101 human action categories. It serves as a standard benchmark for trimmed action recognition.
 
 \subsection{THUMOS}
-THUMOS \cite{dataset:thumos} includes over 13 000 temporally annotated instances from 20 action classes. It evaluates detection in untrimmed videos.
+THUMOS \cite{dataset:thumos} includes over 13,000 temporally annotated instances from 20 action classes. It evaluates detection in untrimmed videos.
 
 \subsection{HACS}
 HACS \cite{dataset:hacs} comprises 1.55 million short clips across 200 action classes. It provides both trimmed classification clips and untrimmed temporal segments.
@@ -65,7 +62,7 @@ The FineAction dataset \cite{dataset:fineaction} comprises 103\,K temporal insta
 Kinetics-400/600/700 \cite{dataset:kinetics} offers hundreds of thousands of 10-second clips labeled with 400–700 action classes. The clips are from YouTube.
 
 \subsection{FineAction}
-FineAction \cite{dataset:fineaction} provides 10 000+ short clips of soccer actions annotated at frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis.
+FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer actions annotated at the frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis.
 
 
 
@@ -73,7 +70,7 @@ FineAction \cite{dataset:fineaction} provides 10 000+ short clips of soccer acti
 % \label{sec:datasets}
 
 % \textcite
-% A number of large‐scale video datasets have been developed to advance action recognition research. \textcite{survey_of_survey} provide comprehensive overviews of available sports‐related action datasets (see their Tables 4 & 5), while Seweryn et al.~\cite{seweryn_survey_2023} focus specifically on football‐centric collections. Below we summarize the main datasets examined in this thesis, ordered by their relevance and scale.
+% A number of large‐scale video datasets have been developed to advance action recognition research. \textcite{survey_of_survey} provides comprehensive overviews of available sports‐related action datasets (see their Tables 4 & 5), while Seweryn et al.~\cite{seweryn_survey_2023} focus specifically on football‐centric collections. Below, we summarize the main datasets examined in this thesis, ordered by their relevance and scale.
 
 
 % \subsection{SoccerNet-V2}
@@ -267,16 +264,16 @@ Limitations of vision transformers include:
 \end{itemize}
 
 
-\subsubsection{META Segment Anything Model 2}
+\subsubsection{META \acrlong{sam}}
 \label{ssec:meta_sam2}
-
-The Segment Anything Model (SAM) was first introduced by Kirillov et al.\ \cite{kirillov_segment_2023} in 2023 as a promptable, foundation segmentation model.  Its core design splits the task into three components:
+\unsure{Move to back of chapter, or reference this part in the back of the chapter?}
+The \acrfull{sam} was first introduced by \textcite{kirillov_segment_2023} in 2023 as a promptable, foundation segmentation model.  Its core design splits the task into three components:
 \begin{itemize}
     \item \textbf{Image Encoder:} A vision transformer (ViT) pretrained on masked autoencoding, which produces dense feature maps for any input image.
     \item \textbf{Prompt Encoder:} A lightweight module that maps interactive prompts (points, bounding boxes or free-form masks) into positional embeddings.
     \item \textbf{Mask Decoder:} A small transformer that fuses image and prompt embeddings to output segmentation masks at multiple scales.
 \end{itemize}
-SAM was trained on the enormous SA-1B dataset (over 11 M images and 1.1 B masks) in a semi-automated pipeline, yielding strong zero-shot performance across diverse domains without any finetuning.
+\acrshort{sam} was trained on the enormous SA-1B dataset (over 11 M images and 1.1 B masks) in a semi-automated pipeline, yielding strong zero-shot performance across diverse domains without any finetuning.
 
 Building on this success, Ravi et al.\ \cite{ravi_sam_nodate} proposed \emph{SAM-2} (sometimes called Video \acrshort{sam}), which extends \acrshort{sam} to sequential video data via a \emph{memory-augmented attention} mechanism:
 \begin{itemize}
@@ -284,14 +281,19 @@ Building on this success, Ravi et al.\ \cite{ravi_sam_nodate} proposed \emph{SAM
     \item \textbf{Memory Attention:} A cross-frame attention layer that retains a compact set of “memory tokens” summarizing past masks, enabling consistent tracking of object masks over time.
     \item \textbf{Interactive Prompts in Video:} Mouse clicks and bounding-box prompts can be applied on any frame, and propagated forward or backward via the memory bank.
 \end{itemize}
-The authors also released SA-V, a large video-segmentation dataset with millions of frame-mask pairs, demonstrating that \acrshort{sam}-2 achieves near real-time inference (15-30 fps) and high temporal consistency on common benchmarks.
+The authors also released SA-V, a large video-segmentation dataset with millions of frame-mask pairs, demonstrating that \acrshort{sam}-2 achieves near real-time inference (15-30 fps) and high temporal consistency on common benchmarks. \autoref{fig:sa-v} shows the masklets in the dataset. 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{figures/sam_2.png}
+    \caption{Examples from the SA-V dataset. Figure 4 in the \acrshort{sam}-2 paper\cite{ravi_sam_nodate}.}
+    \label{fig:sa-v}
+\end{figure}
 
-Together, the original \acrshort{sam} and its video-centric successor exemplify a new paradigm in segmentation: a single, promtable\unsure{promtable or promtable?} transformer that can be deployed off-the-shelf, adapted to novel objects or domains with minimal human guidance, and extended from static images to dynamic scenes. 
+Together, the original \acrshort{sam} and its video-centric successor exemplify a new paradigm in segmentation: a single, promptable transformer that can be deployed off-the-shelf, adapted to novel objects or domains with minimal human guidance, and extended from static images to dynamic scenes. 
 
 \improvement{To increase readability I this section needs more figures, not only here}
 \subsection{State-Space Models}
 \label{ssec:state_space_models}
-\improvement{Temporal Modeling Techniques” (RNN, TCN, TSN, Transformers) can be summarized in Background—only the variants you actually implement/test (e.g. your MAMBA variant, TSN baseline) get full detail in Methods}
 % \acrfull{ssm} offer a continuous-time representation of sequential data via a latent state \(h(t)\in\mathbb{R}^N\):
 % \begin{align}
 %     \frac{\mathrm{d}h(t)}{\mathrm{d}t} &= A\,h(t) + B\,x(t),  \label{eq:ssm_continuous1}\\
@@ -333,7 +335,7 @@ In supervised learning, models are trained on labeled data comprising input-outp
 \[
 \theta \leftarrow \theta - \eta \,\nabla_{\theta}J\bigl(y_i,\hat y_i\bigr),
 \]
-where \(\eta\) is the learning rate. Updates continue over the dataset until a stopping condition is met (e.g., maximum epochs, target loss, or early stopping).
+where \(\eta\) is the learning rate. Updatthe es continue over the dataset until a stopping condition is met (e.g., maximum epochs, target loss, or early stopping).
 
 \paragraph{Unsupervised Learning}
 Unsupervised learning discovers structure from unlabeled data without explicit targets. Common tasks include clustering, association rule learning, and dimensionality reduction. \unsure{should I write just about supervised learning?}
@@ -378,8 +380,8 @@ Knowledge distillation trains a compact \emph{student} model to mimic a larger, 
 However, distillation also has limitations:
 \begin{itemize}
     \item A weak teacher leads to a weak student—distillation cannot exceed the teacher's performance.
-    \item Training both teacher and student increases total computational cost.
-    \item Some fine-grained knowledge may not transfer fully, which can hurt the student's generalization on new data.
+    \item Training both teacher and student increases the total computational cost.
+    \item Some fine-grained knowledge may not transfer fully, which can hurt the student's generalization to new data.
 \end{itemize}
 
 
@@ -478,14 +480,14 @@ By sparsely sampling over long videos, TSN balances efficiency and temporal cove
 
 \subsection{Spotting-Level Metrics}
 \subsubsection{Mean Average Precision (mAP)}
-Each predicted timestamp is treated with $\hat t_j$ with class $\hat c_j$ as a detection. A true positive occurs if there exists a ground-truth event $(t_i,c_i)$ such that $\hat c_j = c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1\,s). All unmatched predictions are false positives, and missed ground-truth events are false negatives. We compute precision-recall curves per class and report
+Each predicted timestamp is treated with $\hat t_j$ with class $\hat c_j$ as a detection. A true positive occurs if there exists a ground-truth event $(t_i,c_i)$ such that $\hat c_j = c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1\,s). All unmatched predictions are false positives, and missed ground-truth events are false negatives. We compute precision-recall curves per class and report.
 \[
 \mathrm{AP}_c = \int_{0}^{1} p_c(r)\,\mathrm{d}r,\quad
 \mathrm{mAP} = \frac{1}{|\mathcal{C}|}\sum_{c\in\mathcal{C}}\mathrm{AP}_c.
 \]
 
 \subsubsection{Precision / Recall @ Tolerance}
-In addition to mAP, we report precision and recall at fixed tolerance levels $\Delta\in\{0.5,1.0,2.0\}$\,s. This highlights the trade-off between temporal precision (small $\Delta$) and detection rate.
+In addition to \acrshort{map}, we report precision and recall at fixed tolerance levels $\Delta\in\{0.5,1.0,2.0\}$\,s. This highlights the trade-off between temporal precision (small $\Delta$) and detection rate.
 
 \subsection{Localization-Level Metrics}
 \subsubsection{\acrfull{iou}}
@@ -499,10 +501,6 @@ A segment is correct if $\mathrm{IoU}\!\ge\theta$ and $\hat c_j=c_i$.
 \subsubsection{mAP @ IoU Thresholds}
 \acrshort{map} is computed as above, replacing the tolerance criterion $|\hat t_j - t_i|\le\Delta$ with $\mathrm{IoU}\ge\theta$ for $\theta\in\{0.3,0.5,0.7\}$. This compares single-timestamp spotting to full localization performance.
 
-\subsection{Computational Metrics} 
-\subsubsection{Inference Latency} 
-Measure time lol. But we already know that MAMBA is faster \unsure{is this a necessary topic, to talk about how to measure time}
-\todo{write if necessary}
 
 \subsection{Metrics Correlation and Importance}
 
