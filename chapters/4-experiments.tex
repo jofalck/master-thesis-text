@@ -41,7 +41,6 @@ The \acrshort{vms} model (Mamba-\acrshort{s6}) had an average \acrshort{map}, ac
 
 Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 of \textbf{47.65\%}. Whereas the corresponding test metric for the \acrshort{vms} model is not provided or calculated. There is a significant disparity between \acrshort{tdeed}'s validation and test performance. This is primarily due to differences in stride during prediction, with the validation model using a stride of two, effectively halving its temporal resolution compared to the test evaluation. 
 
-% Furthermore, it is mentioned that \acrshort{tdeed} incorporates significant postprocessing, as illustrated in \autoref{tab:results_ex1}. The discussion also posits that the fine-grained nature of the action spotting task, with its narrow \( \pm 1 \) second tolerance window, is inherently well-suited to the \acrshort{tdeed} model's design.
 
 \subsection{Discussion}
 \label{ssec:ex1_discussion}
@@ -49,7 +48,6 @@ Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 
 The large difference in validation \acrshort{map}@50 for \acrshort{tdeed} could be a result of lacking postprocessing. \acrshort{tdeed} uses two different functions for predicting the test \acrshort{map} and the validation \acrshort{map}. The test evaluator applies soft non-maximum suppression to remove redundant detections, while the validation does not remove redundant predictions. In addition to this, the validation predicts with a stride of \(2\), but the test has a stride of \(1\). With \(fps=25\) and a \(tolerance = \pm 1s\), this reduction in temporal resolution hinders the predictions from hitting the tolerance window. 
 
 
-% \acrshort{vms} does little preprocessing, and its only configurable parameter was the top \(k\) classes to predict in each step. \acrshort{vms} predicts the likelihood of different action classes being present anywhere in the entire video. \autoref{fig:topk} shows that the baseline with \(topk=2\) and the run with \(topk=12\) behaved quite similarly. The baseline with \(topk=12\) is the same as in \autoref{tab:results_ex1}, while a run with \(topk=2\) achieved 45.85\% average \acrshort{map}. An explanation for the similarity could be the very skewed distribution of classes in the annotations as seen in \autoref{fig:soccernet_dist}. The two classes, PASS and DRIVE, add up to 75\% of total annotations. This can explain the ignorance towards the \(topk\) variable. 
 
 The \acrshort{vms} model employs a form of post-processing. \acrshort{vms} does little preprocessing, and its only configurable parameter was the top (k) classes to predict in each step. \acrshort{vms} predicts the likelihood of different action classes being present anywhere in the entire video. 
 
@@ -73,8 +71,6 @@ These two types of post-processing are not mutually exclusive and can be complem
 Using a shorter stride for validation is a technique to increase training speed. In the case of the \acrshort{tdeed} implemented for SoccerNet, the testing phase is weighted more heavily than validation, as it is the submission to a challenge. This is an oversight; a run with \(STRIDE=1\) was run, but not completed in time for discussion. This oversight could be a hindrance to the direct comparison between the validation scores.\improvement{a run with stride=1 is run, but when will it complete? Late according to squeue --start --me}
 
 
-% You suggest the "fine-grained nature of the action spotting task...is inherently well-suited to the \acrshort{tdeed} model's design." Could you expand on which specific design elements of \acrshort{tdeed} make it suitable for such tasks?
-
 The temporal discriminability enhancer part of the \acrfull{tdeed} has specialized strategies and components designed to:
 \begin{itemize}
     \item improve the distinction between similar actions
@@ -84,20 +80,11 @@ The temporal discriminability enhancer part of the \acrfull{tdeed} has specializ
 
 The focus on enhancing temporal distinctions is one of the keys to success in tasks where small variations in timing or appearance can result in different categories. 
 
-% How do the architectural differences between \acrshort{vms} (Mamba-\acrshort{s6}) and \acrshort{tdeed} relate to their observed performance characteristics in this experiment?
-
 In contrast, Mamba's design captures long-range contexts and provides a broader understanding of the whole video. It is also meant to learn quicker with linear complexity and require less data. It is my theory that with a stronger post-processing pipeline, the \acrshort{map} advantage would be larger. 
-
-% The \acrshort{tdeed} model used a specific train/validation split of 4 matches to 1. How comparable is this to the 80\%/20\% split used for the \acrshort{vms} model in terms of data representativeness or potential biases?
 
 The validation set size of a single football game can be problematic. Football games can vary significantly due to teams, play styles, event frequency, and referee threshold for giving fouls, to name a few. There is a risk of bias from the distribution of actions within the validation game. If the validation game is "easy" or "hard", that would severely influence the validation score. A split of 80\% to 20\% validates on one game and trains on four in total. But when the game is split into 90 sections, which are randomly assigned to each category, the validation set is more robust. The result will be more transferable and generalizable. 
 
-% Given the mixed results (VMS better on some metrics, T-DEED on another), what are the practical takeaways? When might one model be preferred over the other based on these findings?
-
 \acrshort{vms} runs on any \acrshort{gpu}, but \acrshort{tdeed} needs a lot of memory and only runs on premium GPUs. If computational resources (especially GPU memory and type) are a limiting factor, \acrshort{vms} is the more practical choice. \acrshort{vms} has a simpler post-processing and a clearer GitHub explaining installation steps, which could be more straightforward to deploy. However, without obvious comparisons, it is hard to pick out clear advantages of one model over the other. 
-
-
-% What are the main limitations of this first experiment that should be acknowledged in the discussion?
 
 The most significant limitation is the absence of the test \acrshort{map}@50 score for the \acrshort{vms} model. This prevents a direct and complete comparison with \acrshort{tdeed} on this crucial metric, which is often considered the primary indicator of performance on unseen test data.
 
@@ -110,7 +97,7 @@ The \acrshort{tdeed} model was evaluated differently for validation and testing.
 
 While \acrshort{tdeed}'s "four matches for training and one for validation" is an 80\%/20\% split, validating on a single match can be less representative and more prone to bias compared to an 80\%/20\% split.
 
-Using "default hyperparameters from their original papers" might not be optimal for the specific SoccerNet-V2 dataset or the fine-grained action spotting task. These defaults might have been tuned for different datasets or tasks, potentially disadvantaging one or both models. This is tackled in \autoref{sec:experiment4}.
+Using default hyperparameters from their original papers" might not be optimal for the specific SoccerNet-V2 dataset or the fine-grained action spotting task. These defaults might have been tuned for different datasets or tasks, potentially disadvantaging one or both models. This is tackled in \autoref{sec:experiment4}.
 
 
 
@@ -120,8 +107,18 @@ Using "default hyperparameters from their original papers" might not be optimal 
 Wall-clock training time for each model on a Tesla A100 \acrshort{gpu} was recorded. Feature extraction was also timed, but separated from the time. \unsure{should I use identical epoch count and batch size?}
 \todo{same number of epochs? Normalize for number of epochs?} 
 
+
+
 \subsection{Setup}
 \label{ssec:ex2_setup}
+
+The same runs as used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' metric for duration is measured. In addition, the preprocessing pipelines for each model is isolated and measured by its own. A validation run is also done to measure the inference time of each model. A100 \acrshort{gpu}s are used, of size 80 GB or 40 GB, with an indifference to interpret the results. 
+
+\subsection{Results}
+\label{ssec:ex2_result}
+
+\subsection{Discussion}
+\label{ssec:ex2_discussion}
 
 We know Mamba is faster than the Vit-based tdeed
 
@@ -183,7 +180,7 @@ A total of 210 runs across three sweeps of 70 runs each were completed. Because 
 \subsection{Results}
 \label{ssec:ex4_results}
 
-\begin{figure}
+\begin{figure}[ht]
     \centering
     \includegraphics[width=1\linewidth]{figures/sweep_two_best.png}
     \caption{The hyperparameters of the two best results(yellow) compared to all runs (grey) in the thrid sweep. }
@@ -199,16 +196,138 @@ Interpreting the results to create a hyperparameter configuration, as explained 
 \subsection{Discussion}
 \label{ssec:ex4_discussion}
 
-Multiple local optima in the search space. 
+% You found that translating the sweep into a single, consistently better configuration "didn't prove useful," despite some configurations performing "exceptionally better." Why do you believe this was the case?
 
-\improvement{image displaying local optima}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/local_minima.png}
+    \caption{A plot of local minima from \cite{fig:multiple_local_minima}. It is not related to any experiments done but its purpose is as a visualization.}
+    \label{fig:local_minima}
+\end{figure}
 
-lower learning rate because football is homogeneous. many events are very similar
-only tune dataset variables
-negative/neutral results. why? i think its because features are trained to match the preprocessing timeline. some really good runs
-something funny is up with the learning rate
-overfit on 30 percent validation
+It was difficult to translate the sweep into a single consistently better configuration, despite some exceptional outliers. This likely stems from a few different factors. \unsure{multiple local minima, describe in background? bad figure?}
 
+The hyperparameter space might contain multiple local optima. This means there isn't a "peak of performance", but several combinations of hyperparameters cause good results. Picking an average and combining parameters from distinct optima can result in a configuration. For the sake of visualization, look at \autoref{fig:local_minima} and imagine the summits are optima. Picking an average between them will perform worse than individual peaks. 
+
+Hyperparameters often interact in complex and non-linear ways. The success of an \emph{exceptionally better} configuration might depend on a specific interplay between multiple parameters. Changing one parameter in an attempt to generalize or create a "single best" might disrupt this delicate balance, leading to suboptimal performance. The fact that the best two runs had "quite different parameters" (as seen in \autoref{fig:sweep_best_two} supports this idea of different, successful combinations rather than a single clear trend.
+
+
+% What does the observation that the two best runs in the last sweep had "quite different parameters" (as shown in \autoref{fig:sweep_best_two}) imply about the sensitivity of the \acrshort{vms} model to its hyperparameters on the SoccerNet dataset?
+These two runs can imply that there exist multiple good configurations. The interaction between the parameters matters more than the individual values. A specific value for one hyperparameter might work well only in conjunction with others. The two good runs in \autoref{fig:sweep_best_two} could represent two different, good synergies. 
+
+% How does \autoref{fig:sweep_best_two} support your hypothesis of "Multiple local optima in the search space"? What are the broader challenges or implications of such a landscape for hyperparameter tuning?
+
+If the hyperparameter landscape had a single, dominant global optimum, one would expect the best-performing runs to converge towards similar hyperparameter values. The fact that two distinct sets of parameters yield top results suggests that there are at least two separate "peaks" or favorable regions (local optima) in the search space where the model performs exceptionally well. The optimization process has found these different peaks, rather than a single point.
+
+This implies some broader challenges for hyperparameter tuning:
+
+\begin{itemize}
+    \item Difficulty in Identifying a Single "Best" Configuration: It becomes hard to declare one set of hyperparameters as universally optimal. What works best might be one of several good combinations.
+    \item Increased Search Complexity: Optimization algorithms can easily get "stuck" in a local optimum, potentially missing a better global optimum or other strong local optima. This necessitates more sophisticated search strategies or more extensive random sampling to explore the space adequately.
+    \item Sensitivity to Initial Conditions: The starting point of a hyperparameter search can heavily influence which local optimum is discovered.
+    \item Challenges in Interpretation: It's harder to draw simple conclusions about the individual impact of each hyperparameter, as their optimal values might be highly dependent on the values of other interacting parameters, leading to different "optimal" combinations.
+    \item Reproducibility and Generalization: A specific local optimum found might be very specific to the exact dataset split or even the random seed used during the sweep. Generalizing these findings to slightly different conditions can be more challenging.
+    \item 
+\end{itemize}
+
+
+% You noted "something funny is up with the learning rate" and hypothesized a "lower learning rate because football is homogeneous." What specific trends or behaviors in the learning rate did the sweeps reveal to support this? Were there particular ranges that performed better or worse?
+
+As seen in \autoref{app:sweep_3} the best runs in the end shows that the learning rate of the top-performing runs were quite low. The Bayesian search preferred exploring lower learning rates, and especially the thrid sweep showed low learning rates performed best. In the last sweep, learning rate had the highest importance and highest absolute correlation. The correlation was negative. 
+
+Homogeneous data like football actions, where events can be visually similar, a lower learning rate allows the model to make finer adjustments. This can help it learn the subtle distinguishing features without overshooting the optimal weight configurations in the loss landscape, leading to better discrimination between closely related actions.
+
+% You decided to "only tune dataset variables." Which specific variables were these? Based on the 210 runs, which of these dataset-specific hyperparameters appeared to have the most significant impact on performance, and which seemed less critical?
+
+The hyperparameters that were tuned are:
+\begin{itemize}
+    \item learning\_rate
+    \item weight\_decay
+    \item drop\_path 
+    \item batch\_size (explored in Sweep 1, then fixed)
+    \item voting\_thresh
+    \item trunc\_thresh
+    \item crop\_ratio (introduced in Sweep 3)
+    \item multiclass\_nms (evaluated in Sweep 3)
+    \item max\_seq\_len (explored initially, then ignored)
+    \item pre\_nms\_topk (explored initially, then ignored)
+    \item clip\_grad\_l2norm (explored initially, then ignored)
+    \item 
+\end{itemize}
+
+\textbf{Learning rate} appeared to be the most significant value. While its correlation varied, Sweep 3 indicated that the best performance was concentrated in a very specific low range (around 0.00003-0.00004). 
+
+\textbf{Crop ratio} showed clear performance differences between its settings. As the data augmentation parameter, it was expected to have a higher impact than it did. 
+
+\textbf{droppath} was the most important with the least correlation in the first sweep. It was tuned in Sweep 2 and selected as a fixed value for Sweep 3. 
+
+Sweep 1 deemed \textbf{batchsize} to be unimportant. Ideal values were found for voting\_thresh and trunc\_thresh in Sweep 3. 
+
+% Were there any other hyperparameters (or ranges) that consistently led to better or worse results, or any notable interactions between parameters observed from the wandb logs?
+
+% The interpreted configuration resulted in an average \acrshort{map} of (46.77\%). How does this compare to your baseline \acrshort{vms} performance in Experiment 1 (e.g., 45.99\%)? The default parameters provided an average map of 48.73\%. The best run in the sweep had 49.18\% Is this improvement practically significant?
+
+The interpreted sweep configuration achieved an average \acrshort{map} of $46.77\%$. Default parameters on the same dataset got $48.73\%$ average \acrshort{map}. This is a significant decrease in performance of almost $2\%$. When comparing on the same data split (70\%/30\% using all 7 videos), the default hyperparameters outperformed the configuration derived from interpreting the sweep results. This suggests that the process of creating a single "interpreted" set of hyperparameters was not successful in finding a configuration superior to the defaults for this specific dataset setup.
+
+The best run in the sweep got a $49.18\%$ average \acrshort{map}. That is $2.41\%$ higher than the interpretation and $0.45\%$ higher than the default parameters. It identifies that the sweep identified some configurations that outperformed the default, but an interpreted result did not exist. 
+
+
+% You suspect "negative/neutral results" might be because "features are trained to match the preprocessing timeline." Could you elaborate on this? How might the pre-trained nature of the features interact with the dataset-specific hyperparameters you were tuning?
+
+The features from \acrshort{vmae} are implicitly optimized to represent video information based on the original preprocessing pipeline. The ability to improve performance could be limited if the features are "happiest" when processed in a way that mirrors the feature extraction. It could be that the dataset hyperparameters are tuned to the features structure, not the features content, to some extent. The tuning might then be exploring variations that don't fundamentally alter or improve upon the information already captured by the features. \unsure{it makes sense to me, but is a bit hard to read. i mean to tell that parameters fit preprocessing and not soccer data}
+
+% Could the modest overall improvement also suggest that the default hyperparameters for \acrshort{vms} are already reasonably well-optimized for this task, or that the search space explored didn't contain dramatically better configurations?
+
+results indicate that while minor gains are possible through extensive tuning, the default \acrshort{vms} hyperparameters seem to be a very effective starting point for the SoccerNet dataset. The hyperparameter space explored, while yielding some improvements, did not reveal overwhelmingly superior configurations.
+
+% What specific evidence from the sweeps led to the concern about "overfit on 30 percent validation"? For instance, how did the training loss/metrics compare to validation loss/metrics for high-performing runs versus others?
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/plateu_sweep.png}
+    \caption{Validation plotted against steps for the latest runs in Sweep 3. }
+    \label{fig:plateu_sweep}
+\end{figure}
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/plateu_loss.png}
+    \caption{Training loss plotted against steps for the latest runs in Sweep 3.}
+    \label{fig:plateu_loss}
+\end{figure}
+The general trend of the sweep was for the runs to plateau relatively early, as seen in \autoref{fig:plateu_sweep}. At the same time, the loss was relatively low and stable. This indicates the model stops generalizing to validation data and fits to noise in training data.
+
+% Why was a Bayesian optimization algorithm chosen? Given your findings (e.g., multiple local optima), do you believe this was the most suitable approach, or might other methods (like random search, or a more targeted search after initial exploration) have been beneficial?
+
+Bayesian optimization aims to find the best hyperparameters in fewer iterations. The algorithm is suited for a landscape with multiple optima, because there is no inherent assumption of a single optimum. As seen in the Sweeps it found some exceptionally good runs compared to the average. 
+
+Random search is effective for initial exploration. It has a use case if the initial parameters are considered to be close to a local optima which is not the global. I had no reason to believe this, neither the motivation of exploring enough variables compared to the original authors\cite{li_videomamba_2024}.
+
+% Were the 210 runs across three sweeps sufficient to thoroughly explore the hyperparameter space, or do you feel more runs could have yielded further insights?
+
+It might have been beneficial to start with a more extensive exploration before running the Bayesian search. This would require a lot more than the 210 runs, on \acrshort{idun} which was already under pressure. I find it probable that the default parameters, which are second \acrshort{sota} on the THUMOS benchmark, are close to the global optima. For sustainability both with regards to power usage but also fair usage of the computational resources, I think it is correct to not continue the search. If the results showed a greater increase, it the decision must be reconsidered.
+
+% Despite the difficulty in pinpointing a single "best" configuration, what practical advice or general heuristics for tuning \acrshort{vms} on SoccerNet-like datasets can be derived from your 210 runs?
+
+
+% How do the outcomes of this hyperparameter optimization experiment influence your confidence in, or interpretation of, the results from Experiment 1 (accuracy comparison)?
+
+This experiment increases my confidence in the results of Experiment 1. The experiment proves that the default hyperparameters performs well. The sweeps only provided a slight increase in accuracy, and its interpretation performed worse. It proves the performance reported in Experiment 1 is a fair representation.
+
+Experiment 1 mentioned that \textit{Using default hyperparameters from their original papers might not be optimal for the specific SoccerNet-V2 dataset... potentially disadvantaging one or both models.}\autoref{ssec:ex1_discussion}. Experiment 4 explored this for \acrshort{vms} and found its defaults were already strong. However, \acrshort{tdeed} was not subjected to a similar hyperparameter optimization. Therefore, while there is more confidence that \acrshort{vms}'s default performance is close to its tuned potential on this dataset, the same cannot be said for \acrshort{tdeed}. \acrshort{tdeed} might still have untapped potential if its hyperparameters were similarly optimized for SoccerNet.
+
+
+% What are the key lessons learned from this experiment that will inform subsequent experiments or the final conclusions of your thesis?
+
+To conclude:
+\begin{itemize}
+    \item \textbf{Default Hyperparameters are Robust}: The default hyperparameters for \acrshort{vms} provide a strong baseline. Extensive tuning might only yield marginal gains, suggesting that the original authors provided well-chosen defaults. This implies that for future comparisons or new experiments, starting with defaults is a reasonable approach, and significant deviations in performance are more likely due to other factors (model architecture, data, etc.) than suboptimal default settings.
+    \item \textbf{Hyperparameter Optimization is Complex and Not Always a Silver Bullet}: The search space can have multiple local optima, making it difficult to find a single, universally "best" configuration. Trying to create an "interpreted" best configuration from a sweep might not outperform the defaults or the best individual run found. This cautions against over-reliance on hyperparameter sweeps to unlock performance gains if a model is already well-designed.
+    \item \textbf{Learning Rate is a Key Lever, Especially for Homogeneous Data}: For datasets like SoccerNet, where actions can be visually similar, a lower learning rate appears beneficial. This is a concrete takeaway for tuning \acrshort{vms} on such data.
+    \item \textbf{Pre-trained Features Influence Tuning}: The characteristics of pre-trained input features can constrain the effectiveness of tuning downstream hyperparameters. The features might already be optimized for a certain processing "timeline," limiting how much dataset-specific tuning can improve things.
+    \item \textbf{Resource Constraints and Practicality}: Exhaustive hyperparameter search is computationally expensive. The decision to stop searching needs to be balanced against the potential for gains and available resources, especially if initial results (like strong default performance) suggest diminishing returns.
+    \item \textbf{Impact on Comparative Experiments}: The finding that \acrshort{vms} defaults are strong lends more credibility to comparisons made using these defaults (like in Experiment 1). However, it also highlights that if a competing model wasn't similarly tuned, the comparison might not fully reflect its potential.
+    \item \textbf{Focus on Broader Factors}: Given the modest gains from hyperparameter tuning, other factors like feature quality (Experiment 3), model architecture, data augmentation, and post-processing strategies might offer more significant avenues for performance improvement.
+\end{itemize}
 
 
 \section{Experiment 5: T-DEED with and without joint training}

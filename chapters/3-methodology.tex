@@ -243,6 +243,10 @@ In the experiments, all training hyperparameters and architectural settings are 
 
 I employed \acrshort{wandb} Sweeps to perform Bayesian Optimization for efficient hyperparameter tuning.  A Gaussian Process surrogate modeled the validation \acrshort{map} as a function of learning rate, weight decay, and hidden dimension. Uniform and log-uniform priors were defined over each hyperparameter in the sweep configuration .YAML file. The expected improvement acquisition function guided the selection of promising hyperparameter combinations. 70 trials were run in three iterations. THe 70 runs were in parallel\footnote{All runs were run as individual trainings, and had nothing to do with each other except the \acrshort{wandb} agent designing parameters. } across multiple GPUs to explore the search space while minimizing wall-clock time. All metrics and configuration parameters were logged to \acrshort{wandb}, enabling real-time monitoring and reproducibility. 
 
+% probabilistic model of the objective function (e.g., validation \acrshort{map}) and using an acquisition function to decide which hyperparameters to evaluate next. This approach attempts to balance exploration (trying new, uncertain areas) and exploitation (focusing on areas known to yield good results).
+
+
+
 \section{visualisation}
 
 idk if this deserves a section or subsection but last year the boys had it. i might define more visualisations while I write discussion and results
