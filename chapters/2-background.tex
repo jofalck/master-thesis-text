@@ -37,7 +37,7 @@ Football analytics rely on two primary data streams:
 \section{Datasets}
 \label{sec:datasets}
 
-\textcite{survey_of_survey} presents comprehensive tables of sports action datasets. \textcite{seweryn_survey_2023} detail football‐specific collections.
+\textcite{survey_of_survey} presents comprehensive tables of sports action datasets. \textcite{seweryn_survey_2023} detail football-specific collections.
 
 \subsection{SoccerNet}
 
@@ -59,7 +59,7 @@ The FineAction dataset \cite{dataset:fineaction} comprises 103\,K temporal insta
 
 
 \subsection{Kinetics}
-Kinetics-400/600/700 \cite{dataset:kinetics} offers hundreds of thousands of 10-second clips labeled with 400–700 action classes. The clips are from YouTube.
+Kinetics-400/600/700 \cite{dataset:kinetics} offers hundreds of thousands of 10-second clips labeled with 400-700 action classes. The clips are from YouTube.
 
 \subsection{FineAction}
 FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer actions annotated at the frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis.
@@ -70,7 +70,7 @@ FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer acti
 % \label{sec:datasets}
 
 % \textcite
-% A number of large‐scale video datasets have been developed to advance action recognition research. \textcite{survey_of_survey} provides comprehensive overviews of available sports‐related action datasets (see their Tables 4 & 5), while Seweryn et al.~\cite{seweryn_survey_2023} focus specifically on football‐centric collections. Below, we summarize the main datasets examined in this thesis, ordered by their relevance and scale.
+% A number of large-scale video datasets have been developed to advance action recognition research. \textcite{survey_of_survey} provides comprehensive overviews of available sports-related action datasets (see their Tables 4 & 5), while Seweryn et al.~\cite{seweryn_survey_2023} focus specifically on football-centric collections. Below, we summarize the main datasets examined in this thesis, ordered by their relevance and scale.
 
 
 % \subsection{SoccerNet-V2}
@@ -429,7 +429,7 @@ These approaches enable extraction of features such as joint angles, stride leng
 Action spotting casts each event as a single instant in time, reducing annotation to one timestamp per occurrence. By contrast, action localization requires predicting both start and end times for each action interval and is typically evaluated with temporal \acrfull{iou} metrics. Spotting simplifies supervision and evaluation (via tolerance windows around true timestamps), but it also challenges models to resolve events occurring in close temporal proximity without relying on segment boundaries.
 
 \subsection{Temporal vs.\ Spatiotemporal Tasks}
-Temporal event spotting focuses solely on “when” an action occurs, using global frame or clip‐level features. Spatiotemporal tasks, in comparison, demand joint localization in time and space (e.g.\ frame‐level bounding boxes). The SoccerNet challenge remains in the temporal domain.
+Temporal event spotting focuses solely on “when” an action occurs, using global frame or clip-level features. Spatiotemporal tasks, in comparison, demand joint localization in time and space (e.g.\ frame-level bounding boxes). The SoccerNet challenge remains in the temporal domain.
 
 \subsection{Notation and Task Definition}
 Let

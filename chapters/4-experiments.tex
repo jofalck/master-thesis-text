@@ -18,7 +18,6 @@ We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_d
 
 All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm 1\) s tolerance window.
 
-\todo{talk about annotation edit? mentioned in method}
 
 \subsection{Results}
 \label{ssec:ex1_results}
@@ -68,7 +67,7 @@ These two types of post-processing are not mutually exclusive and can be complem
     \label{fig:topk}
 \end{figure}
 
-Using a shorter stride for validation is a technique to increase training speed. In the case of the \acrshort{tdeed} implemented for SoccerNet, the testing phase is weighted more heavily than validation, as it is the submission to a challenge. This is an oversight; a run with \(STRIDE=1\) was run, but not completed in time for discussion. This oversight could be a hindrance to the direct comparison between the validation scores.\improvement{a run with stride=1 is run, but when will it complete? Late according to squeue --start --me}
+Using a shorter stride for validation is a technique to increase training speed. In the case of the \acrshort{tdeed} implemented for SoccerNet, the testing phase is weighted more heavily than validation, as it is the submission to a challenge. This is an oversight; a run with \(STRIDE=1\) was run, but not completed in time for discussion. This oversight could be a hindrance to the direct comparison between the validation scores. \improvement{this is adressed in experiment 6}
 
 
 The temporal discriminability enhancer part of the \acrfull{tdeed} has specialized strategies and components designed to:
@@ -86,7 +85,7 @@ The validation set size of a single football game can be problematic. Football g
 
 \acrshort{vms} runs on any \acrshort{gpu}, but \acrshort{tdeed} needs a lot of memory and only runs on premium GPUs. If computational resources (especially GPU memory and type) are a limiting factor, \acrshort{vms} is the more practical choice. \acrshort{vms} has a simpler post-processing and a clearer GitHub explaining installation steps, which could be more straightforward to deploy. However, without obvious comparisons, it is hard to pick out clear advantages of one model over the other. 
 
-The most significant limitation is the absence of the test \acrshort{map}@50 score for the \acrshort{vms} model. This prevents a direct and complete comparison with \acrshort{tdeed} on this crucial metric, which is often considered the primary indicator of performance on unseen test data.
+The most significant limitation is the absence of the test \acrshort{map}@50 score for the \acrshort{vms} model. This prevents a direct and complete comparison with \acrshort{tdeed} on this crucial metric, which is often considered the primary performance indicator on unseen test data.
 
 The \acrshort{tdeed} model was evaluated differently for validation and testing. The validation used a stride of two (halving temporal resolution) and lacked significant post-processing (like SNMS). The test evaluation used a smaller stride and included such post-processing. This inconsistency makes it difficult to:
 
@@ -105,14 +104,12 @@ Using default hyperparameters from their original papers" might not be optimal f
 \label{sec:experiment2}
 
 Wall-clock training time for each model on a Tesla A100 \acrshort{gpu} was recorded. Feature extraction was also timed, but separated from the time. \unsure{should I use identical epoch count and batch size?}
-\todo{same number of epochs? Normalize for number of epochs?} 
-
 
 
 \subsection{Setup}
 \label{ssec:ex2_setup}
 
-The same runs as used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' metric for duration is measured. In addition, the preprocessing pipelines for each model is isolated and measured by its own. A validation run is also done to measure the inference time of each model. A100 \acrshort{gpu}s are used, of size 80 GB or 40 GB, with an indifference to interpret the results. 
+The same runs as used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' metric for duration is measured. In addition, the preprocessing pipelines for each model are isolated and measured by its own. A validation run is also done to measure the inference time of each model. A100 \acrshort{gpu}s are used, of size 80 GB or 40 GB, with an indifference to interpret the results. 
 
 \subsection{Results}
 \label{ssec:ex2_result}
@@ -148,7 +145,7 @@ Both models were trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
     \caption{Validation per epoch for 3200 features (red) and 1408 features(grey). }
     \label{fig:ex3_val}
 \end{figure}
-The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min respectively, which is an increase of \(\approx11\%\). \autoref{fig:ex3_val} 
+The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were 1 h 15 min and 1 h 23 min respectively, which is an increase of \(\approx11\%\). In \autoref{fig:ex3_val}, you can see how the model with more features outperformed the lower feature model from the first epoch to the last. 
 
 
 \subsection{Discussion}
@@ -172,7 +169,7 @@ The goal is to find the best hyperparameters for the \acrshort{vms} model on the
 \subsection{Setup}
 \label{ssec:ex4_setup}
 
-\acrlong{wandb} is used to track the hyperparameters and the results for the \acrshort{vms} model trained on SoccerNet-V2 dataset with a 70 \(\%\)-30\(\%\) validation split. All 7 videos of the SoccerNet-V2-format is considered in this approach, including the train, the validation and the testing videos. A Bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters. The hyperparameters related to the dataset are the only ones modified. Full details about the hyperparameters can be found in \autoref{label:app_sweep}.
+\acrlong{wandb} is used to track the hyperparameters and the results for the \acrshort{vms} model trained on SoccerNet-V2 dataset with a 70 \(\%\)-30\(\%\) validation split. All 7 videos of the SoccerNet-V2-format is considered in this approach, including the training, validation, and testing videos. A Bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters. The hyperparameters related to the dataset are the only ones modified. Full details about the hyperparameters can be found in \autoref{app:sweep}.
 
 A total of 210 runs across three sweeps of 70 runs each were completed. Because of the fast convergence of \acrshort{vms}--models hyperparameter search was an efficient process. 
 
@@ -183,15 +180,15 @@ A total of 210 runs across three sweeps of 70 runs each were completed. Because 
 \begin{figure}[ht]
     \centering
     \includegraphics[width=1\linewidth]{figures/sweep_two_best.png}
-    \caption{The hyperparameters of the two best results(yellow) compared to all runs (grey) in the thrid sweep. }
+    \caption{The hyperparameters of the two best results(yellow) compared to all runs (grey) in the third sweep. }
     \label{fig:sweep_best_two}
 \end{figure}
 
-The sweeps showed a slight improvement to the model. 
+The sweeps showed a slight improvement in the model. 
 
-Trying to translate the sweep into a single better configration didn't prove useful, but some configurations performed exceptionally better than the rest. But these configurations that worked well, had quite different parameters and was hard to differ. As seen in \autoref{fig:sweep_best_two}, the hyperparameters of the best and second best run in the last sweep differed significantly in their hyperparameters. 
+Trying to translate the sweep into a single better configuration didn't prove useful, but some configurations performed exceptionally better than the rest. But these configurations that worked well had quite different parameters and were hard to differentiate. As seen in \autoref{fig:sweep_best_two}, the hyperparameters of the best and second-best runs in the last sweep differed significantly in their hyperparameters. 
 
-Interpreting the results to create a hyperparameter configuration, as explained in the \autoref{app:sweep_3} the resulting average \acrshort{map} was \(46.77\%\). 
+Interpreting the results to create a hyperparameter configuration, as explained in the \autoref{app:sweep_3}, the resulting average \acrshort{map} was \(46.77\%\). 
 
 \subsection{Discussion}
 \label{ssec:ex4_discussion}
@@ -201,11 +198,11 @@ Interpreting the results to create a hyperparameter configuration, as explained 
 \begin{figure}
     \centering
     \includegraphics[width=0.75\linewidth]{figures/local_minima.png}
-    \caption{A plot of local minima from \cite{fig:multiple_local_minima}. It is not related to any experiments done but its purpose is as a visualization.}
+    \caption{A plot of local minima from \cite{fig:multiple_local_minima}. It is not related to any experiments done, but its purpose is as a visualization.}
     \label{fig:local_minima}
 \end{figure}
 
-It was difficult to translate the sweep into a single consistently better configuration, despite some exceptional outliers. This likely stems from a few different factors. \unsure{multiple local minima, describe in background? bad figure?}
+It was difficult to translate the sweep into a single, consistently better configuration, despite some exceptional outliers. This likely stems from a few different factors. \unsure{multiple local minima, describe in background? Bad figure?}
 
 The hyperparameter space might contain multiple local optima. This means there isn't a "peak of performance", but several combinations of hyperparameters cause good results. Picking an average and combining parameters from distinct optima can result in a configuration. For the sake of visualization, look at \autoref{fig:local_minima} and imagine the summits are optima. Picking an average between them will perform worse than individual peaks. 
 
@@ -227,7 +224,6 @@ This implies some broader challenges for hyperparameter tuning:
     \item Sensitivity to Initial Conditions: The starting point of a hyperparameter search can heavily influence which local optimum is discovered.
     \item Challenges in Interpretation: It's harder to draw simple conclusions about the individual impact of each hyperparameter, as their optimal values might be highly dependent on the values of other interacting parameters, leading to different "optimal" combinations.
     \item Reproducibility and Generalization: A specific local optimum found might be very specific to the exact dataset split or even the random seed used during the sweep. Generalizing these findings to slightly different conditions can be more challenging.
-    \item 
 \end{itemize}
 
 
@@ -252,7 +248,6 @@ The hyperparameters that were tuned are:
     \item max\_seq\_len (explored initially, then ignored)
     \item pre\_nms\_topk (explored initially, then ignored)
     \item clip\_grad\_l2norm (explored initially, then ignored)
-    \item 
 \end{itemize}
 
 \textbf{Learning rate} appeared to be the most significant value. While its correlation varied, Sweep 3 indicated that the best performance was concentrated in a very specific low range (around 0.00003-0.00004). 
@@ -274,8 +269,7 @@ The best run in the sweep got a $49.18\%$ average \acrshort{map}. That is $2.41\
 
 % You suspect "negative/neutral results" might be because "features are trained to match the preprocessing timeline." Could you elaborate on this? How might the pre-trained nature of the features interact with the dataset-specific hyperparameters you were tuning?
 
-The features from \acrshort{vmae} are implicitly optimized to represent video information based on the original preprocessing pipeline. The ability to improve performance could be limited if the features are "happiest" when processed in a way that mirrors the feature extraction. It could be that the dataset hyperparameters are tuned to the features structure, not the features content, to some extent. The tuning might then be exploring variations that don't fundamentally alter or improve upon the information already captured by the features. \unsure{it makes sense to me, but is a bit hard to read. i mean to tell that parameters fit preprocessing and not soccer data}
-
+The features from \acrshort{vmae} are implicitly optimized to represent video information based on the original preprocessing pipeline. The ability to improve performance could be limited if the features are "happiest" when processed in a way that mirrors the feature extraction. It could be that the dataset hyperparameters are tuned to the features structure, not the features content, to some extent. The tuning might then be exploring variations that don't fundamentally alter or improve upon the information already captured by the features. 
 % Could the modest overall improvement also suggest that the default hyperparameters for \acrshort{vms} are already reasonably well-optimized for this task, or that the search space explored didn't contain dramatically better configurations?
 
 results indicate that while minor gains are possible through extensive tuning, the default \acrshort{vms} hyperparameters seem to be a very effective starting point for the SoccerNet dataset. The hyperparameter space explored, while yielding some improvements, did not reveal overwhelmingly superior configurations.
@@ -349,6 +343,24 @@ another experiment where I just run array jobs with different train/val splits
 
 \subsection{Discussion}
 \label{ssec:ex5_discussion}
+
+\section{Experiment 6: T-DEED with and without better validation}
+
+Tried some runs with better validation, wanted to put it as my own experiment because previous experiments have already been written. I realized while writing them.
+
+Early results seem like stride doesn't matter
+\subsection{Setup}
+\label{ssec:ex6_setup}
+
+
+\subsection{Results}
+\label{ssec:ex6_results}
+
+
+
+\subsection{Discussion}
+\label{ssec:ex6_discussion}
+
 
 
 \section{Summary}
