@@ -16,7 +16,7 @@ We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_d
     \item \acrshort{tdeed} with four matches for training and one for validation (equivalent to 80\%/20\%).  
 \end{itemize}
 
-All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm 1\) s tolerance window.
+All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm1\) s tolerance window.
 
 
 \subsection{Results}
@@ -44,7 +44,7 @@ Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 
 \subsection{Discussion}
 \label{ssec:ex1_discussion}
 
-The large difference in validation \acrshort{map}@50 for \acrshort{tdeed} could result from lacking postprocessing. \acrshort{tdeed} uses two different functions for predicting the test \acrshort{map} and the validation \acrshort{map}. The test evaluator applies soft non-maximum suppression to remove redundant detections, while the validation does not remove redundant predictions. In addition, the validation predicts with a stride of \(2\), but the test has a stride of \(1\). With \(fps=25\) and a \(tolerance = \pm 1s\), this reduction in temporal resolution hinders the predictions from hitting the tolerance window. 
+The large difference in validation \acrshort{map}@50 for \acrshort{tdeed} could result from a lack of postprocessing. \acrshort{tdeed} uses two different functions for predicting the test \acrshort{map} and the validation \acrshort{map}. The test evaluator applies soft non-maximum suppression to remove redundant detections, while the validation does not remove redundant predictions. In addition, the validation predicts with a stride of \(2\), but the test has a stride of \(1\). With \(fps=25\) and a \(tolerance = \pm 1s\), this reduction in temporal resolution hinders the predictions from hitting the tolerance window. 
 
 
 
@@ -103,8 +103,7 @@ Using default hyperparameters from their original papers" might not be optimal f
 \section{Experiment 2: Compare runtime}
 \label{sec:experiment2}
 
-Wall-clock training time for each model on a Tesla A100 \acrshort{gpu} was recorded. Feature extraction was also timed but separated from the time. \unsure{should I use identical epoch count and batch size?}
-
+Wall-clock training time for each model on a Tesla A100 \acrshort{gpu} was recorded. Feature extraction and inference time were timed. If no \acrshort{gpu} is mentioned, it is A100 which is applied. 
 
 \subsection{Setup}
 \label{ssec:ex2_setup}
@@ -137,38 +136,100 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
         Wigan Athletic - Birmingham City & 5h32min & Tesla V100-PCIE-32GB \\
         \hline
         Cardiff City - Queens Park Rangers & 5h 45min & Tesla V100-PCIE-32GB \\
-        \midrule
-        \textbf{Average}(excluding Stoke v Huddersfield)= & \textbf{5h 47 min} \\
+        \hline
+        \hline
+        \textbf{Average}(excluding Stoke v Huddersfield)= & \textbf{5h 47 min} & \textemdash \\
         \hline
     \end{tabular}
     \caption{The preprocessing times for all games. They are preprocessed using the \acrshort{vmae} pipeline. The average excludes the game between Stoke City and Huddersfield Town because it seems to have been a measuring error making it take twice as long. }
-    \label{tab:placeholder_label}
+    \label{tab:average_feature_extraction}
 \end{table}
+
+\unsure{How important would it be to use A100s in this experiment. For: Comparability. Against: Show that vms runs on any gpu opposed to tdeed}
+
+
 
 \begin{table}[ht]
     \centering
     \begin{tabular}{lccc}
-        \toprule
+        \toprule 
         Model & Preprocessing (1 game)  & Training(4+1 games) & Inference (1 game) \\
         \midrule
         \acrshort{tdeed} & 13 & 3267 & 5\\
         \acrshort{vms} (Mamba-\acrshort{s6}) & 342 & 43 & 0.1$(7s)$ \\
         \bottomrule
     \end{tabular}
-    \caption{Time comparison. All times are measured in minutes. The inference time for \acrshort{vms} is also provided in seconds. The game between Blackburn Rovers and Nottingham Forest lasting 96 minutes took 7.47s with an average of 0.08 per minute. }
+    \caption{Time comparison. All times are measured in minutes. The inference time for \acrshort{vms} is also provided in seconds. The game between Blackburn Rovers and Nottingham Forest, lasting 96 minutes, took 7.47 seconds with an average of 0.08 seconds per minute-long clip. Inference time assumes the preprocessing is completed.}
     \label{tab:results_ex2}
 \end{table}
 
+\cref{tab:results_ex2} shows the time for each step in each model. The total training time for \acrshort{tdeed} is \(13min+3267min= 3280min\). To infer one game with \acrshort{tdeed} it takes \(13min+5min=18min\). Concurrently, \acrshort{vms} takes \(342min+43min=385min\) to train on five games. Inference time for one game is approximately the same time as the preprocessing of that game, in this case \(342min\). In both cases, full parallelizability is assumed in preprocessing and inference. 
 
 \subsection{Discussion}
 \label{ssec:ex2_discussion}
+\todo{run tdeed runs, rn it is haakon data}
+% We know Mamba is faster than the Vit-based tdeed
 
-We know Mamba is faster than the Vit-based tdeed
+% MAMBA training took <3 Hours, but data extraction was slow. However, image extraction on tdeed was also slow. Can say I ignore data preprocessing and look at 
 
-MAMBA training took <3 Hours, but data extraction was slow. However, image extraction on tdeed was also slow. Can say I ignore data preprocessing and look at 
+% storage requirements are not mentioned, but they are so much bigger because tdeed needs to store each frame as an image
 
-storage requirements are not mentioned, but they are so much bigger because tdeed needs to store each frame as an image
+% Training multiple models with the same preprocessed data with tdeed is very slow. 
 
+% preprocessing vms splits videos into 1 min clips AND runs them through model (very parallelizable)
+
+% faster with a100 in feat extraction
+
+% In Table tab:results_ex2, VMS inference is listed as 0.1 min (7s). However, the subsequent paragraph states: "Inference time for one game is approximately the same time as the preprocessing of that game, in this case (342min)". Which value is correct for the model's forward pass on pre-extracted features? Does the 342 min refer to a scenario where features must be extracted during inference for a new, unseen game?
+
+MAMBA is exceptionally quick in running inference on the games, and the bottleneck is the feature processing. Suppose the inference is parallelized over each of the $\approx90$ videos, which is very possible, and the inference time of a game. The inference would be complete before you can blink \cite{bartoshuk_blinking_1977}. Quick. The \acrshort{vmae} preprocessing pipeline is the bottleneck. Efforts should be made to decrease this. 
+
+% Table tab:results_ex2 lists TDEED inference as 5 min. The text calculates total inference as 13 min (preprocessing) + 5 min (model) = 18 min. Is the 5 min in the table only the model's forward pass time, assuming features are already extracted?
+
+The same is not true for \acrshort{tdeed}. The model is relatively balanced between preprocessing time and inference time. A complete pre-processing and inference of a game takes 18 minutes. Comparing the full pipeline time between the two, the inference time, which is supposed to be one of the advantages of \acrlong{s6}s, is lost because of the preprocessing. 
+
+
+% The setup mentions A100 GPUs for the main experiment. Table tab:average_feature_extraction (VMAE preprocessing for VMS) lists V100s and one P100. Was the "Preprocessing (1 game)" for VMS (342 min) in Table tab:results_ex2 also run on V100s, or was it on an A100? How does this potential hardware difference affect the direct comparison of preprocessing times between TDEED (13 min, presumably on A100) and VMS (342 min)?
+% You noted an \unsure about using A100s. Given the results, how does the choice of GPU impact the narrative about VMS being runnable on "any GPU" versus TDEED needing "premium GPUs"?
+
+Therefore, the direct comparison of preprocessing times (13 min for \acrshort{tdeed} vs. 342 min for \acrshort{vms}) is affected by the hardware difference in \acrshort{gpu}s. The actual difference in preprocessing efficiency on identical hardware might be less pronounced than these numbers suggest. \acrshort{vms} preprocessing would still likely be considerably longer. 
+
+% You had an \unsure note: "should I use identical epoch count and batch size?". Were the epoch counts and batch sizes identical or comparable (e.g., training until convergence) for TDEED and VMS in this experiment? If not, how might this have influenced the training times?
+
+Both runs were run with early stopping mechanisms. If one compares \cref{fig:500_7_val_compare} and \cref{fig:plateu_sweep}, it is evident that both models converge before they end. A more aggressive early stopping would favor the \acrshort{tdeed} model. The difference in training time is still very significant. The training time of \acrshort{tdeed} also decreases the efficiency of a hyperparameter sweep. If each run takes two days, the effort expended to tune the \acrshort{tdeed} parameters is big. 
+
+% The setup states, "A100 \acrshort{gpu}s are used, of size 80 GB or 40 GB, with an indifference to interpret the results." Why was there indifference? Could the memory difference have impacted runtimes, even slightly, and should this be acknowledged as a minor limitation or factor?
+
+While A100 \acrshort{gpu}s of both 40GB and 80GB capacities were utilized, the specific workloads were generally not memory-capacity bound, and any minor runtime variations are not expected to alter the primary conclusions regarding relative model and preprocessing speeds. However, this constitutes a minor uncontrolled variable in the experimental setup. 
+
+% You mention, "full parallelizability is assumed in preprocessing and inference." How was this ensured or measured? What are the implications if true parallelization was not perfectly achieved?
+
+The assumption of full parallelization simplifies the comparison by looking at the theoretical maximum throughput. Practical implementations might face limitations that increase the observed times. Parallelization on feature extraction was done by queueing jobs on different \acrshort{gpu}s. Achieving perfect or full parallelization in real-world systems is challenging due to:
+\begin{itemize}
+    \item \textbf{Overhead}: Costs associated with managing parallel tasks (e.g., data distribution, synchronization).
+    \item \textbf{Bottlenecks}: Parts of the pipeline that cannot be parallelized (e.g., serial I/O operations, certain algorithmic steps).
+    \item \textbf{Resource Limits}: Finite number of CPU cores, GPU cores, or memory bandwidth.
+\end{itemize}
+
+% What are the primary computational bottlenecks for each model during (a) preprocessing, (b) training, and (c) inference? (e.g., CPU-bound, GPU-bound, I/O-bound).
+
+
+
+% How do these runtime differences relate to the accuracy findings in Experiment 1? Is there a clear speed-accuracy trade-off, or does one model excel in both?
+
+For research involving frequent retraining or inference on already processed data, \acrshort{vms}'s model speed is a significant advantage. For deploying a model to process new, unseen games quickly from raw video to final output, \acrshort{tdeed}'s faster preprocessing currently gives it an edge in total time, despite its slower model component. The comparison is also impacted by:
+
+\begin{itemize}
+    \item The missing test \acrshort{map}@50 for \acrshort{vms}.
+    \item The different GPUs used for measuring \acrshort{vms} preprocessing (V100s) versus \acrshort{tdeed} components (A100s).
+    \item The inconsistencies in \acrshort{tdeed}'s validation and test procedures noted in Experiment 1
+\end{itemize}
+
+% VMS preprocessing is significantly longer. In what scenarios is this a one-time cost versus a recurring one? How does this affect the overall "time-to-result" for different use cases (e.g., retraining frequently vs. deploying a static model)?
+
+% For Table tab:average_feature_extraction, you mention the Stoke City game time was a "measuring error." What led to this conclusion, as opposed to it being an actual longer processing time due to the P100 GPU or specific video content?
+
+While a P100 \acrshort{gpu} is expected to be slower, the processing time of the Stoke City game was anomalously long. It was excluded from the average sum to provide a more representative preprocessing time for \acrshort{vmae}. The fact that it is $\approx2x$ times the time of the other runs suggests other issues. \improvement{test games with a100 to}
 
 \section{Experiment 3: Feature increase}
 \label{sec:experiment3}
@@ -226,7 +287,7 @@ In academic research or competitive benchmarking, a $3.2\%$ gain is significant.
     \label{fig:another_foul}
   \end{subfigure}%
   \hspace*{\fill}   
-  \caption{Two fouls highlight how unlike similar 'actions' can appear. }
+  \caption{Two fouls highlight how unlike 'the same' action can appear. }
   \label{fig:different_fouls}
 \end{figure}
 
@@ -390,7 +451,7 @@ To conclude:
     \item \textbf{Learning Rate is a Key Lever, Especially for Homogeneous Data}: For datasets like SoccerNet, where actions can be visually similar, a lower learning rate appears beneficial. This is a concrete takeaway for tuning \acrshort{vms} on such data.
     \item \textbf{Pre-trained Features Influence Tuning}: The characteristics of pre-trained input features can constrain the effectiveness of tuning downstream hyperparameters. The features might already be optimized for a specific processing "timeline," limiting how much dataset-specific tuning can improve things.
     \item \textbf{Resource Constraints and Practicality}: Exhaustive hyperparameter search is computationally expensive. The decision to stop searching must be balanced against the potential for gains and available resources, especially if initial results (like strong default performance) suggest diminishing returns.
-    \item \textbf{Impact on Comparative Experiments}: The finding that \acrshort{vms} defaults are strong lends more credibility to comparisons made using these defaults (like in Experiment 1). However, it also highlights that the comparison might not reflect its potential if a competing model was not similarly tuned.
+    \item \textbf{Impact on Comparative Experiments}: The finding that \acrshort{vms} defaults are strong lends more credibility to comparisons made using these defaults (like in Experiment 1). However, it also highlights that the comparison might not reflect its potential if a competing model were not similarly tuned.
     \item \textbf{Focus on Broader Factors}: Given the modest gains from hyperparameter tuning, other factors like feature quality (Experiment 3), model architecture, data augmentation, and postprocessing strategies might offer more significant avenues for performance improvement.
 \end{itemize}
 
@@ -405,7 +466,7 @@ The experiment compares two runs using the \acrfull{tdeed} model. The goal is to
 
 \textcite{cioppa_soccernet_2024} provide the implementation of the \acrshort{tdeed} designed to train on all annotated games. The model is adapted to train on the \acrshort{snb} games, not the full dataset. \acrshort{map} per class, validation \acrshort{map}, test loss and compute time are the metrics used. 
 
-The models are run with default hyperparameters and differ only in the dataset size. 
+The models are run with default hyperparameters and differ only in the dataset size. The difference in the dataset is that the grander datasets' classes are broader. \todo{mention in dataset section}. There are 12 classes from team events, like corners, goal kicks, etc. The newer dataset has annotations for whether the left or the right team is doing an action, while the older dataset does not. The default hyperparameters are designed for the old challenge. 
 
 
 \subsection{Results}
@@ -428,7 +489,7 @@ The models are run with default hyperparameters and differ only in the dataset s
   \hspace*{\fill}   % maximize separation between the subfigures
   \begin{subfigure}{0.5\textwidth}
     \centering
-    \includegraphics[width=\linewidth]{total_map.png}
+    \includegraphics[width=\linewidth]{figures/total_map.png}
     \caption{The \acrshort{snb} and full model achived $30.62\%$ and $48.18\%$ respectively when  predicting teams. }
     \label{fig:map_team}
   \end{subfigure}%
@@ -444,14 +505,31 @@ The models are run with default hyperparameters and differ only in the dataset s
     \label{fig:tdeed_train_loss}
 \end{figure}
 
-The results are showed in \cref{fig:500_7_val_compare,fig:tdeed_map_no_team,fig:map_team,fig:tdeed_train_loss} as direct comparisons. The result shows how the model with more training data performs better in all metrics, even though it is in another annotation format. The biggest difference
+The results are showed in \cref{fig:500_7_val_compare,fig:tdeed_map_no_team,fig:map_team,fig:tdeed_train_loss} as direct comparisons. The result shows how the model with more training data performs better in all metrics, even though it is in another annotation format. The biggest difference comes when predicting the team, class, and time in \cref{fig:tdeed_map_no_team}.
 
 \subsection{Discussion}
 \label{ssec:ex5_discussion}
 
-improved performance
-pretraining with other datasets
-2+1d cnn utilizes something like that pretraining with massive image datasets
+
+
+The most evident result is that the \acrshort{tdeed} model trained with more data (507 videos, "joint training") significantly outperforms the model trained only on \acrshort{snb} games. The performance gains align with general machine learning principles that more data yields better performance. The substantial jump shown in \cref{fig:tdeed_map} shows how the model trained on more data performs significantly better in the most complex task. All reported metrics report substantially better performance for the bigger model. 
+
+
+
+Interestingly, the difference increases when adding the team's prediction. The large old dataset does not have annotations for teams. This signals that the model learns useful features for determining teams from just looking at games. This ability is extended to the realm where team matters. The difference in \acrshort{map} is doubled when adding team prediction, which shows the importance. Without targeted experiments, it is difficult to isolate where exactly the difference comes from.  
+
+
+
+
+While the range of event types is different for the datasets, the information about events is more detailed. The belief is that the model uses game context to predict events. As discussed \todo{can''t find where rn} before, football actions are highly dependent on what action occurred before and what action will occur next. 
+
+
+
+The fact that both models eventually converge to a similar loss suggests that, given enough training, both can fit their respective training datasets similarly. However, the initial lower loss for the model with more data suggests it gets a "head start" in this fitting process, likely due to the increased volume and richness of information available from the outset. The difference in validation and test scores underlines the idea of the richer context learned from the larger dataset. The model has better generalization. 
+
+
+Experiment 5 aligns with the philosophy behind pre-training and transfer learning. Large-scale data helps build better, more generalizable models. While reaching the same loss on the training data, the validation scores are much better for the better-trained model, which proves its generalizability. Training in the football domain favors quantity and diversity, even with some annotation inconsistencies or variations in depth, over smaller, perfectly tailored datasets.
+
 
 \section{Experiment 6: T-DEED with and without better validation}
 \label{sec:experiment_6}
