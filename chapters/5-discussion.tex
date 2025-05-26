@@ -7,10 +7,14 @@
 \info{Error analysis / qualitative examples}
 
 
-\subsection{RQ1:} 
-How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
+\subsection{\textbf{RQ1}:
+How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?}
 
-haven't done a justice to the comparison
+With the current experiments, it is difficult to come to a clear conclusion on which model is better. Results indicate that \acrfull{tdeed} performs better, with \acrshort{vms} not living up to standards. This conclusion is reached by looking at the drop between validation, found in \cref{fig:ex6:no_pp_val}, and its test results shown in \cref{fig:ex6:no_pp_test}. The test results are significantly lower than the validation epoch. Therefore, looking at \cref{tab:results_ex1}, where the test results of \acrshort{tdeed} outperform the validation results found in \acrshort{vms}. It is inferred that the real validation using postprocessing would significantly outperform the \acrshort{vms}. 
+
+This does not tell the true story. 
+
+haven't done justice to the comparison
 
 
 \subsection{RQ2:} 
@@ -24,7 +28,7 @@ inference with tdeed much faster because of videomae before mamba
 \subsection{RQ3:}
 Which types of adaptation can be made to the MAMBA model to increase its precision?
 
-Hyperparameters configured from before, quite well. 
+Hyperparameters were configured from before, quite well. 
 They might be suited to the feature extracted and not mamba directly. 
 future Experiment with this
 

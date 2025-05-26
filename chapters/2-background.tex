@@ -7,7 +7,7 @@ This chapter introduces the theoretical foundation and specialized terminology i
 \label{sec:football_analytics}
 
 \subsection{Continuous Nature of Football}
-Football is a continuous, dynamic domain, unlike sports with discrete plays like baseball or cricket. For example, a goalkeeper's pass during uninterrupted action generates numerous possible temporal sequences and starting conditions. This constant flow challenges both event-based models, which identify individual occurrences, and sequence-based models, which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual information across continuous match sequences. 
+Unlike sports with discrete plays like baseball or cricket, football is a continuous, dynamic domain. For example, a goalkeeper's pass during uninterrupted action generates numerous possible temporal sequences and starting conditions. This constant flow challenges event-based models, which identify individual occurrences, and sequence-based models, which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual information across continuous match sequences. 
 
 \subsection{Data Sources and Key Metrics}
 Football analytics rely on two primary data streams:
@@ -43,7 +43,7 @@ Football analytics rely on two primary data streams:
 
 \textcite{deliege_soccernet-v2_dataset_2021} introduces SoccerNet-V2, offering 500 match recordings annotated with 17 football events.
 
-In 2024, \textcite{deliege_soccernet-v2_dataset_2021} released seven new games annotated with 12 ball events and team annotations. There are about 6 times as many events in these seven videos per video, than in the original 500. 
+In 2024, \textcite{deliege_soccernet-v2_dataset_2021} released seven new games annotated with 12 ball events and team annotations. There are about 6 times as many events in these seven videos per video as in the original 500. 
 
 \subsection{UCF101}
 UCF101 \cite{dataset:UCF101} comprises 13,320 YouTube clips spanning 101 human action categories. It serves as a standard benchmark for trimmed action recognition.
@@ -110,7 +110,7 @@ FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer acti
 \label{sec:deep_learning}
 
 Deep learning comprises multilayer neural networks that automatically learn hierarchical data representations. By contrast, classical methods rely on handcrafted features; deep architectures instead discover interesting patterns from raw inputs. They stack linear transformations and non-linear activations to extract meaningful features at each layer \cite{lecun_deep_learning_2015}. 
-Early layers capture low-level primitives, while deeper layers combine these primitives into high-level concepts. Model training uses backpropagation to compute loss gradients with respect to millions of parameters. \unsure{to cv related, the second part?}
+Early layers capture low-level primitives, while deeper layers combine these primitives into high-level concepts. Model training uses backpropagation to compute loss gradients with respect to millions of parameters. \unsure{to CV related, the second part?}
 
 \subsection{Forward pass}
 For a network with two hidden layers, the forward pass is:
@@ -169,7 +169,7 @@ In the most basic scenario, when there is a layer with input dimensions of \( (N
 
 \[out(N_i, C_{out_j}=bias(C_{out_j})+\sum_{k=0}^{C_{in}-1}weight(C_{out_j},k)\star input(N_i,k)\]
 
-The symbol \(\star\) represents the valid 2D cross-correlation operation in this expression. Here, \textit{\textbf{N}} refers to the batch size, \textit{\textbf{C}} indicates the number of channels, \textit{\textbf{H}} represents the height of the input planes measured in pixels, and \textit{\textbf{W}} denotes the width measured in pixels\cite{pytorch_conv2d}. 
+The symbol \(\star\) represents this expression's valid 2D cross-correlation operation. Here, \textit{\textbf{N}} refers to the batch size, \textit{\textbf{C}} indicates the number of channels, \textit{\textbf{H}} represents the height of the input planes measured in pixels, and \textit{\textbf{W}} denotes the width measured in pixels\cite{pytorch_conv2d}. 
 
 Key components:
 \begin{itemize}
@@ -210,7 +210,7 @@ Despite their locality bias, \acrshort{cnn}-based video models remain foundation
 
 \subsection{Recurrent Neural Nets}
 
-\acrfull{rnn} are a class of deep learning models designed to handle sequential data. \acrshort{rnn}s keep a memory of previous inputs. Unlike traditional feedforward networks, for example, \acrshort{cnn}s and neural nets, \acrshort{rnn}s use feedback loops that allow information to exist over multiple time steps. \unsure{Do I say the same sentence twice here?} This makes \acrshort{rnn}s useful for tasks requiring temporal dependencies, such as natural language processing, speech recognition, and time-series forecasting\cite{ibm_rnn_2025}. In the context of \acrfull{cv}, \acrshort{rnn}s have been applied for applications such as image captioning or video analysis. \unsure{Is it better to write in the present?}
+\acrfull{rnn} are deep learning models designed to handle sequential data. \acrshort{rnn}s keep a memory of previous inputs. Unlike traditional feedforward networks, for example, \acrshort{cnn}s and neural nets, \acrshort{rnn}s use feedback loops that allow information to exist over multiple time steps. \unsure{Do I say the same sentence twice here?} This makes \acrshort{rnn}s useful for tasks requiring temporal dependencies, such as natural language processing, speech recognition, and time-series forecasting\cite{ibm_rnn_2025}. In the context of \acrfull{cv}, \acrshort{rnn}s have been applied for applications such as image captioning or video analysis. \unsure{Is it better to write in the present?}
 
 Standard \acrshort{rnn}s suffer from the vanishing gradient problem. The issue is due to the repeated multiplication of small gradient values during backpropagation through time. This leads to diminishing updates in early layers. \acrfull{lstm} is one solution to this problem \cite{bhogal_human_2023, kumar_human_2023, mahaseni_spotting_2021}.The other widespread solution is the \acrfull{gru} \cite{giveki_human_2024,li_oarnet_2024,yu_i3d_2023}. 
 
@@ -223,13 +223,13 @@ Standard \acrshort{rnn}s suffer from the vanishing gradient problem. The issue i
 \subsubsection{Bi-Directional Layers}
 \label{ssec:bi_directional_layers}
 
-Bi-directional recurrent layers combine two parallel LSTM networks to capture both past and future context in a sequence \cite{radhakrishnan_bi_lstm_2023, bhogal_human_2023}. One LSTM processes the input in its original order (forward pass), while the other processes it in reverse (backward pass). At each time step \(t\), the hidden states from both directions are concatenated to form a richer representation of the data:
+Bi-directional recurrent layers combine two parallel LSTM networks to capture past and future context in a sequence \cite{radhakrishnan_bi_lstm_2023, bhogal_human_2023}. One LSTM processes the input in its original order (forward pass), while the other processes it in reverse (backward pass). At each time step \(t\), the hidden states from both directions are concatenated to form a richer representation of the data:
 
 \[
 h_t = \bigl[\,\overrightarrow{h}_t;\,\overleftarrow{h}_t\bigr].
 \]
 
-In the context of football analytics, this approach is helpful because events (e.g., \ goals, passes) often depend on both preceding and succeeding actions on the field. By integrating information from before and after a given frame, bi-directional layers can improve the accuracy of sequence predictions. The main trade-off is that they require roughly twice the number of parameters and incur longer training and inference times compared to unidirectional models.
+In football analytics, this approach is helpful because events (e.g., \ goals, passes) often depend on both preceding and succeeding actions on the field. By integrating information from before and after a given frame, bi-directional layers can improve the accuracy of sequence predictions. The main trade-off is that they require roughly twice the number of parameters and incur longer training and inference times than unidirectional models.
 
 
 \subsection{Vision Transformers}
@@ -269,11 +269,11 @@ Limitations of vision transformers include:
 \unsure{Move to the back of the chapter, or reference this part in the back of the chapter?}
 The \acrfull{sam} was first introduced by \textcite{kirillov_segment_2023} in 2023 as a promptable, foundation segmentation model. Its core design splits the task into three components:
 \begin{itemize}
-    \item \textbf{Image Encoder:} A vision transformer (ViT) pre-trained on masked autoencoding, which produces dense feature maps for any input image.
+    \item \textbf{Image Encoder:} A vision transformer (ViT) pre-trained on masked autoencoding produces dense feature maps for any input image.
     \item \textbf{Prompt Encoder:} A lightweight module that maps interactive prompts (points, bounding boxes, or free-form masks) into positional embeddings.
     \item \textbf{Mask Decoder:} A small transformer that fuses image and prompt embeddings to output segmentation masks at multiple scales.
 \end{itemize}
-\acrshort{sam} was trained on the enormous SA-1B dataset (over 11 M images and 1.1 B masks) in a semi-automated pipeline, yielding strong zero-shot performance across diverse domains without any finetuning.
+\acrshort{sam} was trained on the enormous SA-1B dataset (over 11 M images and 1.1 B masks) in a semi-automated pipeline, yielding strong zero-shot performance across diverse domains without finetuning.
 
 Building on this success, Ravi et al.\ \cite{ravi_sam_nodate} proposed \emph{SAM-2} (sometimes called Video \acrshort{sam}), which extends \acrshort{sam} to sequential video data via a \emph{memory-augmented attention} mechanism:
 \begin{itemize}
@@ -281,7 +281,7 @@ Building on this success, Ravi et al.\ \cite{ravi_sam_nodate} proposed \emph{SAM
     \item \textbf{Memory Attention:} A cross-frame attention layer that retains a compact set of "memory tokens" summarizing past masks, enabling consistent tracking of object masks over time.
     \item \textbf{Interactive Prompts in Video:} Mouse clicks and bounding-box prompts can be applied on any frame and propagated forward or backward via the memory bank.
 \end{itemize}
-The authors also released SA-V, a large video-segmentation dataset with millions of frame-mask pairs, demonstrating that \acrshort{sam}-2 achieves near real-time inference (15-30 fps) and high temporal consistency on common benchmarks. \autoref{fig:sa-v} shows the masklets in the dataset. 
+The authors also released SA-V, a large video-segmentation dataset with millions of frame-mask pairs. This demonstrates that \acrshort{sam}-2 achieves near real-time inference (15-30 fps) and high temporal consistency on common benchmarks. \autoref{fig:sa-v} shows the masklets in the dataset. 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{figures/sam_2.png}
@@ -294,7 +294,7 @@ Together, the original \acrshort{sam} and its video-centric successor exemplify 
 \improvement{To increase readability, this section needs more figures, not only here}
 \subsection{State-Space Models}
 \label{ssec:state_space_models}
-% \acrfull{ssm} offer a continuous-time representation of sequential data via a latent state \(h(t)\in\mathbb{R}^N\):
+% \acrfull{ssm} offers a continuous-time representation of sequential data via a latent state \(h(t)\in\mathbb{R}^N\):
 % \begin{align}
 %     \frac{\mathrm{d}h(t)}{\mathrm{d}t} &= A\,h(t) + B\,x(t),  \label{eq:ssm_continuous1}\\
 %     y(t) &= C\,h(t),                                    \label{eq:ssm_continuous2}
@@ -321,7 +321,7 @@ Together, the original \acrshort{sam} and its video-centric successor exemplify 
 
 VideoMAMBA extends \acrshort{s6} to spatiotemporal video features: each frame is first embedded (e.g., \ via convolutional or patch-based encoders) into \(x_k\), then processed through the discrete SSM along the temporal dimension. Prior studies \cite{lee_enhancing_mamba_s6_2024, li_videomamba_2024} report that VideoMAMBA matches transformer-based action recognition on common benchmarks while reducing inference overhead.
 
-This thesis applies the VideoMAMBA suite to a newly collected football video dataset to evaluate its event-spotting performance (see Chapter~\ref{chap:experiments}). The results demonstrate that VideoMAMBA achieves not only competitive accuracy but also delivers substantial gains in inference speed and memory efficiency, confirming the practicality of state-space models for large-scale video analytics. \unsure{Remove this paragraph? Move to intro?}
+This thesis applies the VideoMAMBA suite to a newly collected football video dataset to evaluate its event-spotting performance (see Chapter~\ref{chap:experiments}). The results demonstrate that VideoMAMBA achieves not only competitive accuracy but also substantial gains in inference speed and memory efficiency, confirming the practicality of state-space models for large-scale video analytics. \unsure{Remove this paragraph? Move to intro?}
 
 
 \subsection{Training Strategies}
@@ -342,7 +342,7 @@ Unsupervised learning discovers structure from unlabeled data without explicit t
 
 \subsubsection{Masking}
 
-In an encoder-decoder masking setup, the input video frames are first tokenized into spatio-temporal patches. A binary mask tensor \(M\in\{0,1\}^{T\times H\times W}\) with masking ratio \(r\) is generated, where
+The input video frames are first tokenized into spatio-temporal patches in an encoder-decoder masking setup. A binary mask tensor \(M\in\{0,1\}^{T\times H\times W}\) with masking ratio \(r\) is generated, where
 \[
 \sum_{t,h,w} M_{t,h,w} = r\,T\,H\,W.
 \]
@@ -350,7 +350,7 @@ The visible patches \(x_\text{vis}\) are obtained by
 \[
 x_\text{vis} = x \,\odot\,(1 - M)\,,
 \]
-and fed into a lightweight transformer encoder \(E\). The decoder \(D\) takes the encoder output plus positional embeddings and mask tokens and attempts to reconstruct the original video:
+and fed into a lightweight transformer encoder \(E\). The decoder \(D\) takes the encoder output, plus positional embeddings and mask tokens, and attempts to reconstruct the original video:
 \[
 \hat{x} = D\bigl(E(x_\text{vis}),\,\text{mask\_tokens}\bigr).
 \]
@@ -388,7 +388,7 @@ However, distillation also has limitations:
 \section{Computer Vision} 
 \label{sec:computer_vision}
 
-\acrfull{cv} is a subset of machine learning that focuses on letting computers interpret and understand digital images and videos. The aim of \acrlong{cv} is to enable computers to see. Some tasks relating to computer vision, extracted from Papers with Code\footnote{\url{https://paperswithcode.com/datasets}}, are Action Recognition, Object Detection, Semantic Segmentation, Classification, and Question ASimilarlyion{Hand-Crafted methods}
+\acrfull{cv} is a subset of machine learning that focuses on letting computers interpret and understand digital images and videos. The aim of \acrlong{cv} is to enable computers to see. Some tasks relating to computer vision, extracted from Papers with Code\footnote{\url{https://paperswithcode.com/datasets}}, are Action Recognition, Object Detection, Semantic Segmentation, Classification, and Question Similarity {Handcrafted methods}
 
 \begin{figure}
     \centering
@@ -397,7 +397,7 @@ However, distillation also has limitations:
     \label{fig:pedestrian_gradient}
 \end{figure}
 
-Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \autoref{fig:pedestrian_gradient} visualizes the gradient vectors. In a similar fashion, action recognition in videos was addressed through the Histogram of Flow\cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept by calculating gradient descriptors at each frame, capturing motion information through the analysis of optical flows, and then combining these per-frame descriptors into a representation that encapsulates temporal dynamics. \unsure{The HOG image is from Wikipedia, but they do not provide any source for it.}
+Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \autoref{fig:pedestrian_gradient} visualizes the gradient vectors. Similarly, action recognition in videos was addressed through the Histogram of Flow\cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept by calculating gradient descriptors at each frame, capturing motion information through the analysis of optical flows, and then combining these per-frame descriptors into a representation that encapsulates temporal dynamics. \unsure{The HOG image is from Wikipedia, but they do not provide any source.}
 
 Despite these approaches' innovation in early computer vision, their limitations soon became apparent. The reliance on accurate handcrafted features often led to challenges in scaling to complex scenarios and achieving generalization. Deep learning, with its ability to learn hierarchical, data-driven representations, has mainly outpaced these manual methods.
 
@@ -410,7 +410,7 @@ Skeleton and posture estimation techniques recover 2D or 3D joint coordinates fr
     \item Bottom-up methods: predict all joint candidates first and group them into skeletons.
     \item Graph-based models: use spatial-temporal graph convolutional networks (ST-GCN) to capture joint correlations over time\cite{yan_spatial_temporal_graph_convolutional_2018}.
 \end{itemize}
-These approaches enable extracting features such as joint angles, stride length, and posture transitions for performance analysis and injury risk assessment. In football scenarios, however, they face:
+These approaches extract features such as joint angles, stride length, and posture transitions for performance analysis and injury risk assessment. In football scenarios, however, they face:
 \begin{itemize}
     \item Severe occlusions and player overlaps in crowded penalty areas.
     \item Varying camera angles, resolutions, and lens distortions.
@@ -514,7 +514,7 @@ COMEDIAN \cite{denize_comedian_2024} combines self-supervised learning and knowl
 
 \acrfull{tdeed} \cite{xarles_t-deed_2024} won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability is making sure each frame of the video is distinct. Encoder-decoder refers to compressing and expanding the video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. Enhanced discriminability is useful because sports actions can appear similar. \todo{write more?}
 
-In 2021, \textcite{gerats_individual_same_task_2021} worked with a single static panorama camera for action-spotting and activity recognition. The authors use player snippets as model input. Inflated 3D \acrshort{cnn} is used to extract spatio-temporal features from the snippets. A graph attention network analyzes the relationship between players and their activities and actions.
+In 2021, \textcite{gerats_individual_same_task_2021} worked with a single static panorama camera for action-spotting and activity recognition. The authors use player snippets as model input. Inflated 3D \acrshort{cnn} extracts spatio-temporal features from the snippets. A graph attention network analyzes the relationship between players and their activities and actions.
 
 
 \todo{add relevant articles from literature search}

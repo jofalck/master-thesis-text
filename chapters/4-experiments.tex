@@ -81,7 +81,7 @@ Focusing on enhancing temporal distinctions is one key to success in tasks where
 
 In contrast, Mamba's design captures long-range contexts and provides a broader understanding of the video. It is also meant to learn quicker with linear complexity and require less data. It is my theory that with a stronger postprocessing pipeline, the \acrshort{map} advantage would be larger. 
 
-The validation set size of a single football game can be problematic. Football games can vary significantly due to teams, play styles, event frequency, and referee threshold for giving fouls, to name a few. There is a risk of bias from the distribution of actions within the validation game. If the validation game is "easy" or "hard," that would severely influence the score. A split of 80\% to 20\% validates on one game and trains on four in total. However, the validation set is more robust when the game is split into 90 sections randomly assigned to each category. The result will be more transferable and generalizable. The model with joint training in \cref{fig:500_7_val_compare}, varies a lot in its validation. I assume this is because of the inherited differences in validation clips. 
+The validation set size of a single football game can be problematic. Football games can vary significantly due to teams, play styles, event frequency, and referee threshold for giving fouls, to name a few. There is a risk of bias from the distribution of actions within the validation game. If the validation game is "easy" or "hard," that would severely influence the score. A split of 80\% to 20\% validates on one game and trains on four in total. However, the validation set is more robust when the game is split into 90 sections, randomly assigned to each category. The result will be more transferable and generalizable. The model with joint training in \cref{fig:500_7_val_compare} varies greatly in its validation. I assume this is because of the inherited differences in validation clips. 
 
 \acrshort{vms} runs on any \acrshort{gpu}, but \acrshort{tdeed} needs a lot of memory and only runs on premium GPUs. If computational resources (especially GPU memory and type) are a limiting factor, \acrshort{vms} is the more practical choice. \acrshort{vms} has simpler postprocessing and a clearer GitHub explaining installation steps, which could be more straightforward to deploy. However, without obvious comparisons, it is hard to pick out clear advantages of one model over the other. 
 
@@ -141,11 +141,11 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
         \textbf{Average}(excluding Stoke v Huddersfield)= & \textbf{5h 47 min} & \textemdash \\
         \hline
     \end{tabular}
-    \caption{The preprocessing times for all games. They are preprocessed using the \acrshort{vmae} pipeline. The average excludes the game between Stoke City and Huddersfield Town because it seems to have been a measuring error making it take twice as long. }
+    \caption{The preprocessing times for all games. They are preprocessed using the \acrshort{vmae} pipeline. The average excludes the game between Stoke City and Huddersfield Town because it seems to have been a measuring error, making it take twice as long. }
     \label{tab:average_feature_extraction}
 \end{table}
 
-\unsure{How important would it be to use A100s in this experiment. For: Comparability. Against: Show that vms runs on any gpu opposed to tdeed}
+\unsure{How important would it be to use A100s in this experiment. For: Comparability. Against: Show that VMS runs on any GPU opposed to tdeed}
 
 
 
@@ -172,14 +172,14 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
 MAMBA is exceptionally quick in running inference on the games, and the bottleneck is the feature processing. Suppose the inference is parallelized over each of the $\approx90$ videos, which is very possible, and the inference time of a game. The inference would be complete before you can blink \cite{bartoshuk_blinking_1977}. Quick. The \acrshort{vmae} preprocessing pipeline is the bottleneck. Efforts should be made to decrease this. 
 
 
-The same is not true for \acrshort{tdeed}. The model is relatively balanced between preprocessing time and inference time. A complete pre-processing and inference of a game takes 18 minutes. Comparing the full pipeline time between the two, the inference time, which is supposed to be one of the advantages of \acrlong{s6}s, is lost because of the preprocessing. 
+The same is not true for \acrshort{tdeed}. The model is relatively balanced between preprocessing time and inference time. A complete preprocessing and inference of a game takes 18 minutes. Comparing the full pipeline time between the two, the inference time, which is supposed to be one of the advantages of \acrlong{s6}s, is lost because of the preprocessing. 
 
 
 
 Therefore, the direct comparison of preprocessing times (13 min for \acrshort{tdeed} vs. 342 min for \acrshort{vms}) is affected by the hardware difference in \acrshort{gpu}s. The actual difference in preprocessing efficiency on identical hardware might be less pronounced than these numbers suggest. \acrshort{vms} preprocessing would still likely be considerably longer. 
 
 
-Both runs were run with early stopping mechanisms. If one compares \cref{fig:500_7_val_compare} and \cref{fig:plateu_sweep}, it is evident that both models converge before they end. A more aggressive early stopping would favor the \acrshort{tdeed} model. The difference in training time is still very significant. The training time of \acrshort{tdeed} also decreases the efficiency of a hyperparameter sweep. If each run takes two days, the effort expended to tune the \acrshort{tdeed} parameters is big. 
+Both runs were run with early stopping mechanisms. Suppose one compares \cref{fig:500_7_val_compare} and \cref{fig:plateu_sweep}, it is evident that both models converge before they end. A more aggressive early stopping would favor the \acrshort{tdeed} model. The difference in training time is still very significant. The training time of \acrshort{tdeed} also decreases the efficiency of a hyperparameter sweep. If each run takes two days, the effort to tune the \acrshort{tdeed} parameters is considerable. 
 
 
 While A100 \acrshort{gpu}s of both 40GB and 80GB capacities were utilized, the specific workloads were generally not memory-capacity bound, and any minor runtime variations are not expected to alter the primary conclusions regarding relative model and preprocessing speeds. However, this constitutes a minor uncontrolled variable in the experimental setup. 
@@ -187,7 +187,7 @@ While A100 \acrshort{gpu}s of both 40GB and 80GB capacities were utilized, the s
 
 The assumption of full parallelization simplifies the comparison by looking at the theoretical maximum throughput. Practical implementations might face limitations that increase the observed times. Parallelization on feature extraction was done by queueing jobs on different \acrshort{gpu}s. Achieving perfect or full parallelization in real-world systems is challenging due to:
 \begin{itemize}
-    \item \textbf{Overhead}: Costs associated with managing parallel tasks (e.g., data distribution, synchronization).
+    \item \textbf{Overhead}: Costs of managing parallel tasks (e.g., data distribution, synchronization).
     \item \textbf{Bottlenecks}: Parts of the pipeline that cannot be parallelized (e.g., serial I/O operations, certain algorithmic steps).
     \item \textbf{Resource Limits}: Finite number of CPU cores, GPU cores, or memory bandwidth.
 \end{itemize}
@@ -227,7 +227,7 @@ Both models were trained for 49 epochs on a Tesla V100-PCIE-32GB \acrshort{gpu}.
     \caption{Validation per epoch for 3200 features (red) and 1408 features(grey). }
     \label{fig:ex3_val}
 \end{figure}
-The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were one hour and 15 min and 1 hour 23 min respectively, an increase of \(\approx11\%\). In \autoref{fig:ex3_val}, you can see how the model with more features outperformed the lower feature model from the first epoch to the last. 
+The 1,408-dimensional model achieved a  \acrshort{map} of \(0.686\), while the 3,200-dimensional model reached a \acrshort{map} of \(0.718\) (a 3.2\% absolute gain). Training times were one hour and 15 minutes and 1 hour 23 minutes respectively, an increase of \(\approx11\%\). In \autoref{fig:ex3_val}, you can see how the model with more features outperformed the lower feature model from the first epoch to the last. 
 
 
 \subsection{Discussion}
@@ -291,7 +291,7 @@ The goal is to find the best hyperparameters for the \acrshort{vms} model on the
 
 \acrlong{wandb} is used to track the hyperparameters and the results for the \acrshort{vms} model trained on the SoccerNet-V2 dataset with a 70 \(\%\)-30\(\%\) validation split. All seven videos of the SoccerNet V2 format are considered in this approach, including the training, validation, and testing videos. A Bayesian optimization algorithm is used to find the best importance and correlation of the hyperparameters. The hyperparameters related to the dataset are the only ones modified. Full details about the hyperparameters can be found in \autoref{app:sweep}.
 
-A total of 210 runs across three sweeps of 70 runs each were completed. Because of the fast convergence of \acrshort{vms}--models hyperparameter search was an efficient process. 
+A total of 210 runs across three sweeps of 70 runs each were completed. The hyperparameter search was an efficient process because of the fast convergence of \acrshort{vms}-models. 
 
 
 \subsection{Results}
@@ -306,7 +306,7 @@ A total of 210 runs across three sweeps of 70 runs each were completed. Because 
 
 The sweeps showed a slight improvement in the model. 
 
-Trying to translate the sweep into a single better configuration did not prove helpful, but some configurations performed exceptionally better than the rest. However, these configurations that worked well had quite different parameters and were hard to differentiate. As seen in \autoref{fig:sweep_best_two}, the hyperparameters of the best and second-best run in the last sweep differed significantly in their hyperparameters. 
+Trying to translate the sweep into a single, better configuration did not prove helpful, but some configurations performed exceptionally better than the rest. However, these configurations that worked well had quite different parameters and were hard to differentiate. As seen in \autoref{fig:sweep_best_two}, the hyperparameters of the best and second-best runs in the last sweep differed significantly. 
 
 Interpreting the results to create a hyperparameter configuration, as explained in the \autoref{app:sweep_3}, the resulting average \acrshort{map} was \(46.77\%\). 
 
@@ -321,14 +321,14 @@ Interpreting the results to create a hyperparameter configuration, as explained 
     \label{fig:local_minima}
 \end{figure}
 
-It was not easy to translate the sweep into a single, consistently better configuration despite some exceptional outliers. This likely stems from a few different factors. \unsure{multiple local minima, describe in the background? Bad figure?}
+It was difficult to translate the sweep into a consistently better configuration despite some exceptional outliers. This likely stems from a few different factors. \unsure{multiple local minima, describe in the background? Bad figure?}
 
-The hyperparameter space might contain multiple local optima. This means there is not a "peak of performance," but several combinations of hyperparameters cause good results. Picking an average and combining parameters from distinct optima can result in a configuration. For the sake of visualization, look at \autoref{fig:local_minima} and imagine the summits are optima. Picking an average between them will perform worse than individual peaks. 
+The hyperparameter space might contain multiple local optima. This means there is no "peak of performance," but several combinations of hyperparameters cause good results. Picking an average and combining parameters from distinct optima can result in a configuration. For the sake of visualization, look at \autoref{fig:local_minima} and imagine the summits are optima. Picking an average between them will perform worse than individual peaks. 
 
 Hyperparameters often interact in complex and non-linear ways. The success of an \emph{exceptionally better} configuration might depend on a specific interplay between multiple parameters. Changing one parameter in an attempt to generalize or create a "single best" might disrupt this delicate balance, leading to suboptimal performance. The fact that the best two runs had "quite different parameters" (as seen in \autoref{fig:sweep_best_two} supports this idea of different, successful combinations rather than a single clear trend.
 
 
-These two runs imply that multiple good configurations exist. The interaction between the parameters matters more than the individual values. A specific value for one hyperparameter might work well only in conjunction with others. The two good runs in \autoref{fig:sweep_best_two} could represent two good synergies. 
+These two runs imply that multiple good configurations exist. The interaction between the parameters matters more than the individual values. A specific value for one hyperparameter might work well only with others. The two good runs in \autoref{fig:sweep_best_two} could represent two good synergies. 
 
 
 If the hyperparameter landscape had a dominant global optimum, one would expect the best-performing runs to converge towards similar hyperparameter values. The fact that two distinct sets of parameters yield top results suggests that there are at least two separate "peaks" or favorable regions (local optima) in the search space where the model performs exceptionally well. The optimization process has found these different peaks rather than a single point.
@@ -345,7 +345,7 @@ This implies some broader challenges for hyperparameter tuning:
 
 
 
-As seen in \autoref{app:sweep_3}, the best runs in the end show that the learning rate of the top-performing runs was relatively low. The Bayesian search preferred exploring lower learning rates, and especially the third sweep showed low learning rates performed best. In the last sweep, the learning rate had the highest importance and absolute correlation. The correlation was negative. 
+As seen in \autoref{app:sweep_3}, the best runs in the end show that the learning rate of the top-performing runs was relatively low. The Bayesian search preferred exploring lower learning rates, and especially the third sweep showed that low learning rates performed best. In the last sweep, the learning rate had the highest importance and absolute correlation. The correlation was negative. 
 
 A lower learning rate allows the model to make finer adjustments in homogeneous data like football actions, where events can be visually similar. This can help it learn the subtle distinguishing features without overshooting the optimal weight configurations in the loss landscape, leading to better discrimination between closely related actions.
 
@@ -494,20 +494,20 @@ Interestingly, the difference increases when adding the team's prediction. The l
 
 
 
-While the range of event types is different for the datasets, the information about events is more detailed. The belief is that the model uses game context to predict events. As discussed \todo{can''t find where rn} before, football actions are highly dependent on what action occurred before and what action will occur next. 
+While the range of event types differs for the datasets, the information about events is more detailed. The belief is that the model uses game context to predict events. As discussed \todo{can '' t find where rn} before, football actions are highly dependent on what action occurred before and what action will occur next. 
 
 
 
 The fact that both models eventually converge to a similar loss suggests that, given enough training, both can fit their respective training datasets similarly. However, the initial lower loss for the model with more data suggests it gets a "head start" in this fitting process, likely due to the increased volume and richness of information available from the outset. The difference in validation and test scores underlines the idea of the richer context learned from the larger dataset. The model has better generalization. 
 
 
-Experiment 5 aligns with the philosophy behind pre-training and transfer learning. Large-scale data helps build better, more generalizable models. While reaching the same loss on the training data, the validation scores are much better for the better-trained model, which proves its generalizability. Training in the football domain favors quantity and diversity, even with some annotation inconsistencies or variations in depth, over smaller, perfectly tailored datasets.
+Experiment 5 aligns with the philosophy behind pretraining and transfer learning. Large-scale data helps build better, more generalizable models. While reaching the same loss on the training data, the validation scores are much better for the better-trained model, which proves its generalizability. Training in the football domain favors quantity and diversity, even with some annotation inconsistencies or variations in depth, over smaller, perfectly tailored datasets.
 
 
 \section{Experiment 6: Testing validation stride and postprocessing of \acrshort{tdeed}}
 \label{sec:experiment_6}
 
-This experiment is motivated by earlier results, which suggested that postprocessing steps could be the cause of major performance improvements. 
+This experiment is motivated by earlier results, which suggested that postprocessing steps could cause major performance improvements. 
 
 \subsection{Setup}
 \label{ssec:ex6_setup}
@@ -561,7 +561,7 @@ The difference in test scores, \cref{fig:ex6:no_pp_test}, is significant. The mo
 
 I did not expect the significance of the postprocessing to be as considerable as it was, and subsequently, the impact of the validation step to be so little. The importance could be greater if the model did not provide as many redundant, overlapping predictions. There is an increase from $stride=2$ to $stride=1$, an increase of $3\%$. A theory is that with such an acceptable margin of $\pm1s$, and the sheer number of predictions, more predictions fit within the constraints. There should not be any difference in the number of actions predicted, but in the temporal accuracy. 
 
-This experiment confirms that \acrshort{snms} is the primary driver behind the increase from the validation to the test score. The stride change had a small but noticeable difference in validation. However, compared to the improvement from the postprocessing, the change was insignificant. After changing stride, the results were not comparable with \acrshort{vms}. 
+This experiment confirms that \acrshort{snms} is the primary driver behind the increase from the validation to the test score. The stride change had a small but noticeable difference in validation. However, the change was insignificant compared to the improvement from the postprocessing. After changing stride, the results were not comparable with \acrshort{vms}. 
 
 The high impact from \acrshort{snms} could be because of the benchmark specificity. Because each event can only be assigned to one ground truth, many predictions around one ground truth will cause a low \acrlong{map}. For a detection system with $k$ redundant predictions per true object, the precision becomes:
 
@@ -575,4 +575,4 @@ The findings and the clarification about the redundant positive predictions decr
 
 \section{Summary}
 
-Experiment one compared \acrfull{vms} and \acrfull{tdeed}, finding that it was difficult to compare the two because of preprocessing. However, the model is likely more accurate with \acrshort{tdeed} achieving a higher test score than the validation score for \acrshort{vms}. No conclusion was reached on that. Experiment two confirmed \acrshort{vms}'s significant time complexity advantages, although a slow preprocessing timeline currently hinders its practical application. Pretraining proved helpful and should be applied to the \acrshort{vms} model. Using larger context vectors increased performance similarly. Future studies should focus on postprocessing techniques rather than hyperparameters. 
+Experiment one compared \acrfull{vms} and \acrfull{tdeed}, finding it difficult to compare the two because of postprocessing. However, the model is likely more accurate with \acrshort{tdeed} achieving a higher test score than the validation score for \acrshort{vms}. No conclusion was reached on that. Experiment two confirmed \acrshort{vms}'s significant time complexity advantages, although a slow preprocessing timeline currently hinders its practical application. Pretraining proved helpful and should be applied to the \acrshort{vms} model. Using larger context vectors increased performance similarly. Future studies should focus on postprocessing techniques rather than hyperparameters. 
