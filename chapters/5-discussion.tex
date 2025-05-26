@@ -2,13 +2,17 @@
 \label{chap:discussion}
 
 \section{Addressing the Research Questions Based on the Experiments}
-\info{– Quantitative results vs. baselines}
+\info{Quantitative results vs. baselines}
 \info{Ablations on clip length, masking ratio, MAMBA variants}
 \info{Error analysis / qualitative examples}
 
 
 \subsection{RQ1:} 
 How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
+
+haven't done a justice to the comparison
+
+
 \subsection{RQ2:} 
 What are the model’s inference speed and computational requirements compared to T-DEED?
 
@@ -45,6 +49,10 @@ trying to make my own model from scratch was a waste of time
 could it be erronous that all clips have the same size because of the last clips in each game not having
 i want to build my own simpler model :) and understand the whole process
 significant impact of postprocessing in tdeed
+understand more about suppression with the map score
+vms runs on any GPU, but tdeed needs a lot of memory and only runs on premium GPUs.
+could sit here and add up increases and pretend it would be the predicted results of an increased, but no value without experiments
+hard to say how much info is gained/lost from video mae
 
 \section{Sustainability}
 VideoMAE is not very good. MAMBA in itself is nice. if you calculate power. i can do something similar with power need as done in visual intelligence, but i do not have all the data in wandb now. 

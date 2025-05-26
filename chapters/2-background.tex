@@ -1,13 +1,13 @@
 \chapter{Background and Related Work}
 \label{chap:background}
 
-This chapter introduces the theoretical foundation and specialized terminology in deep learning and computer vision that underpin this thesis. By defining core architectures, \acrlong{cnn}, \acrlong{rnn}, and transformer variants, the chapter establishes the methodological basis for experiments. Next, it outlines standard evaluation metrics, \acrfull{map} and temporal intersection-over-union (IoU), to ensure reproducible performance assessment. The chapter then examines advanced video-analysis methodologies, including spatiotemporal convolutions, state-space models, and masked autoencoder frameworks. Finally, it reviews recent football-event-spotting research—such as COMEDIAN and VideoMAMBA, to identify specific limitations that motivate our proposed approach.
+This chapter introduces the theoretical foundation and specialized terminology in deep learning and computer vision that underpin this thesis. By defining core architectures, \acrlong{cnn}, \acrlong{rnn}, and transformer variants, the chapter establishes the methodological basis for experiments. Next, it outlines standard evaluation metrics, \acrfull{map} and temporal intersection-over-union (IoU), to ensure reproducible performance assessment. The chapter then examines advanced video-analysis methodologies, including spatiotemporal convolutions, state-space models, and masked autoencoder frameworks. Finally, it reviews recent football-event-spotting research, such as COMEDIAN and VideoMAMBA, to identify specific limitations that motivate our proposed approach.
 
 \section{Football Analytics}
 \label{sec:football_analytics}
 
 \subsection{Continuous Nature of Football}
-Football is a continuous, dynamic domain, unlike sports with discrete plays like baseball or cricket. For example, a goalkeeper's pass occurs during uninterrupted action and results in numerous possible temporal sequences and starting conditions. This constant flow challenges both event-based models, which identify individual occurrences, and sequence-based models, which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual information across continuous match sequences. 
+Football is a continuous, dynamic domain, unlike sports with discrete plays like baseball or cricket. For example, a goalkeeper's pass during uninterrupted action generates numerous possible temporal sequences and starting conditions. This constant flow challenges both event-based models, which identify individual occurrences, and sequence-based models, which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual information across continuous match sequences. 
 
 \subsection{Data Sources and Key Metrics}
 Football analytics rely on two primary data streams:
@@ -43,7 +43,7 @@ Football analytics rely on two primary data streams:
 
 \textcite{deliege_soccernet-v2_dataset_2021} introduces SoccerNet-V2, offering 500 match recordings annotated with 17 football events.
 
-In 2024, \textcite{deliege_soccernet-v2_dataset_2021} released seven new games annotated with 12 ball events and team annotations. There are about 6 times as many events in these seven videos per video than the original 500. 
+In 2024, \textcite{deliege_soccernet-v2_dataset_2021} released seven new games annotated with 12 ball events and team annotations. There are about 6 times as many events in these seven videos per video, than in the original 500. 
 
 \subsection{UCF101}
 UCF101 \cite{dataset:UCF101} comprises 13,320 YouTube clips spanning 101 human action categories. It serves as a standard benchmark for trimmed action recognition.
@@ -147,7 +147,7 @@ with \(y^{(0)}\equiv x\). Figure~\ref{fig:backward_pass} shows the backpropagati
 \begin{figure}[ht]
     \centering
     \includegraphics[width=0.6\linewidth]{figures/neural_net_back_prop.jpg}
-    \caption{The equations that compute the backward pass.} 
+    \caption{The equations that compute the backward pass.}
     \label{fig:backward_pass}
 \end{figure}
 
@@ -161,7 +161,7 @@ b^{(l)} \leftarrow b^{(l)} - \eta\,\nabla_{b^{(l)}}E.
 Regularization techniques such as weight decay, dropout, and batch normalization further improve generalization and training stability \cite{ioffe_batch_2015}.
 
 \subsection{Convolutions}
-\improvement{I never alter formulas, is it necessary to explain them then} 
+\improvement{I never alter formulas, is it necessary to explain them then?} 
 
 Convolutions learn small filters that slide over the input to detect local features in space (and time). Each filter is a small tensor of weights that computes a weighted sum plus a bias at every position. Convolutions capture patterns such as edges, textures, and motion by sharing the same weights across all locations.  
 
@@ -169,7 +169,7 @@ In the most basic scenario, when there is a layer with input dimensions of \( (N
 
 \[out(N_i, C_{out_j}=bias(C_{out_j})+\sum_{k=0}^{C_{in}-1}weight(C_{out_j},k)\star input(N_i,k)\]
 
-In this expression, the symbol \(\star\) represents the valid 2D cross-correlation operation. Here, \textit{\textbf{N}} refers to the batch size, \textit{\textbf{C}} indicates the number of channels, \textit{\textbf{H}} represents the height of the input planes measured in pixels, and \textit{\textbf{W}} denotes the width measured in pixels\cite{pytorch_conv2d}. 
+The symbol \(\star\) represents the valid 2D cross-correlation operation in this expression. Here, \textit{\textbf{N}} refers to the batch size, \textit{\textbf{C}} indicates the number of channels, \textit{\textbf{H}} represents the height of the input planes measured in pixels, and \textit{\textbf{W}} denotes the width measured in pixels\cite{pytorch_conv2d}. 
 
 Key components:
 \begin{itemize}
@@ -186,16 +186,16 @@ Key components:
     \label{fig:alexnet}
 \end{figure}
 
-Stacking multiple convolution-activation-pooling blocks builds hierarchical feature representations, from edges and textures in early layers to object parts in deeper layers \cite{lecun_deep_learning_2015}. \autoref{fig:alexnet} shows how \textcite{krizhevsky_alexnet} designed AlexNet in 2012 with alternating convolution and pooling layers. Residual connections \cite{he_deep_residual_2015} further ease training in very deep networks by learning residual mappings. An example of a residual block is shown in \autoref{fig:res_connection}. Architectures such as Inception \cite{szegedy_going_2014}, MobileNet (depthwise separable convolution) \cite{howard_mobilenets_2017} and EfficientNet (compound scaling) \cite{tan_efficientnet_2020} optimize accuracy-efficiency trade-offs in image tasks. 
+Stacking multiple convolution-activation-pooling blocks builds hierarchical feature representations, from edges and textures in early layers to object parts in deeper layers \cite{lecun_deep_learning_2015}. \autoref{fig:alexnet} shows how \textcite{krizhevsky_alexnet} designed AlexNet in 2012 with alternating convolution and pooling layers. Residual connections \cite{he_deep_residual_2015} further ease training in very deep networks by learning residual mappings. An example of a residual block is shown in \autoref{fig:res_connection}. Architectures such as Inception \cite{szegedy_going_2014}, MobileNet (depthwise separable convolution) \cite{howard_mobilenets_2017}, and EfficientNet (compound scaling) \cite{tan_efficientnet_2020} optimize accuracy-efficiency trade-offs in image tasks. 
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{figures/res_connection.png} 
-    \caption{Residual block. Created by \textcite{wong_what_is_residual_2022}. }
+    \caption{Residual block. Created by \textcite{wong_what_is_residual_2022}.}
     \label{fig:res_connection}
 \end{figure}
 
-In the video domain, spatiotemporal convolutions extend the same principles over time. Early 3D \acrshort{cnn}s \cite{tran_learning_2015} apply cubic kernels to capture motion but suffer from high computational cost. The (2+1)D decomposition \cite{tran_2_plus_1_convolution} splits 3D kernels into separate spatial and temporal convolutions, improving the optimization. The Inflated 3D \acrshort{cnn} (I3D) \cite{carreira_2017_i3d_quo_vadis} “inflates” pretrained 2D filters into the time dimension. This creates a balance between efficiency and representation.
+In the video domain, spatiotemporal convolutions extend the same principles over time. Early 3D \acrshort{cnn}s \cite{tran_learning_2015} apply cubic kernels to capture motion but suffer high computational costs. The (2+1)D decomposition \cite{tran_2_plus_1_convolution} splits 3D kernels into separate spatial and temporal convolutions, improving the optimization. The Inflated 3D \acrshort{cnn} (I3D) \cite{carreira_2017_i3d_quo_vadis} “inflates” pretrained 2D filters into the time dimension. This creates a balance between efficiency and representation.
 
 Further advances address long-range temporal modeling:
 \begin{itemize}
@@ -354,7 +354,7 @@ and fed into a lightweight transformer encoder \(E\). The decoder \(D\) takes th
 \[
 \hat{x} = D\bigl(E(x_\text{vis}),\,\text{mask\_tokens}\bigr).
 \]
-The model is trained to minimize the reconstruction loss only over masked positions:
+The training process minimizes the reconstruction loss only over masked positions:
 \[
 \mathcal{L} \;=\; \bigl\lVert\,M \,\odot\,(x - \hat{x})\bigr\rVert_2^2.
 \]
@@ -367,41 +367,39 @@ Different masking strategies can be used:
 High masking ratios (e.g., \ 75-90\%) force the encoder to capture global context while the decoder reconstructs fine-grained details from a compact latent code. This approach underlies VideoMAE and similar masked autoencoder variants for self-supervised video representation learning.
 
 
-Encoding and masking techniques are used with video data because of their inherent large size. Encoding encapsulates the process of compressing video files to reduce size while maintaining satisfactory quality. Video masking is the technique used to discard uninteresting regions and patches to focus on more meaningful features. This motivates the model to learn meaningful representations rather than predicting based on redundant data \cite{tong_videomae_2022}. The most prominent masking variant used on \acrshort{sota} benchmarks on Papers with Code' in the category \textit{Action Recognition}\footnote{\url{https://paperswithcode.com/task/action-recognition-in-videos}} is the VideoMAE V2 \cite{wang_videomae_2023} and its highly related InternVideo2 \cite{wang_internvideo2_2024}. 
+Encoding and masking techniques address the challenge of video data's inherent large size. Encoding encapsulates the process of compressing video files to reduce size while maintaining satisfactory quality. Video masking is used to discard uninteresting regions and patches to focus on more meaningful features. Discarding uninteresting regions and patches motivates the model to learn meaningful representations rather than predicting based on redundant data \cite{tong_videomae_2022}. The most prominent masking variant used on \acrshort{sota} benchmarks on Papers with Code' in the category \textit{Action Recognition}\footnote{\url{https://paperswithcode.com/task/action-recognition-in-videos}} is the VideoMAE V2 \cite{wang_videomae_2023} and its highly related InternVideo2 \cite{wang_internvideo2_2024}. 
 
-\textcite{tong_videomae_2022} address the problem of training video transformers from scratch. The aim is to use self-supervised learning to capture meaningful representations, which enables the model to decode data into the original representations. The contributions of the masked autoencoder \cite{tong_videomae_2022} are the ability to train \acrshort{vit}s on smaller datasets. VideoMAE \cite{tong_videomae_2022} also tackles the problems of temporal relations in video data and suggests a high masking ratio. VideoMAE-V2 \cite{wang_videomae_2023} improves the VideoMAE-models training time. It is still a very computationally expensive approach. 
+\textcite{tong_videomae_2022} addresses the problem of training video transformers from scratch. The aim is to use self-supervised learning to capture meaningful representations, which enables the model to decode data into the original representations. The contributions of the masked autoencoder \cite{tong_videomae_2022} are the ability to train \acrshort{vit}s on smaller datasets. VideoMAE \cite{tong_videomae_2022} also tackles the problems of temporal relations in video data and suggests a high masking ratio. VideoMAE-V2 \cite{wang_videomae_2023} improves the VideoMAE model's training time. It is still a very computationally expensive approach. 
 
 
 \subsubsection{Knowledge Distillation}
 \label{sssec:knowledge_distillation}
 
-Knowledge distillation trains a compact \emph{student} model to mimic a larger, pre-trained \emph{teacher} model \cite{denize_comedian_2024, li_videomamba_2024, bose_soccerkdnet_2023}. By matching the teacher's softened output distribution (using a temperature-scaled softmax), the student can achieve similar accuracy with far fewer parameters. This reduction in size and computation is particularly valuable for video models with high inference costs.
+Knowledge distillation trains a compact \emph{student} model to mimic a larger, pre-trained \emph{teacher} model \cite{denize_comedian_2024, li_videomamba_2024, bose_soccerkdnet_2023}. The student can achieve similar accuracy with far fewer parameters by matching the teacher's softened output distribution (using a temperature-scaled softmax). This reduction in size and computation is particularly valuable for video models with high inference costs.
 
 However, distillation also has limitations:
 \begin{itemize}
     \item A weak teacher leads to a weak student—distillation cannot exceed the teacher's performance.
-    \item Training both teacher and student increases the total computational cost.
-    \item Some fine-grained knowledge may not transfer fully, which can hurt the student's generalization to new data.
+    \item Training the teacher and the student increases the total computational cost.
+    \item Some fine-grained knowledge may not transfer fully, hurting the student's generalization to new data.
 \end{itemize}
 
 
 \section{Computer Vision} 
 \label{sec:computer_vision}
 
-\acrfull{cv} is a subset of machine learning that focuses on letting computers interpret and understand digital images and videos. The aim of \acrlong{cv} is to enable computers to see. Some tasks relating to computer vision, extracted from Papers with Code\footnote{\url{https://paperswithcode.com/datasets}}, are Action Recognition, Object Detection, Semantic Segmentation, Classification and Question Answering. 
-
-\subsection{Hand-Crafted methods}
+\acrfull{cv} is a subset of machine learning that focuses on letting computers interpret and understand digital images and videos. The aim of \acrlong{cv} is to enable computers to see. Some tasks relating to computer vision, extracted from Papers with Code\footnote{\url{https://paperswithcode.com/datasets}}, are Action Recognition, Object Detection, Semantic Segmentation, Classification, and Question ASimilarlyion{Hand-Crafted methods}
 
 \begin{figure}
     \centering
     \includegraphics[width=0.5\linewidth]{figures/Pedestrian_gradient.jpg}
-    \caption{An image of a pedestrian and his gradient calculated by \acrshort{hog}.}
+    \caption{An image of a pedestrian and gradient calculated by \acrshort{hog}.}
     \label{fig:pedestrian_gradient}
 \end{figure}
 
-Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. This method was designed to detect humans in static images by partitioning an image into small regions and computing gradient directions within each patch, ultimately assembling these measurements into a descriptive feature vector. \autoref{fig:pedestrian_gradient} visualizes the gradient vectors. In a similar fashion, action recognition in videos was addressed through the Histogram of Flow\cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept by calculating gradient descriptors at each frame, capturing motion information through the analysis of optical flows, and then combining these per-frame descriptors into a representation that encapsulates temporal dynamics. \unsure{The HOG image is from Wikipedia, but they do not provide any source for it.}
+Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \autoref{fig:pedestrian_gradient} visualizes the gradient vectors. In a similar fashion, action recognition in videos was addressed through the Histogram of Flow\cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept by calculating gradient descriptors at each frame, capturing motion information through the analysis of optical flows, and then combining these per-frame descriptors into a representation that encapsulates temporal dynamics. \unsure{The HOG image is from Wikipedia, but they do not provide any source for it.}
 
-Despite the innovation these approaches brought to early computer vision, their limitations soon became apparent. The reliance on accurate handcrafted features often led to challenges in scaling to complex scenarios and achieving generalization. With the arrival of deep learning and its ability to learn hierarchical, data-driven representations, these manual methods have mainly been outpaced. 
+Despite these approaches' innovation in early computer vision, their limitations soon became apparent. The reliance on accurate handcrafted features often led to challenges in scaling to complex scenarios and achieving generalization. Deep learning, with its ability to learn hierarchical, data-driven representations, has mainly outpaced these manual methods.
 
 \subsection{Skeleton and Posture Estimation}
 \label{ssec:skeleton_posture_estimation}
@@ -412,7 +410,7 @@ Skeleton and posture estimation techniques recover 2D or 3D joint coordinates fr
     \item Bottom-up methods: predict all joint candidates first and group them into skeletons.
     \item Graph-based models: use spatial-temporal graph convolutional networks (ST-GCN) to capture joint correlations over time\cite{yan_spatial_temporal_graph_convolutional_2018}.
 \end{itemize}
-These approaches enable the extraction of features such as joint angles, stride length, and posture transitions for performance analysis and injury risk assessment. In football scenarios, however, they face:
+These approaches enable extracting features such as joint angles, stride length, and posture transitions for performance analysis and injury risk assessment. In football scenarios, however, they face:
 \begin{itemize}
     \item Severe occlusions and player overlaps in crowded penalty areas.
     \item Varying camera angles, resolutions, and lens distortions.
@@ -426,7 +424,7 @@ These approaches enable the extraction of features such as joint angles, stride 
 \improvement{title change}
 
 \subsection{Action Spotting vs.\ Action Localization}
-Action spotting casts each event as a single instant in time, reducing annotation to one timestamp per occurrence. By contrast, action localization requires predicting both start and end times for each action interval and is typically evaluated with temporal \acrfull{iou} metrics. Spotting simplifies supervision and evaluation (via tolerance windows around accurate timestamps), but it also challenges models to resolve events occurring in close temporal proximity without relying on segment boundaries.
+Action spotting casts each event as a single time, reducing annotation to one timestamp per occurrence. By contrast, action localization requires predicting both start and end times for each action interval and is typically evaluated with temporal \acrfull{iou} metrics. Spotting simplifies supervision and evaluation (via tolerance windows around accurate timestamps), but it also challenges models to resolve events occurring in close temporal proximity without relying on segment boundaries.
 
 \subsection{Temporal vs.\ Spatiotemporal Tasks}
 Temporal event spotting focuses solely on "when" an action occurs, using global frame or clip-level features. Spatiotemporal tasks, in comparison, demand joint localization in time and space (e.g., \ frame-level bounding boxes). The SoccerNet challenge remains in the temporal domain.
@@ -439,7 +437,8 @@ Let
   \item $\mathcal{Y}=\{(t_i,c_i)\}_{i=1}^N$ the ground-truth annotations (timestamp $t_i$, class $c_i$),
   \item $\hat{\mathcal{Y}}=\{(\hat t_j,\hat c_j,\hat s_j)\}_{j=1}^M$ the model's predicted timestamps, classes, and confidence scores.
 \end{itemize}
-A prediction $(\hat t_j,\hat c_j)$ is correct if $\hat c_j=c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1 s). Performance is measured by \acrfull{map} over all classes under the chosen $\Delta$.
+We consider a prediction $(\hat t_j,\hat c_j)$ correct if $\hat c_j=c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1 s). Performance is measured by \acrfull{map} over all classes under the chosen $\Delta$.
+
 \section{Temporal Modeling Techniques}\unsure{Should I remove this section}
 \label{sec:temporal_models}
 
@@ -480,7 +479,7 @@ By sparse sampling over long videos, TSN balances efficiency and temporal covera
 
 \subsection{Spotting-Level Metrics}
 \subsubsection{Mean Average Precision (mAP)}
-Each predicted timestamp is treated with $\hat t_j$ with class $\hat c_j$ as a detection. A true positive occurs if there exists a ground-truth event $(t_i,c_i)$ such that $\hat c_j = c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1\,s). All unmatched predictions are false positives, and missed ground-truth events are false negatives. We compute precision-recall curves per class and report.
+We treat each predicted timestamp $\hat t_j$ and its corresponding class $\hat c_j$ as a detection. A true positive occurs if there exists a ground-truth event $(t_i,c_i)$ such that $\hat c_j = c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1\,s). All unmatched predictions are false positives, and missed ground-truth events are false negatives. We compute precision-recall curves per class and report.
 \[
 \mathrm{AP}_c = \int_{0}^{1} p_c(r)\,\mathrm{d}r,\quad
 \mathrm{mAP} = \frac{1}{|\mathcal{C}|}\sum_{c\in\mathcal{C}}\mathrm{AP}_c.
@@ -499,23 +498,24 @@ For methods that predict temporal segments $[s_j,e_j]$, we measure overlap with 
 A segment is correct if $\mathrm{IoU}\!\ge\theta$ and $\hat c_j=c_i$.
 
 \subsubsection{mAP @ IoU Thresholds}
-\acrshort{map} is computed as above, replacing the tolerance criterion $|\hat t_j - t_i|\le\Delta$ with $\mathrm{IoU}\ge\theta$ for $\theta\in\{0.3,0.5,0.7\}$. This compares single-timestamp spotting to full localization performance.
+\acrshort{map} is computed as above, replacing the tolerance criterion $|\hat t_j - t_i|\le\Delta$ with $\mathrm{IoU}\ge\theta$ for $\theta\in\{0.3,0.5,0.7\}$. This calculation compares single-timestamp spotting to full localization performance.
 
 
 \subsection{Metrics Correlation and Importance}
 
 Hyperparameter correlation measures the linear relationship between a hyperparameter and a selected metric, such as validation loss. A high correlation implies that an increase or decrease in the hyperparameter value leads to a similar change in the metric. However, correlation alone does not capture second-order interactions or non-linear dependencies.
 
-To address these limitations, importance metrics are derived using a tree-based model, specifically a **random forest**, trained on hyperparameters as inputs and the performance metric as the target output. Feature importance values from this model provide deeper insights into which hyperparameters significantly impact results. Unlike linear models, tree-based approaches are more robust to categorical data and non-normalized values.
+To address these limitations, importance metrics are derived using a tree-based model, specifically a random forest, trained on hyperparameters as inputs and the performance metric as the target output. Feature importance values from this model provide deeper insights into which hyperparameters significantly impact results. Unlike linear models, tree-based approaches are more robust to categorical data and non-normalized values.
 
 \section{Related Work in Football Event Spotting}
 \label{sec:fw_work}
 
-COMEDIAN \cite{denize_comedian_2024} combines self-supervised learning and knowledge distillation to initialize a transformer for action-spotting on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}. The contributions from Denize et al. are a three-step training pipeline and \acrshort{sota} performance. The first step is to use self-supervised pretraining on a spatial transformer. The second step is to initialize a temporal transformer by using knowledge distillation to enrich the spatial transformer's output. The last step is the training on the relevant action spotting task, in this case, the SoccerNet-V2 \cite{deliege_soccernet-v2_dataset_2021}.
+COMEDIAN \cite{denize_comedian_2024} combines self-supervised learning and knowledge distillation to initialize a transformer for action-spotting on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}. The contributions from Denize et al. are a three-step training pipeline and \acrshort{sota} performance. The first step is to use self-supervised pretraining on a spatial transformer. The second step is to initialize a temporal transformer using knowledge distillation to enrich the spatial transformer's output. The last step is the training on the relevant action spotting task, in this case, the SoccerNet-V2 \cite{deliege_soccernet-v2_dataset_2021}.
 
-T-DEED \cite{xarles_t-deed_2024} is a Temporal-Discriminability Enhancer Encoder-Decoder, which won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability is making sure each frame of the video is distinct. Encoder-decoder refers to compressing and expanding the video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. This is useful because sports actions can appear similar. \todo{write more?}
+\acrfull{tdeed} \cite{xarles_t-deed_2024} won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability is making sure each frame of the video is distinct. Encoder-decoder refers to compressing and expanding the video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. Enhanced discriminability is useful because sports actions can appear similar. \todo{write more?}
 
-In 2021, \textcite{gerats_individual_same_task_2021} worked with a single static panorama camera for action-spotting and activity recognition. They use player snippets as model input. Inflated 3D \acrshort{cnn} is used to extract spatio-temporal features from the snippets. A graph attention network is used to analyze the relationship between players and their activities and actions.
+In 2021, \textcite{gerats_individual_same_task_2021} worked with a single static panorama camera for action-spotting and activity recognition. The authors use player snippets as model input. Inflated 3D \acrshort{cnn} is used to extract spatio-temporal features from the snippets. A graph attention network analyzes the relationship between players and their activities and actions.
+
 
 \todo{add relevant articles from literature search}
 \todo{internvideo 2}
@@ -530,7 +530,7 @@ In 2021, \textcite{gerats_individual_same_task_2021} worked with a single static
 \todo{General feedback • Prune repetitive definitions (RNN gating details, basic backpropagation) unless directly relevant.
 • Group related items tightly: all masking/AEs under one "Self-Supervised Pretraining" heading; all sequence models under a single "Temporal Modeling" theme.
 • Use a neutral academic style: replace "this thesis" with "the present work" or "the proposed method."
-• Check figure placement: each major concept benefits from a schematic (e.g. pipeline, masking schedule, SSM recurrence).
+• Check figure placement: each significant concept benefits from a schematic (e.g., pipeline, masking schedule, SSM recurrence).
 • Spell-check and unify acronym expansions on first use; remove stray unsure{} and todo{} comments}
 
 \improvement{write about parameter importance in \acrshort{wandb} https://docs.wandb.ai/guides/app/features/panels/parameter-importance/}

@@ -9,12 +9,12 @@ The first experiment compares accuracy from \acrfull{tdeed} and \acrfull{vms}. T
 
 \subsection{Setup}
 \label{ssec:ex1_setup}
-We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}:  
-\begin{itemize}
-    \item \acrshort{vms}-80\_20 using an 80\%/20\% train/val split,  
-    \item \acrshort{vms}-70\_30 using a 70\%/30\% split, and  
-    \item \acrshort{tdeed} with four matches for training and one for validation (equivalent to 80\%/20\%).  
-\end{itemize}
+% We trained three models on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}:  
+% \begin{itemize}
+%     \item \acrshort{vms}-80\_20 using an 80\%/20\% train/val split,  
+%     \item \acrshort{vms}-70\_30 using a 70\%/30\% split, and  
+%     \item \acrshort{tdeed} with four matches for training and one for validation (equivalent to 80\%/20\%).  
+% \end{itemize}
 
 All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm1\) s tolerance window.
 
@@ -44,7 +44,7 @@ Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 
 \subsection{Discussion}
 \label{ssec:ex1_discussion}
 
-The large difference in validation \acrshort{map}@50 for \acrshort{tdeed} could result from a lack of postprocessing. \acrshort{tdeed} uses two different functions for predicting the test \acrshort{map} and the validation \acrshort{map}. The test evaluator applies soft non-maximum suppression to remove redundant detections, while the validation does not remove redundant predictions. In addition, the validation predicts with a stride of \(2\), but the test has a stride of \(1\). With \(fps=25\) and a \(tolerance = \pm 1s\), this reduction in temporal resolution hinders the predictions from hitting the tolerance window. 
+The large difference in validation \acrshort{map}@50 for \acrshort{tdeed} could result from a lack of postprocessing. \acrshort{tdeed} uses two different functions for predicting the test \acrshort{map} and the validation \acrshort{map}. The test evaluator applies \acrlong{snms} to remove redundant detections, while the validation does not remove redundant predictions. In addition, the validation predicts with a stride of \(2\), but the test has a stride of \(1\). With \(fps=25\) and a \(tolerance = \pm1s\), this reduction in temporal resolution hinders the predictions from hitting the tolerance window. 
 
 
 
@@ -52,13 +52,13 @@ The \acrshort{vms} model employs a form of postprocessing. \acrshort{vms} does l
 
 This "top (k)" mechanism, which uses video-level classification scores to refine predictions for temporal segments, is a postprocessing technique. It helps reduce class confusion and boost correct class assignments by leveraging global video context. \autoref{fig:topk} shows that the baseline with \(topk=2\) and the run with \(topk=12\) behaved quite similarly. The baseline with \(topk=12\) is the same as in \autoref{tab:results_ex1}, while a run with \(topk=2\) achieved 45.85\% average \acrshort{map}.
 
-However, this type of postprocessing is different from the "significant postprocessing" (specifically Soft Non-Maximum Suppression - SNMS) that the \acrshort{tdeed} model uses for its test evaluation. SNMS primarily addresses the issue of removing redundant or overlapping detections.
+However, this type of postprocessing is different from the "significant postprocessing" (specifically \acrfull{snms}) that the \acrshort{tdeed} model uses for its test evaluation. \acrshort{snms} primarily addresses the issue of removing redundant or overlapping detections.
 
 The performance of the \acrshort{vms} model could be enhanced by incorporating techniques similar to \acrshort{tdeed}'s test-time postprocessing, specifically NMS or SNMS.
 
 The current "top (k)" postprocessing in \acrshort{vms} refines the classification and scoring of proposed segments.
-NMS/SNMS would address a different aspect: filtering out redundant temporal detections.
-These two types of postprocessing are not mutually exclusive and can be complementary. Applying NMS/SNMS after the "top (k)" refinement could potentially lead to a further increase in \acrshort{vms}'s \acrshort{map} scores, particularly for metrics like \acrshort{map}@50, where precise, non-redundant detections are crucial. This would make its evaluation more directly comparable to \acrshort{tdeed}'s test performance.
+\acrshort{snms} would address a different aspect: filtering out redundant temporal detections.
+These two types of postprocessing are not mutually exclusive and can be complementary. Applying \acrshort{snms} after the "top (k)" refinement could potentially lead to a further increase in \acrshort{vms}'s \acrshort{map} scores, particularly for metrics like \acrshort{map}@50, where precise, non-redundant detections are crucial. This would make its evaluation more directly comparable to \acrshort{tdeed}'s test performance.
 
 \begin{figure}
     \centering
@@ -87,7 +87,7 @@ The validation set size of a single football game can be problematic. Football g
 
 The most significant limitation is the absence of the test \acrshort{map}@50 score for the \acrshort{vms} model. This prevents a direct and complete comparison with \acrshort{tdeed} on this crucial metric, which is often considered the primary performance indicator on unseen test data.
 
-The \acrshort{tdeed} model was evaluated differently for validation and testing. The validation used a stride of two (halving temporal resolution) and lacked significant postprocessing (like SNMS). The test evaluation used a smaller stride and included such postprocessing. This inconsistency makes it difficult to:
+The \acrshort{tdeed} model was evaluated differently for validation and testing. The validation used a stride of two (halving temporal resolution) and lacked significant postprocessing (like \acrshort{snms}). The test evaluation used a smaller stride and included such postprocessing. This inconsistency makes it difficult to:
 
 \begin{itemize}
     \item Directly compare \acrshort{tdeed}'s validation \acrshort{map}@50 with its test \acrshort{map}@50.
@@ -168,41 +168,22 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
 \subsection{Discussion}
 \label{ssec:ex2_discussion}
 \todo{run tdeed runs, rn it is haakon data}
-% We know Mamba is faster than the Vit-based tdeed
-
-% MAMBA training took <3 Hours, but data extraction was slow. However, image extraction on tdeed was also slow. Can say I ignore data preprocessing and look at 
-
-% storage requirements are not mentioned, but they are so much bigger because tdeed needs to store each frame as an image
-
-% Training multiple models with the same preprocessed data with tdeed is very slow. 
-
-% preprocessing vms splits videos into 1 min clips AND runs them through model (very parallelizable)
-
-% faster with a100 in feat extraction
-
-% In Table tab:results_ex2, VMS inference is listed as 0.1 min (7s). However, the subsequent paragraph states: "Inference time for one game is approximately the same time as the preprocessing of that game, in this case (342min)". Which value is correct for the model's forward pass on pre-extracted features? Does the 342 min refer to a scenario where features must be extracted during inference for a new, unseen game?
 
 MAMBA is exceptionally quick in running inference on the games, and the bottleneck is the feature processing. Suppose the inference is parallelized over each of the $\approx90$ videos, which is very possible, and the inference time of a game. The inference would be complete before you can blink \cite{bartoshuk_blinking_1977}. Quick. The \acrshort{vmae} preprocessing pipeline is the bottleneck. Efforts should be made to decrease this. 
 
-% Table tab:results_ex2 lists TDEED inference as 5 min. The text calculates total inference as 13 min (preprocessing) + 5 min (model) = 18 min. Is the 5 min in the table only the model's forward pass time, assuming features are already extracted?
 
 The same is not true for \acrshort{tdeed}. The model is relatively balanced between preprocessing time and inference time. A complete pre-processing and inference of a game takes 18 minutes. Comparing the full pipeline time between the two, the inference time, which is supposed to be one of the advantages of \acrlong{s6}s, is lost because of the preprocessing. 
 
 
-% The setup mentions A100 GPUs for the main experiment. Table tab:average_feature_extraction (VMAE preprocessing for VMS) lists V100s and one P100. Was the "Preprocessing (1 game)" for VMS (342 min) in Table tab:results_ex2 also run on V100s, or was it on an A100? How does this potential hardware difference affect the direct comparison of preprocessing times between TDEED (13 min, presumably on A100) and VMS (342 min)?
-% You noted an \unsure about using A100s. Given the results, how does the choice of GPU impact the narrative about VMS being runnable on "any GPU" versus TDEED needing "premium GPUs"?
 
 Therefore, the direct comparison of preprocessing times (13 min for \acrshort{tdeed} vs. 342 min for \acrshort{vms}) is affected by the hardware difference in \acrshort{gpu}s. The actual difference in preprocessing efficiency on identical hardware might be less pronounced than these numbers suggest. \acrshort{vms} preprocessing would still likely be considerably longer. 
 
-% You had an \unsure note: "should I use identical epoch count and batch size?". Were the epoch counts and batch sizes identical or comparable (e.g., training until convergence) for TDEED and VMS in this experiment? If not, how might this have influenced the training times?
 
 Both runs were run with early stopping mechanisms. If one compares \cref{fig:500_7_val_compare} and \cref{fig:plateu_sweep}, it is evident that both models converge before they end. A more aggressive early stopping would favor the \acrshort{tdeed} model. The difference in training time is still very significant. The training time of \acrshort{tdeed} also decreases the efficiency of a hyperparameter sweep. If each run takes two days, the effort expended to tune the \acrshort{tdeed} parameters is big. 
 
-% The setup states, "A100 \acrshort{gpu}s are used, of size 80 GB or 40 GB, with an indifference to interpret the results." Why was there indifference? Could the memory difference have impacted runtimes, even slightly, and should this be acknowledged as a minor limitation or factor?
 
 While A100 \acrshort{gpu}s of both 40GB and 80GB capacities were utilized, the specific workloads were generally not memory-capacity bound, and any minor runtime variations are not expected to alter the primary conclusions regarding relative model and preprocessing speeds. However, this constitutes a minor uncontrolled variable in the experimental setup. 
 
-% You mention, "full parallelizability is assumed in preprocessing and inference." How was this ensured or measured? What are the implications if true parallelization was not perfectly achieved?
 
 The assumption of full parallelization simplifies the comparison by looking at the theoretical maximum throughput. Practical implementations might face limitations that increase the observed times. Parallelization on feature extraction was done by queueing jobs on different \acrshort{gpu}s. Achieving perfect or full parallelization in real-world systems is challenging due to:
 \begin{itemize}
@@ -211,11 +192,6 @@ The assumption of full parallelization simplifies the comparison by looking at t
     \item \textbf{Resource Limits}: Finite number of CPU cores, GPU cores, or memory bandwidth.
 \end{itemize}
 
-% What are the primary computational bottlenecks for each model during (a) preprocessing, (b) training, and (c) inference? (e.g., CPU-bound, GPU-bound, I/O-bound).
-
-
-
-% How do these runtime differences relate to the accuracy findings in Experiment 1? Is there a clear speed-accuracy trade-off, or does one model excel in both?
 
 For research involving frequent retraining or inference on already processed data, \acrshort{vms}'s model speed is a significant advantage. For deploying a model to process new, unseen games quickly from raw video to final output, \acrshort{tdeed}'s faster preprocessing currently gives it an edge in total time, despite its slower model component. The comparison is also impacted by:
 
@@ -225,9 +201,6 @@ For research involving frequent retraining or inference on already processed dat
     \item The inconsistencies in \acrshort{tdeed}'s validation and test procedures noted in Experiment 1
 \end{itemize}
 
-% VMS preprocessing is significantly longer. In what scenarios is this a one-time cost versus a recurring one? How does this affect the overall "time-to-result" for different use cases (e.g., retraining frequently vs. deploying a static model)?
-
-% For Table tab:average_feature_extraction, you mention the Stoke City game time was a "measuring error." What led to this conclusion, as opposed to it being an actual longer processing time due to the P100 GPU or specific video content?
 
 While a P100 \acrshort{gpu} is expected to be slower, the processing time of the Stoke City game was anomalously long. It was excluded from the average sum to provide a more representative preprocessing time for \acrshort{vmae}. The fact that it is $\approx2x$ times the time of the other runs suggests other issues. \improvement{test games with a100 to}
 
@@ -531,26 +504,75 @@ The fact that both models eventually converge to a similar loss suggests that, g
 Experiment 5 aligns with the philosophy behind pre-training and transfer learning. Large-scale data helps build better, more generalizable models. While reaching the same loss on the training data, the validation scores are much better for the better-trained model, which proves its generalizability. Training in the football domain favors quantity and diversity, even with some annotation inconsistencies or variations in depth, over smaller, perfectly tailored datasets.
 
 
-\section{Experiment 6: T-DEED with and without better validation}
+\section{Experiment 6: Testing validation stride and postprocessing of \acrshort{tdeed}}
 \label{sec:experiment_6}
 
-I tried some runs with better validation. While writing them, I realized that I wanted to make it my own experiment because previous experiments had already been written.
+This experiment is motivated by earlier results, which suggested that postprocessing steps could be the cause of major performance improvements. 
 
-Early results seem like stride does not matter
 \subsection{Setup}
 \label{ssec:ex6_setup}
+The setup is similar to \cref{sec:experiment_5}, where the small, new dataset is utilized. The only difference in these runs is:
 
+\begin{itemize}
+    \item \textbf{Stride} is set to one, not two, as in the baseline.
+    \item \textbf{Postprocessing} is disabled, the baseline uses \acrlong{snms}.
+\end{itemize}
 
 \subsection{Results}
 \label{ssec:ex6_results}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/no_pprocess_test.png}
+    \caption{Test results on the models. The figure shows the big impact of applying the postprocessing step. The test results of each model are $13.62\%$ and $47.65\%$, respectively. Both cases use $stride=1$.}
+    \label{fig:ex6:no_pp_test}
+\end{figure}
 
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/no_pprocess_val.png}
+    \caption{The development of validation scores over the training session. After the first five validation epochs, where the results vary, the model with a lower validation stride is better. Their peaks at epoch 23 and 24, top out at $22.68\%$ and $20.78\%$. }
+        \label{fig:ex6:no_pp_val}
+\end{figure}
+
+The validation differences were slight but notable. \cref{fig:ex6:no_pp_val} shows how the scores develop over time, and that their peaks vary not much in value. As seen in \cref{fig:ex6:no_pp_avg_val}, the difference in validation score increases as the training continues. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/no_pprocess_avg_val.png}
+    \caption{The same graph as in \cref{fig:ex6:no_pp_val}, but with the running average, not validation per epoch.}
+    \label{fig:ex6:no_pp_avg_val}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\linewidth]{figures/no_pprocess_loss.png}
+    \caption{Loss scores for the two trainings. As expected, it is equal because only validation and test scores should vary.}
+    \label{fig:ex6:no_pp_loss}
+\end{figure}
+
+The difference in test scores, \cref{fig:ex6:no_pp_test}, is significant. The model with postprocessing performs more than three times as well as the no-postprocessing model. If one recalls \cref{fig:tdeed_map_no_team}, the difference to the training model on the full dataset is $42.64\%$. 
 
 \subsection{Discussion}
 \label{ssec:ex6_discussion}
 
 
+\acrfull{snms} is critical for \acrshort{tdeed}'s performance because the raw output likely contains many redundant and overlapping detections for the same event. The drop off when removing \acrshort{snms} is massive. Experiment 6 provides evidence that the validation score in Experiment 1 was significantly tampered with by the lack of \acrshort{snms}. The validation scores can not be directly compared from raw \acrshort{tdeed} to \acrshort{vms}. 
+
+I did not expect the significance of the postprocessing to be as considerable as it was, and subsequently, the impact of the validation step to be so little. The importance could be greater if the model did not provide as many redundant, overlapping predictions. There is an increase from $stride=2$ to $stride=1$, an increase of $3\%$. A theory is that with such an acceptable margin of $\pm1s$, and the sheer number of predictions, more predictions fit within the constraints. There should not be any difference in the number of actions predicted, but in the temporal accuracy. 
+
+This experiment confirms that \acrshort{snms} is the primary driver behind the increase from the validation to the test score. The stride change had a small but noticeable difference in validation. However, compared to the improvement from the postprocessing, the change was insignificant. After changing stride, the results were not comparable with \acrshort{vms}. 
+
+The high impact from \acrshort{snms} could be because of the benchmark specificity. Because each event can only be assigned to one ground truth, many predictions around one ground truth will cause a low \acrlong{map}. For a detection system with $k$ redundant predictions per true object, the precision becomes:
+
+\[P_{redundant} = \frac{TP}{TP + (k-1) \cdot TP} = \frac{1}{k}\]
+
+This causes nonmax suppression to be necessary for a good result. \unsure{does this belong in method?} 
+
+With validation results yielding different results, integrating postprocessing into the validation step must be discussed. Even if time-consuming, this step would be necessary to run a good hyperparameter search and get probable estimates of test results. Early stopping mechanisms based on validation scores might perform suboptimally. 
+
+The findings and the clarification about the redundant positive predictions decrease the \acrshort{map} score of validation.
 
 \section{Summary}
-vms runs on any GPU, but tdeed needs a lot of memory and only runs on premium GPUs.
 
+Experiment one compared \acrfull{vms} and \acrfull{tdeed}, finding that it was difficult to compare the two because of preprocessing. However, the model is likely more accurate with \acrshort{tdeed} achieving a higher test score than the validation score for \acrshort{vms}. No conclusion was reached on that. Experiment two confirmed \acrshort{vms}'s significant time complexity advantages, although a slow preprocessing timeline currently hinders its practical application. Pretraining proved helpful and should be applied to the \acrshort{vms} model. Using larger context vectors increased performance similarly. Future studies should focus on postprocessing techniques rather than hyperparameters. 
