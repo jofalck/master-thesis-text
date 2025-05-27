@@ -38,7 +38,7 @@ All models used default hyperparameters from their original papers. Performance 
 
 The \acrshort{vms} model (Mamba-\acrshort{s6}) had an average \acrshort{map}, achieving \textbf{45.99\%}. The \acrshort{tdeed} model's average \acrshort{map} is not calculated as there is no \acrshort{iou}, but its validation \acrshort{map}@50 was 20.78\%. In the validation \acrshort{map}@50 category, the \acrshort{vms} model significantly outperformed \acrshort{tdeed}, scoring (43.62\%) compared to \acrshort{tdeed}'s (20.78\%).
 
-Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 of \textbf{47.65\%}. The corresponding test metric for the \acrshort{vms} model is not provided or calculated. A significant disparity exists between \acrshort{tdeed}'s validation and test performance. This difference is primarily due to differences in stride during prediction, with the validation model using a stride of two, effectively halving its temporal resolution compared to the test evaluation. 
+Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 of \textbf{47.65\%}. The corresponding test metric for the \acrshort{vms} model is not provided or calculated. A significant disparity exists between \acrshort{tdeed}'s validation and test performance. This difference is primarily due to differences in stride during prediction, with the validation model using a stride of two, effectively halving its temporal resolution compared to the test evaluation. \todo{rewrite}
 
 
 \subsection{Discussion}
@@ -70,7 +70,7 @@ These two types of postprocessing are not mutually exclusive and can be compleme
 Using a shorter stride for validation is a technique to increase training speed. In the case of the \acrshort{tdeed} implemented for SoccerNet, the testing phase is weighted more heavily than validation, as it is the submission to a challenge. This is an oversight; a run with \(STRIDE=1\) was run but not completed in time for discussion. This oversight could hinder the direct comparison between the validation scores. \improvement{this is addressed in experiment 6}
 
 
-The temporal discriminability enhancer part of the \acrfull{tdeed} has specialized strategies and components designed to:
+The temporal discriminability enhancer part of the \acrfull{tdeed} has specialized strategies and components designed to: \todo{rewrite}
 \begin{itemize}
     \item improve the distinction between similar actions
     \item improve token discrimination
@@ -567,7 +567,7 @@ The high impact from \acrshort{snms} could be because of the benchmark specifici
 
 \[P_{redundant} = \frac{TP}{TP + (k-1) \cdot TP} = \frac{1}{k}\]
 
-This causes nonmax suppression to be necessary for a good result. \unsure{does this belong in method?} 
+This causes nonmax suppression to be necessary for a good result, because if $k$ increases, the Precision reduces. \unsure{does this belong in method?} 
 
 With validation results yielding different results, integrating postprocessing into the validation step must be discussed. Even if time-consuming, this step would be necessary to run a good hyperparameter search and get probable estimates of test results. Early stopping mechanisms based on validation scores might perform suboptimally. 
 

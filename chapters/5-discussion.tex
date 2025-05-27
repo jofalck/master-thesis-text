@@ -6,57 +6,116 @@
 \info{Ablations on clip length, masking ratio, MAMBA variants}
 \info{Error analysis / qualitative examples}
 
-
-\subsection{\textbf{RQ1}:
-How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?}
-
-With the current experiments, it is difficult to come to a clear conclusion on which model is better. Results indicate that \acrfull{tdeed} performs better, with \acrshort{vms} not living up to standards. This conclusion is reached by looking at the drop between validation, found in \cref{fig:ex6:no_pp_val}, and its test results shown in \cref{fig:ex6:no_pp_test}. The test results are significantly lower than the validation epoch. Therefore, looking at \cref{tab:results_ex1}, where the test results of \acrshort{tdeed} outperform the validation results found in \acrshort{vms}. It is inferred that the real validation using postprocessing would significantly outperform the \acrshort{vms}. 
-
-This does not tell the true story. 
-
-haven't done justice to the comparison
-
-
-\subsection{RQ2:} 
-What are the model’s inference speed and computational requirements compared to T-DEED?
-
-add video-mae to the time is fair, as it contributes to the results
-
-inference with tdeed much faster because of videomae before mamba
+Briefly reiterate the primary purpose of your study.
+For each Research Question (RQ):
+Summarize the key findings from your experiments that address this RQ.
+Interpret these findings: What do they mean? How do they answer the RQ?
+Compare your findings with existing literature or State-of-the-Art (SOTA) methods (as appropriate).
+Discuss any unexpected results or nuances.
+Broader Implications: What do your overall findings mean for the field?
+Limitations of your study: Be honest about what your study didn't or couldn't address.
+Future Work: Based on your findings and limitations, what are the next logical steps or open questions?
+Concluding Summary: Briefly wrap up the main takeaways of your discussion.
 
 
-\subsection{RQ3:}
-Which types of adaptation can be made to the MAMBA model to increase its precision?
 
-Hyperparameters were configured from before, quite well. 
-They might be suited to the feature extracted and not mamba directly. 
-future Experiment with this
+\subsection{RQ1: How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?}
 
 
-plot to check if it predicts equal amount of actions at all times, eg doesnt ignore first and last second 
+Based on Experiment 1, \acrshort{vms} showed a significantly better validation accuracy than the \acrshort{tdeed}. However, some doubts were put to these results when the testing \acrshort{map} of \acrshort{tdeed} was seen.
+Experiment 6 proved a massive difference in accuracy when applying \acrfull{snms} and not in the testing. 
+
+
+With the current experiments, it isn't easy to come to a clear conclusion on which model is better. The most significant limitation is the absence of a test \acrshort{map}@50 score for the \acrshort{vms} model (as stated in \cref{ssec:ex1_results} and \cref{ssec:ex1_discussion}). \acrshort{tdeed}'s test \acrshort{map}@50 is 47.65\%, but there's no equivalent \acrshort{vms} metric to compare against directly on unseen test data. Experiment 6 shows the impact of the postprocessing step and explains why it is necessary for a competitive \acrshort{map} score. Because the models use different postprocessing, it is not evident how much contribute compared to the model. 
+
+
+In a hypothetical scenario where the difference from validation, found in \cref{fig:ex6:no_pp_val}, and its test results, in \cref{fig:ex6:no_pp_test}, which lets us compute the validation score from a test score. In Experiment 6, the increase was \(\approx10\%\), giving the baseline a \acrshort{map} of $58\%$. However, because the impacts of postprocessing on \acrshort{vms} are not fully known, it is unwise to infer this.
+
+
+Another significant contribution to the difficulty in comparison is the nature of the \acrshort{vms} being action localization, while \acrshort{tdeed} focuses on action spotting. This is why the postprocessing differs and is difficult to compare directly. \acrshort{vms} works on an \textit{artificial dataset} as explained in \cref{sec:method_datasets}. In future work, the input and output layers of \acrshort{vms} should be changed. 
+
+Based on the experiments, a definitive statement on which model is more accurate is difficult. The \acrshort{tdeed} model achieved a test \acrshort{map}@50 of 47.65\% (Experiment 1). This result was obtained using \acrfull{snms} postprocessing and a prediction stride of 1. The \acrshort{vms} (Mamba-\acrshort{s6}) model achieved a validation \acrshort{map}@50 of 43.62\% (Experiment 1). This result used a "top (k)" postprocessing method. The \acrshort{vms} model was not evaluated on the test set. Experiment 6 demonstrated that \acrshort{tdeed}'s performance is highly dependent on \acrshort{snms}; without it, its test \acrshort{map}@50 dropped to 13.62\% (at stride 1). \acrshort{tdeed}'s validation \acrshort{map}@50 in Experiment 1 was 20.78\% (stride 2, no \acrshort{snms}).
+
+
+\subsection{RQ2: What are the model’s inference speed and computational requirements compared to T-DEED?}
+
+Preprocessing time for \acrshort{vms} with \acrshort{vmae} and \acrshort{tdeed} varied greatly. Experiment 2 showed how \acrshort{vms} can offer instant inference. \acrshort{tdeed} was slower, but its inference time is decent for the context of football. It infers quicker than its input, which means real-time inference is possible. The \acrshort{vmae} preprocessing pipeline slows the practical inference time of \acrshort{vms}. 
+
+The training time for \acrshort{vms} is less than an hour for the SoccerNet-V2 dataset. The \acrshort{tdeed} model training time is above two days. If the models only had to be trained once, this problem could be mitigated. However, in a practical application, one would probably like to correct annotations on games and add the training. Not only is the training time significant, but it requires an A100 or better \acrshort{gpu} to function. The magnitude of the difference in time between inference and training makes this an investment question. Concurrently, the \acrshort{vms} works on all \acrshort{gpu}s available from IDUN. Even the heavy preprocessing of inference at \acrshort{vmae} can run on any \acrshort{gpu} as seen in \cref{tab:results_ex2}.
+
+
+
+The key bottleneck for the \acrshort{vms} model, which prevents the apparent answer to the research question, is the \acrshort{vmae} preprocessing step. As long as this is the preprocessing timeline, \acrshort{tdeed} has the lower practical inference time. It does not help in an application that \acrshort{vms} has a super inference time, when the preprocessing is as long as it is. Alternatives to \acrshort{vmae} should be reviewed and considered in a real-world application. 
+
+The inference and training time of \acrshort{vms} must not be looked at without being critical towards the size reduction of \acrshort{vmae}. The features loaded into the \acrshort{vms} model are significantly smaller than the folder containing all the images, which matters for the processing time. Given the hardware-aware design of \acrfull{s6}, the \acrshort{vms}, which builds upon this, is still much quicker than a vanilla \acrfull{vit} such as \acrshort{tdeed}.
+
+In pure model inference and training speed, \acrshort{vms} is quickest. When inferring a single unseen video, \acrshort{tdeed} is quicker. Training on \acrshort{vms} is significantly faster than \acrshort{tdeed}. The computational footprint of \acrshort{vms} is very light compared to \acrshort{tdeed}, backed by its adaptability to all types of \acrshort{gpu}s at \acrshort{idun}. 
+
+
+\subsection{RQ3: Which types of adaptation can be made to the MAMBA model to increase its precision?}
+
+
+Experiment 5 showed \acrshort{tdeed} that pretraining on the older SoccerNet videos improved the prediction performance on the newer, differently annotated, SoccerNet videos. Experiment 3 showed that the increasing feature dimensionality extracted from \acrshort{vmae} improved performance. The fourth experiment suggested the hyperparameter space of \acrshort{vms} models consists of several local minima, which are hard to find. Experiment 6 indicated that strong postprocessing techniques would increase a model's performance on the \acrshort{map} benchmark. 
+
+
+The experiments suggest that postprocessing is a strong avenue for model improvement. Applying \acrfull{snms} to \acrshort{vms} is a promising and relatively straightforward modification with good potential for improvement. More expressive and higher-dimensional features are more likely to increase the performance, but not by the same magnitude as the postprocessing. In addition, the masked autoencoders are customizable, and fine-tuning the models to football data can be highly influential. The nature of football videos differs from that of the Kinetics dataset. Different masking ratios are interesting to study as well. 
+
+
 
 \section{Limitations}
-didnt fine tune the feature extractor
-didnt test on rbk data
-no pretraining
+
+The most significant drawback repeated throughout the discussions is the difference in the nature between the compared models and the difficulties in comparing metrics. Direct comparison is difficult because they do not work on the same data. \acrfull{tal} and action spotting fundamentally differ in the temporal spotting domain, and the annotation edit to work in the \acrshort{tal} domain can remove information about the action. This was necessary to run the model in the scope of this thesis, but a two-second segment with the action in the middle is different from a single frame with an action. 
+
+The \acrshort{vmae} feature extractor was used without fine-tuning on the specific football dataset or for the action spotting task. Although Experiment 6 proved that general pre-training helps, fine-tuning the \acrshort{vmae} model on football data was not done. According to its authors, \textit{" It takes more than two weeks to pre-train a ViT-g model with VideoMAE on 64 A100 \acrshort{gpu}s"}\cite{wang_videomae_2023}. In the related GitHub, they assign just half the \acrshort{gpu}s, 32, to perform the fine-tuning. 
+
+The experiments did not cover tests on \acrfull{rbk} data. No labeled data existed, so a dataset must be created from scratch. 
+
+The dataset has a highly skewed event distribution, and the models struggle to predict low-frequency events, such as goals. Predicting actions on the edges of 1-minute videos was handled by having them span one second before and after the end and start of the video. This could slightly alter the results of the prediction of \acrshort{vms}, but with the current environment, it does not have the largest priority. 
+
+The usage of V100 \acrshort{gpu}s in Experiment 2 for \acrshort{vmae} extraction, opposed to the A100 \acrshort{gpu} for \acrshort{tdeed}, affects the direct comparison of the processing times. However, this difference was of a magnitude that the changes achieved from using different \acrshort{gpu}s would not significantly affect the result. 
+
+
+
 1 second fail margin of sn doesnt apply to actions in edge cases, but they are stricter. 
 skewed distribution of events, even full tdeed training cant predict goal with correct team
 
 \section{Reflections}
-mamba should be explored more in the sports action recognition based on litareture review and results. 
-a lot of time was spent debugging and setting up the project to run with mamba. 
-registered for the competition
-asked for too little help. didnt use either github nor discord nor supervisors very much
-should have designed a math formula for hyperparameter optimalization
-had daily standups with myself, those were useful. especially to see what took a lot of time, what blocked me.
-trying to make my own model from scratch was a waste of time
-could it be erronous that all clips have the same size because of the last clips in each game not having
-i want to build my own simpler model :) and understand the whole process
-significant impact of postprocessing in tdeed
-understand more about suppression with the map score
-vms runs on any GPU, but tdeed needs a lot of memory and only runs on premium GPUs.
-could sit here and add up increases and pretend it would be the predicted results of an increased, but no value without experiments
-hard to say how much info is gained/lost from video mae
+
+
+It was disappointing that the \acrfull{s6} did not outperform the \acrshort{sota} \acrshort{tdeed} implementation when trained on the same dataset. I was confident from the literature review that the \acrshort{s6} would excel on the task, given its limited training data. I believe MAMBA is an underexplored technology within the context of sports\cite{survey_of_survey} and, in particular, football\cite{seweryn_survey_2023}. RDFA-S6\cite{lee_enhancing_mamba_s6_2024} results on \acrshort{sota} benchmarks in \acrshort{tal} underlie the statement. Additionally, the rapid scaling of \acrshort{s6} and its low data consumption compared to \acrfull{vit} should enable it to learn patterns from limited data quickly. This is very useful for teams that annotate their data; in the football environment, it is not common to share. The literature study consisted of only one article from a professional football club, Liverpool. And there are definitely more clubs using it, according to the \acrshort{rbk} coaches. 
+
+I have a few theories as to why the desired results were not achieved. Primarily, I think the feature extraction loses some essential features. Because the football actions are very subtle in most cases, I believe the pretrained \acrshort{vmae} is unable to focus on those segments. Secondly, I think the adaptation of the action localization framework of \acrshort{vms} to the spotting task might have been suboptimal. Some information may be altered during the translation process. A 2-second segment contains more information than a single timestamp. This could confuse the model, but also strengthen it. 
+
+% a lot of time was spent debugging and setting up the project to run with mamba. 
+% asked for too little help. didnt use either github nor discord nor supervisors very much
+
+Regarding the workflow, I had daily standup meetings with myself. They were quite helpful in showing where the most time was spent, and the results align with my beliefs. The majority of the work involved programming, followed by writing, reading, meetings, and other tasks. Debugging and setting up MAMBA projects took longer than they should have, as did attempting to create a model from scratch rather than implementing an existing one. Creating a model from scratch was not worth the effort. Dealing with the technical \acrshort{gpu} issues and \acrshort{idun} issues when implementing the hardware-aware parts of MAMBA, I must have done either way. It took a long time, as the language (*.cu) and the error messages were unfamiliar to me. The problems became difficult to break down into more minor, manageable problems and, therefore, difficult to solve. 
+
+% understand more about suppression with the map score
+% significant impact of postprocessing in tdeed
+
+% should have designed a math formula for hyperparameter optimalization
+% The process should be a wheel: experiment -> shortcoming -> add method -> new experiment, etc. I did it in a linear fashion, which wasn't ideal. iterative approach
+% new experiments are designed while doing experiments
+
+The stress of the models not being easy to implement hindered the methodical approach I made in a plan to solve the master's thesis. Ideally, the process of conducting experiments should have started earlier, allowing me to approach the problem more iteratively. Experimenting, finding its shortcomings, researching the method to solve the problem, and then designing and doing a new experiment. Repeat. The method is as important, if not even more important, than the results. For instance, with hyperparameters, I selected new ranges based on what I observed in \acrfull{wandb}. I think the experiment would have been stronger if there were an algorithm that could explicitly design new ranges based on results.
 
 \section{Sustainability}
-VideoMAE is not very good. MAMBA in itself is nice. if you calculate power. i can do something similar with power need as done in visual intelligence, but i do not have all the data in wandb now. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figures/un_poster.jpg}
+    \caption{The UN sustainability goals. The content of this publication has not been approved by the United Nations and does not reflect the views of the United Nations or its officials or Member States. The goals can be found at: \url{https://www.un.org/sustainabledevelopment}.}
+    \label{fig:sdg}
+\end{figure}
+
+
+Working with video data, especially with \acrshort{vit}s, raises concerns about the environmental footprint. I will not concern myself with the footprint related to the production of \acrshort{gpu}s, but rather with their high energy consumption. Addressing sustainability in this context aligns with several \acrfull{sdg}, notably \acrshort{sdg} 9 (Industry, Innovation, and Infrastructure) by promoting efficient technologies, \acrshort{sdg} 12 (Responsible Consumption and Production) by minimizing computational waste, and \acrshort{sdg} 13 (Climate Action) by reducing energy demands. All the sustainability goals can be seen in \cref{fig:sdg}
+
+Experiment 2 shows how much more efficient the \acrshort{s6} model is compared to a \acrshort{vit} for training. The difference between 1 hour and $\approx55$ hours is significant, and when conducting several experiments, this is an excellent argument for choosing \acrshort{ssm}s over \acrshort{vit}s. The difference in training time translates directly to power consumption. If you add to the equation that the \acrshort{vms} model can run on older \acrshort{gpu}s, that lowers the power consumption even more. And it allows for fairer \acrfull{ai} development, since the barrier of entry is lower. It promotes equality. 
+
+
+I have used over 5000 hours of compute time on this master, most of it on the \acrlong{vit}s \acrshort{vmae} and \acrshort{tdeed}. Most of these hours are not at 100\% capacity, but the environmental footprint this master has left behind is significant. If 100\% power usage is assumed, and an electric car uses $15\frac{kWh}{100km}$. With the energy from running 5000 hours on A100 \acrshort{gpu}s, the vehicle could drive $\approx10,000 km$. \info{most of this came from doing masked autoencoding of all 500 videos, which weren't used in the end. }
+
+
+The SoccerNet V2 dataset consists of all 507 male games. \acrshort{sdg} 5 (Gender Equality) is not addressed at all in the dataset. There is no female representation. This is stupid, even from a technical view. The rules are the same, the actions are the same, and the pitches are the same. Including female games could enhance model generalizability by exposing it to a broader range of player physiques, movement styles, and game dynamics. Promoting the inclusion of female sports data encourages more professional women's teams to adopt and benefit from these analytical tools. Underrepresentation in datasets is a well-documented issue in data science, often leading to biased models that perform less effectively for underrepresented groups. Addressing this gap in sports analytics datasets, such as SoccerNet, is a step towards more equitable and ultimately more effective \acrshort{ai}.
