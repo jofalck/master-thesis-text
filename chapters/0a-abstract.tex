@@ -1,3 +1,12 @@
 \chapter*{Abstract}
 
-The \texttt{ntnuthesis} document class is a customised version of the standard \LaTeX{} \texttt{report} document class. It can be used for theses at all levels – bachelor, master and PhD – and is available in English (British and American) and Norwegian (Bokmål and Nynorsk). This document is ment to serve (i) as a description of the document class, (ii) as an example of how to use it, and (iii) as a thesis template.
+\begin{abstract}
+This thesis examines the Mamba-based \acrfull{vms} for detecting actions in football videos. It compares \acrshort{vms} to the \acrfull{tdeed} model on the SoccerNet dataset. The research evaluated \acrshort{vms}'s accuracy, speed, and potential areas for improvement.
+
+Results show \acrshort{vms} trains much faster (e.g., 43 minutes instead of over 54 hours for \acrshort{tdeed}). It also needs less powerful \acrfull{gpu}s. However, it was difficult to determine which model was more accurate. A long feature-making step for \acrshort{vms} (\acrfull{vmae}, 342 minutes per game) means \acrshort{tdeed} is currently quicker (18 minutes per game total) for processing new videos from start to finish. \acrshort{vms} can infer predictions in seconds when ignoring preprocessing. 
+
+\acrshort{vms}, with its S6 design, did not beat \acrshort{tdeed} for football action spotting in this study. However, its fast training and low computer needs show it has promise. The model is especially viable when computer resources are limited, or models need to be updated often.
+
+The thesis proposes limitations and future work to enhance the prediction accuracy further. Sustainability questions are tackled in the discussion.
+
+\end{abstract}

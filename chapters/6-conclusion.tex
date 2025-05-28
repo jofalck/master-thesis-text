@@ -1,4 +1,58 @@
 \chapter{Conclusion and Future Work}
 \label{chap:conclusion}
 
+\section{Conclusion}
+\label{sec:conclusion}
+This thesis investigated the usefulness of the Mamba-based \acrfull{vms} model for temporal action spotting in football videos. It compared the model with the \acrfull{sota} \acrfull{tdeed} model on the SoccerNet benchmark. The research aimed to answer three primary questions regarding the accuracy, computational efficiency, and potential adaptations for the \acrshort{vms} model.
+
+Regarding accuracy (RQ1), a definitive comparison proved challenging. The \acrshort{tdeed} model achieved a test \acrshort{map}@50 of 47.65\%, while the \acrshort{vms} model obtained a validation \acrshort{map}@50 of 43.62\%. However, the absence of a test \acrshort{map}@50 for \acrshort{vms} and significant differences in evaluation protocols, particularly the critical role of \acrfull{snms} postprocessing for \acrshort{tdeed} (Experiment 6), hindered a direct, like-for-like comparison. The inherent differences between \acrshort{vms} as an action localization framework and \acrshort{tdeed} as an action spotting model further complicated this assessment.
+
+In terms of inference speed and computational requirements (RQ2, Experiment 2), the \acrshort{vms} model demonstrated substantially faster training times (43 minutes vs. over 54 hours for \acrshort{tdeed}) and significantly lower computational demands. \acrshort{vms} was capable of running on less powerful \acrshort{gpu}s. While \acrshort{vms}'s raw inference speed is exceptionally high, its current reliance on a lengthy \acrshort{vmae} preprocessing pipeline (342 minutes per game) makes \acrshort{tdeed} (18 minutes total per game) more practical for end-to-end processing of unseen videos.
+
+Examining adaptations to improve \acrshort{vms}'s precision (RQ3) reveals several promising avenues for improvement. Increasing feature dimensionality from 1408 to 3200 yielded a 3.2\% absolute \acrshort{map} gain on THUMOS-14 (Experiment 3), suggesting similar benefits for football data. Experiment 5, which showed \acrshort{tdeed}'s performance improvement with more extensive pretraining, implies that pretraining the \acrshort{vms} model would increase its result. Fine-tuning feature extractors, such as \acrshort{vmae}, on domain-specific data could also benefit \acrshort{vms}. Furthermore, the significant impact of postprocessing on \acrshort{tdeed} (Experiment 6) suggests that implementing robust postprocessing techniques, such as \acrshort{snms}, for \acrshort{vms} is a possible step for performance improvement. Hyperparameter optimization for \acrshort{vms} (Experiment 4) indicated that default parameters are relatively robust, with a lower learning rate showing some benefit, but extensive tuning yielded only marginal gains.
+
+The \acrshort{s6} architecture within \acrshort{vms} did not unequivocally outperform the established \acrshort{tdeed} model in its current configuration for this specific task. However, its significantly reduced training time and computational footprint highlight its potential, particularly in resource-constrained environments or scenarios requiring frequent retraining. The primary limitations identified were the difficulties in direct metric comparison due to differing model paradigms and evaluation setups, as well as the bottleneck imposed by the \acrshort{vmae} feature extraction.
+
+The findings suggest that the Mamba architecture is a promising direction for future work on video analysis, but not without further optimization and adaptation. The domain of football action spotting is a complex one, but there is no evidence that Mamba does not have huge potential. The work also highlighted sustainability considerations, favoring \acrshort{s6}'s efficiency, and noted the lack of gender diversity in the SoccerNet dataset, an area for future improvement in sports analytics.
+
+
 \section{Future Work}
+\label{sec:future_work}
+Based on the findings and limitations identified in this thesis, I will propose new avenues of research. To further advance the capabilities of Mamba-based models for temporal action spotting in football, the following challenges should be addressed:
+
+\subsection{Model Architecture and Adaptation}
+
+\subsubsection{Refine \acrshort{vms} for Action Spotting:} 
+Adapt the input and output layers of the \acrshort{vms} model. They should become more suited to the action spotting task rather than relying on conversion to its native temporal action localization framework. The challenge involves investigating how to represent and predict single-timestamp events effectively. Attacking this will allow for a fairer comparison to \acrshort{tdeed}
+
+\subsubsection{End-to-End Training:} 
+Explore end-to-end training of the \acrshort{vms} model with a learnable feature extractor. Reduce the reliance on fixed, pre-extracted features like \acrshort{vmae} and allow the feature extraction process to be optimized for the spotting task.
+
+\subsection{Feature Representation}
+
+\subsubsection{Optimize Feature Extraction for \acrshort{vms}:}
+    \begin{itemize}
+        \item \textbf{Reduce \acrshort{vmae} Preprocessing Time:} Investigate methods to significantly speed up the \acrshort{vmae} feature extraction pipeline, or explore lighter alternative feature extractors that maintain high descriptive power.
+        \item \textbf{Fine-tune \acrshort{vmae} on Football Data:} Fine-tune the \acrshort{vmae} model on the SoccerNet dataset.
+        \item \textbf{Study Masking Ratios:} Experiment with different masking ratios and strategies within \acrshort{vmae} if fine-tuning or retraining it. Optimize for the characteristics of football actions.
+    \end{itemize}
+    
+\subsubsection{Higher-Dimensional and Alternative Features:} 
+Systematically evaluate the impact of using higher-dimensional features (e.g., 3200-dimensional InternVideo features) with \acrshort{vms} on the SoccerNet dataset. Build on the promising results from THUMOS-14.
+
+\subsubsection{Multi-modal Features:} 
+Explore the incorporation of other modalities, such as audio features or player/ball tracking data, to enhance the input representation for the \acrshort{vms} model.
+
+\subsection{Data Strategies and Handling}
+
+\subsubsection{Address Skewed Event Distribution:} Develop and test strategies to mitigate the impact of highly skewed event distributions in the SoccerNet dataset.
+
+\subsubsection{Dataset Expansion and Diversity:}
+    \begin{itemize}
+        \item \textbf{Create Labeled \acrfull{rbk} Dataset:} Undertake the creation and annotation of a dataset from \acrshort{rbk} data to enable model testing and fine-tuning on team-specific footage.
+        \item \textbf{Incorporate Female Football Data:} Advocate for and utilize datasets that include female football games to improve model generalizability, address \acrshort{sdg} 5, and reduce potential biases. \acrshort{rbk} has a female team, and they probably record their games. 
+    \end{itemize}
+    
+\subsubsection{Data Augmentation:} Develop and evaluate data augmentation techniques tailored explicitly to temporal action spotting in football videos to improve model robustness.
+
+\subsubsection{Model Interpretability:} Apply interpretability techniques to understand what features and temporal patterns the \acrshort{vms} model learns to identify different football actions, particularly how the Mamba mechanism processes long-range dependencies.
