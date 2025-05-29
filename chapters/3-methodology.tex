@@ -1,6 +1,6 @@
 \chapter{Methodology} 
 \label{chap:methodology}
-This chapter describes the experimental setup used to evaluate the \acrfull{s6} model for temporal event spotting in football video. The section details computing infrastructure, data preprocessing and feature extraction pipeline, model architectures, training protocols, and evaluation metrics aligned with the research questions (\autoref{sec:research_questions}).
+This chapter describes the experimental setup used to evaluate the \acrfull{s6} model for temporal event spotting in football video. The section details computing infrastructure, data preprocessing and feature extraction pipeline, model architectures, training protocols, and evaluation metrics. All aligned with the research questions (\autoref{sec:research_questions}).
 
 
 \section{Tools and Resources}
@@ -8,22 +8,21 @@ This chapter describes the experimental setup used to evaluate the \acrfull{s6} 
 
 \subsection{IDUN}
 \label{ssec:idun}
-Video processing pipelines demand substantial computational resources. I utilized the IDUN cluster\footnote{\url{https://www.hpc.ntnu.no/idun/}}. IDUN is a faculty-operated system at NTNU equipped with 234 NVIDIA GPU accelerators (as of April 24, 2024). Although IDUN is not NTNU's central supercomputer, its nodes, featuring Tesla H100 and A100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. Full-match videos were partitioned into fixed-duration clips and distributed workloads across multiple GPUs via data-parallel training to mitigate occasional queuing delays and VRAM limitations.
+Video processing pipelines demand substantial computational resources. IDUN is a faculty-operated system at NTNU equipped with 234 NVIDIA \acrfull{gpu} accelerators (as of April 24, 2025)\footnote{\url{https://www.hpc.ntnu.no/idun/}}. Although IDUN is not NTNU's central supercomputer, its nodes, featuring Tesla H100 and A100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. Full-match videos were partitioned into fixed-duration clips and distributed workloads across multiple \acrshort{gpu}s via data-parallel training to mitigate occasional queuing delays and VRAM limitations.
 
-Due to the high memory requirements of the \acrlong{tdeed} and software requirements of the \acrlong{s6} framework, all experiments were run on IDUN nodes. Attempts to train on GPUs with 16 GB of memory occasionally trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation were restricted to nodes meeting these hardware and software requirements to guarantee stable training and reproducible results. 
-% Later was run on all types of GPUs, and I have no reason why. 
+Due to the high memory requirements of the \acrfull{tdeed} and software requirements of the \acrfull{s6} framework, all experiments run on IDUN nodes. Attempts to train on \acrshort{gpu}s with 16 GB of memory trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation are restricted to nodes that meet these hardware and software requirements to ensure stable training and reproducible results. 
 
-% \subsection{draw.io}
-% \label{ssec:draw.io}
-% For the creation and maintenance of all schematic overviews—such as model architectures, data‐flow pipelines, and experimental workflows—we employed draw.io (diagrams.net). draw.io is an open-source, web-based diagramming tool that allows rapid assembly of vector‐based figures using a rich library of shapes, connectors, and templates. 
+
 
 \subsection{\acrfull{wandb}}
 \label{ssec:wandb}
-To streamline the management and reproducibility of the training experiments, I used the \acrlong{wandb} platform. Hyperparameters are logged automatically using \acrshort{wandb}'s Python client, as are training and validation metrics, model checkpoints, and GPU utilization statistics. The centralized dashboard enabled real-time monitoring and direct comparison of concurrent runs. Crucially, \acrshort{wandb}'s automated hyperparameter sweep feature was used to conduct systematic hyperparameter searches. These sweeps were coordinated and logged performance metrics. Integrating \acrshort{wandb} into the workflow significantly enhanced the experimental pipeline's transparency, comparability, and reproducibility.
+
+To streamline the management and reproducibility of the training experiments, I used the \acrlong{wandb} platform. Hyperparameters are logged automatically using \acrshort{wandb}'s Python client, as are training and validation metrics, model checkpoints, and \acrshort{gpu} utilization statistics. A dashboard enables real-time monitoring of experiments, as well as direct and live comparison of runs. \acrshort{wandb}'s automated hyperparameter sweep feature was used to conduct hyperparameter searches. Coordinated sweeps log performance metrics, and visualize the results. \acrshort{wandb} enhances the transparency, comparability, and reproducibility of workflows. 
 
 \subsection{Bayesian Hyperparameter Search}
 
-Bayesian optimization utilizes a probabilistic method for hyperparameter tuning, effectively navigating the search space by balancing exploration and exploitation. It creates a surrogate model, usually a Gaussian Process, to estimate the objective function and forecast its \acrshort{map}. Bayesian optimization is a probabilistic approach to hyperparameter tuning that efficiently explores the search space by balancing exploration and exploitation. 
+Bayesian optimization uses probability to tune hyperparameters. It balances exploring new hyperparameter values with exploiting known good ones. The method uses a Gaussian Process as a surrogate model to predict the \acrlong{map} performance metric.
+
 
 The optimization process follows these steps:
 \begin{itemize}
@@ -33,15 +32,16 @@ The optimization process follows these steps:
     \item \textbf{Iteration}: The process repeats until convergence or a stopping criterion is met.
 \end{itemize}
 
-Bayesian optimization is beneficial for tuning hyperparameters in deep learning models, where evaluating each configuration is computationally expensive. By leveraging probabilistic modeling, it efficiently identifies optimal hyperparameter values while minimizing unnecessary evaluations.
+Bayesian optimization is beneficial for deep learning models because testing each hyperparameter set requires significant computing power. It utilizes probability to determine the optimal hyperparameters, thereby reducing the number of tests needed.
+
 
 \subsection{Comparing Correlation and Importance}
 
-While correlation identifies linear dependencies, importance accounts for complex interactions among multiple hyperparameters. This distinction helps researchers make informed decisions when designing hyperparameter search strategies. Bayesian optimization further enhances this process by intelligently selecting hyperparameters based on probabilistic predictions, leading to improved model performance and faster convergence.
+While correlation identifies linear dependencies, importance seeks for complex interactions among hyperparameters. This distinction enables researchers to make informed decisions when designing hyperparameter search spaces. Bayesian optimization enhances this process by selecting hyperparameters based on probabilistic predictions. The predictions lead to faster convergence.
 
 \subsection{Anaconda and pip}
 \label{ssec:conda_pip}
-Python environments were managed using conda, but all packages—including CUDA-enabled PyTorch builds—were installed via pip to follow recent PyTorch recommendations favoring pip over conda for GPU support.
+Python environments were managed using conda. However, all packages, including CUDA-enabled PyTorch builds, were installed via pip to follow recent PyTorch recommendations. Those recommendations favor pip over conda for \acrshort{gpu} support.
 
 \section{Data Preprocessing \& Feature Extraction}
 \label{sec:preprocessing}
@@ -67,7 +67,7 @@ Retrieved 13th of May}
 
 \unsure{the code uses random.random to create a train/val split. To reproduce, should I upload the used data for reproducibility?}
 
-Each full‐match video is split into non‐overlapping clips of fixed duration (60 s). Clips are sampled at 25 fps and stored as input sequences $V_k=\{x_t\}_{t=1}^{T_c}$ where $T_c=60\times25$. \todo{edge cases(end of game)}. The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration}, which sets a default value if the duration is not explicitly set. 
+Each full-match video is split into non-overlapping clips of a fixed duration (60 seconds). Clips are sampled at 25 fps and stored as input sequences $V_k=\{x_t\}_{t=1}^{T_c}$ where $T_c=60\times25$. \todo{edge cases(end of game)}. The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration}, which sets a default value if the duration is not explicitly set. 
 
 \lstinputlisting[
     caption={Part of \acrshort{vms} code used to determine the duration to be pointless. },
@@ -79,15 +79,15 @@ Each clip $V_k$ is fed through the pre‐trained VideoMAE-V2 encoder (\autoref{s
 \[
 z_k = \mathrm{VideoMAE\text{-}V2}(V_k)\;\in\;\mathbb{R}^D.
 \]
-These $D$‐dimensional vectors serve as inputs to the downstream temporal MAMBA model. The vectors are saved on IDUN as \textit{*.pt} files. This avoids redundant computations, reduces storage requirements, and lowers training times significantly. 
+These $D$‐dimensional vectors serve as inputs to the downstream temporal MAMBA model. The vectors are saved on IDUN as \textit{*.pt} files. Offline data eliminates redundant computations, reduces storage requirements, and significantly lowers training times. 
 
-Edge‐case handling at the end of match videos was approached by fixed‐length segmentation despite the model's capacity to process variable‐length inputs. This simplified protocol was adopted without established guidelines for optimally splitting football footage. \info{In the literature study I did, I found nothing about this} Future research could explore overlapping windows, adaptive clip boundaries, or dynamic segmentation schemes to mitigate boundary artifacts and potentially improve temporal event localization. \unsure{write about future work here and in the end, or only in the end}
+Edge-case handling at the end of match videos was addressed by fixed-length segmentation despite the model's capacity to process variable-length inputs. This simplified protocol was adopted without established guidelines for optimally splitting football footage. \info{In the literature study I did, I found nothing about this} Future research could explore overlapping windows, adaptive clip boundaries, or dynamic segmentation schemes to mitigate boundary artifacts and potentially improve temporal event localization. \unsure{write about future work here and in the end, or only in the end}
 
 Despite its demonstrated effectiveness in learning meaningful spatiotemporal representations, \acrlong{vmae} incurs substantial computational overhead that must be managed in large-scale experiments. The dual-stage masking strategy yields robust feature embeddings in which up to 90 \% of video tokens are hidden during training. However, it also increases the number of model parameters and the complexity of each forward pass. In practice, processing a single 60s clip at 25 fps requires on the order of tens of gigaflops\cite{wang_videomae_2023}. All \acrlong{vmae} embeddings are extracted and stored offline to mitigate these resource requirements. The heavy compute footprint of \acrlong{vmae} motivates the exploration of more lightweight architectures or more aggressive token reduction techniques in future work. \unsure{again future work}
 
 \acrlong{vmae} has been pre-trained on the large-scale Kinetics dataset\todo{write about kinetics dataset in background}, which comprises thousands of general sports clips over diverse action categories\todo{remove after written background}. Consequently, its learned representations capture broad spatiotemporal patterns common to various athletic activities but are not explicitly tailored to football. While this generic pretraining supports robust feature extraction across multiple sports domains, specialized fine-tuning on football video may improve temporal event localization performance. Future work should explore domain-specific adaptation using dedicated football datasets to bridge the semantic gap between Kinetics pretraining and match-level footage. 
 
-InternVideo is the foundation for our comparative experiment, in which we evaluate 1,408-dimensional feature vectors extracted by a Kinetics-pretrained model against 3,302-dimensional embeddings generated by an expanded masked autoencoder. Both architectures originate from the same research group responsible for developing VideoMAE-V2. InternVideo is a bigger, still open-source framework.
+InternVideo is the foundation for our comparative experiment, in which we evaluate 1,408-dimensional feature vectors extracted by a Kinetics-pretrained model against 3,302-dimensional embeddings generated by an expanded masked autoencoder. Both architectures originate from the same research group that developed VideoMAE-V2. InternVideo is a bigger, still open-source framework.
 
 \todo{The weights from internvideo 2 are available for download from Huggingface; the link is findable. Also, vectors used in experiments}
 
@@ -98,7 +98,7 @@ InternVideo is the foundation for our comparative experiment, in which we evalua
 
 \subsection{SoccerNet-V2}
 
-The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} contains video recordings of 7 professional football matches with fine-grained annotations for 12 action classes. It provides:
+The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} comprises video recordings of 7 professional football matches, along with fine-grained annotations for 12 action classes. It provides:
 \begin{itemize}
     \item 7 full matches (90 min each) at 25 fps.
     \item Time-stamped action labels for spotting tasks.
@@ -130,7 +130,7 @@ The data is locked behind an NDA. There are nine annotated games, of which seven
     \item 
 \end{itemize}
 
-The authors claim the first four games are training games, and the fifth is validation. The sixth and seventh games are test games used as tests, while the last two games do not have public annotations. They are the challenge games, as mentioned above. All videos are in the *.mkv file format; one can also download features for older videos. \todo{write more academic}
+The authors claim that the first four games are training games, and the fifth is a validation game. The sixth and seventh games are test games used for testing purposes, while the last two games do not have public annotations. They are the challenge games, as mentioned above. All videos are in the *.mkv file format; one can also download features for older videos. \todo{write more academic}
 
 \begin{figure}
     \centering
@@ -139,7 +139,7 @@ The authors claim the first four games are training games, and the fifth is vali
     \label{fig:soccernet_dist}
 \end{figure}
 
-\todo{how dataset was changed to work with VMS}
+\todo{how the dataset was changed to work with VMS}
 
 \section{Model Architectures}
 \label{sec:model_architectures}
@@ -175,7 +175,7 @@ The training process minimizes the reconstruction loss only over masked position
     \item \emph{Dense tube masking} in later epochs to refine local motion representations.
 \end{itemize}
 
-VideoMAE has three components: embedder, encoder, and decoder. VideoMAE uses cube embedding \(\Phi_{emb}\) to transform frames into sequences of tokens. It designs a tube masking strategy with ratios \(\rho \simeq 90\%\). The visible tokens are encoded by a vanilla \acrshort{vit} backbone. A decoder reconstructs the masked patches using another \acrshort{vit}\cite{wang_videomae_2023}. 
+VideoMAE has three components: embedder, encoder, and decoder. VideoMAE uses cube embedding \(\Phi_{emb}\) to transform frames into sequences of tokens. It designs a tube masking strategy with a ratio of \(\rho \simeq 90\%\). The visible tokens are encoded by a vanilla \acrshort{vit} backbone. A decoder reconstructs the masked patches using another \acrshort{vit}\cite{wang_videomae_2023}. 
 % Each frame is first partitioned into non‑overlapping $P\times P$ patches and tokenized; a binary mask tensor $M\in\{0,1\}^{T\times H/P\times W/P}$ with masking ratio up to 90\% is then generated according to the dual schedule. The visible tokens $x_{\rm vis}=x\odot(1-M)$ are encoded by a standard ViT backbone, while a lightweight three‑layer transformer decoder reconstructs only the masked patches. 
 \improvement{There is some juicy math in the paper which can help the thesis seem more professional}
 
@@ -186,7 +186,7 @@ By dynamically varying the masking granularity, VideoMAE‑V2 achieves:
     \item robust transferability across action recognition, temporal localization, and segmentation tasks\cite{wang_videomae_2023}.
 \end{itemize}
 
-Pre-extraction of VideoMAE-V2 embeddings significantly reduces storage and computational demands. Saving compact feature vectors instead of raw video sequences lowers I/O overhead and accelerates data loading. This approach decouples frame encoding from model training, enabling more rapid iterative experiments. As a result, overall training time decreases, and resource utilization improves. \unsure{repetition?}
+Pre-extraction of VideoMAE-V2 embeddings significantly reduces storage and computational demands. Saving compact feature vectors instead of raw video sequences lowers I/O overhead and accelerates data loading. This approach decouples frame encoding from model training, allowing for more rapid and iterative experiments. As a result, overall training time decreases, and resource utilization improves. \unsure{repetition?}
 
 \subsection{\acrfull{s6}}
 \label{ssec:s6}
@@ -220,15 +220,15 @@ By preserving a compact hidden state, Mamba approximates long-range dependencies
 The \acrfull{vms} is a \acrfull{sota} implementation in the Papers with Code benchmark. It integrates a \acrlong{s6} optimized for long-range temporal dependencies and offers robust performance across various video event detection tasks. 
 
 \subsubsection{RDFA-S6}
-The RDFA-S6 architecture extends the \acrshort{vms} core with recurrent mechanisms, yielding improved temporal representation capacity in benchmarks of \acrfull{tal}. Empirical evaluations reveal that RDFA-S6 achieves slightly higher mean average precision, indicating its superior performance in event localization benchmarks on THUMOS-14, ActivityNet, FineAction, and HACS.
+The RDFA-S6 architecture extends the \acrshort{vms} core with recurrent mechanisms, yielding improved temporal representation capacity in benchmarks of \acrfull{tal}. Empirical evaluations reveal that RDFA-S6 achieves slightly higher mean average precision, indicating its superior performance in event localization benchmarks on THUMOS-14, ActivityNet, FineAction, and HACS. \todo{ai}
 
-Although RDFA-S6 demonstrated marginally superior accuracy, limited documentation hindered its adoption compared to the well-supported \acrlong{vms}. Consequently, \acrshort{vms} remained this study's primary model for empirical evaluation. 
+Although RDFA-S6 showed marginally improved accuracy, limited documentation hindered its adoption. Compared to the well-supported \acrlong{vms}, RDFA-S6 documentation lacked central elements, such as datasets. Consequently, \acrshort{vms} remained this study's primary model for empirical evaluation. 
 
 
 \subsection{\acrfull{tdeed}}
 \label{ssec:tdeed}
 
-\acrfull{tdeed} is a deep learning architecture designed to address the challenge of \acrfull{pes} in sports videos. This model improves token discriminability while leveraging multiple temporal scales, ensuring high-resolution event localization. The architecture consists of three main components: a feature extractor, a temporally discriminant encoder-decoder, and prediction heads\cite{xarles_t-deed_2024}.
+\acrfull{tdeed} is a deep learning architecture designed to address the challenge of \acrfull{pes} in sports videos. This model enhances token discriminability while utilizing multiple temporal scales, thereby ensuring high-resolution event localization. The architecture consists of three main components: a feature extractor, a temporally discriminant encoder-decoder, and prediction heads\cite{xarles_t-deed_2024}.
 
 The feature extractor generates per-frame feature representations. It employs a RegNetY-based backbone with \acrfull{gsf} modules, integrating local temporal context while maintaining spatial information. Given an input frame sequence of shape \(\mathbb{R}^{L \times H \times W \times 3}\), the extracted feature representation is formulated as:
 
@@ -241,7 +241,7 @@ The encoder-decoder architecture enables processing across multiple temporal sca
 The prediction head consists of a classification head and a displacement head. The classification head predicts event occurrences per frame using a softmax function, while the displacement head improves predictions by estimating the precise event frame within a given radius. This ensures robust event localization even when slight spatial or temporal differences exist.
 
 
-T-DEED is trained end-to-end using a multi-task loss. The loss comprises a weighted cross-entropy loss \(\mathcal{L}_c\) and a displacement loss \(\mathcal{L}_d\), defined as
+T-DEED trains end-to-end using a multi-task loss. The loss comprises a weighted cross-entropy loss \(\mathcal{L}_c\) and a displacement loss \(\mathcal{L}_d\), defined as
 
 \[
 \mathcal{L} = \frac{1}{L}\sum_{l=1}^{L}\Big(\mathcal{CE}_{w}(y_l^{c},\hat{y}_l^c) + \operatorname{MSE}(y_l^{d},\hat{y}_l^d)\Big).
@@ -249,20 +249,20 @@ T-DEED is trained end-to-end using a multi-task loss. The loss comprises a weigh
 
 Here, \(y_l^{c}\) is the one-hot encoding of the event in frame \(l\). The probability distribution at frame \(l\) is denoted by \(\hat{y}_l^c\). Similarly, \(y_l^{d}\) and \(\hat{y}_l^d\) represent the ground truth and predicted displacements, respectively.
 
-\paragraph{Implementation Details} The experiments use a T-DEED implementation adapted for the SoccerNet challenge. Embeddings are computed offline following the original method. Event spotting performance is evaluated using mean Average Precision at IoU thresholds \(\{0.1,0.3,0.5\}\).
+\paragraph{Implementation Details} The experiments use a T-DEED implementation adapted for the SoccerNet challenge. Embeddings are computed offline following the original method. Event spotting performance is evaluated using \acrlong{map}.
 
 
-\section{Training Details}
+\section{Training Details} \todo{ai}
 % optimizer, learning rates, augmentation, early‐stopping, etc.
 
-In this study, we evaluated both \acrshort{vms} and RDFA-S6 architectures, balancing performance and ease of use. RDFA-S6 achieved slightly higher event localization accuracy on benchmarks, yet its documentation and setup complexity introduced reproducibility challenges. By contrast, the \acrshort{vms} implementation provided comprehensive THUMOS dataset annotations, robust download links, and a well-structured run script. These features facilitated an easier integration into the experimental pipeline. Consequently, given its superior usability and reliable performance, \acrshort{vms} was chosen as the primary model.
+In this study, we evaluated both \acrshort{vms} and RDFA-S6 architectures, striking a balance between performance and ease of use. RDFA-S6 achieved slightly higher event localization accuracy on benchmarks, yet its documentation and setup complexity introduced reproducibility challenges. By contrast, the \acrshort{vms} implementation provided comprehensive THUMOS dataset annotations, robust download links, and a well-structured run script. These features facilitated an easier integration into the experimental pipeline. Consequently, given its superior usability and reliable performance, \acrshort{vms} was chosen as the primary model.
 
 All training hyperparameters and architectural settings are specified in the experiments' external configuration files, ensuring reproducibility and transparency. An early stopping mechanism based on validation loss halts training when performance improvements plateau and/or decrease. While no explicit data augmentation pipelines are utilized during model fitting, selective augmentation techniques are available and configurable through the same files if needed.
 
 \section{Bayesian Hyperparameter Optimization}
 \label{sec:bayesian_optimization}
 
-I employed \acrshort{wandb} Sweeps to perform Bayesian Optimization for efficient hyperparameter tuning. A Gaussian Process surrogate modeled the validation \acrshort{map} as a function of learning rate, weight decay, and hidden dimension. Uniform and log-uniform priors were defined over each hyperparameter in the sweep configuration *.YAML file. The expected improvement acquisition function guided the selection of promising hyperparameter combinations. 70 trials were run in three iterations. The 70 runs were in parallel\footnote{All runs were run as individual training and had nothing to do with each other except the \acrshort{wandb} agent designing parameters. } across multiple GPUs to explore the search space while minimizing wall-clock time. All metrics and configuration parameters were logged to \acrshort{wandb}, enabling real-time monitoring and reproducibility. 
+I employed \acrshort{wandb} Sweeps to perform Bayesian Optimization for efficient hyperparameter tuning. A Gaussian Process surrogate model was used to represent the validation \acrshort{map} as a function of learning rate, weight decay, and hidden dimension. Uniform and log-uniform priors were defined over each hyperparameter in the sweep configuration *.YAML file. The expected improvement acquisition function guided the selection of promising hyperparameter combinations. 70 trials were run in three iterations. The 70 runs were in parallel\footnote{All runs were run as individual training and had nothing to do with each other except the \acrshort{wandb} agent designing parameters. } across multiple GPUs to explore the search space while minimizing wall-clock time. All metrics and configuration parameters were logged to \acrshort{wandb}, enabling real-time monitoring and reproducibility. 
 
 % probabilistic model of the objective function (e.g., validation \acrshort{map}) and using an acquisition function to decide which hyperparameters to evaluate next. This approach balances exploration (trying new, uncertain areas) and exploitation (focusing on areas that yield good results).
 
