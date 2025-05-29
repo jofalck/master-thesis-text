@@ -10,7 +10,7 @@ This chapter describes the experimental setup used to evaluate the \acrfull{s6} 
 \label{ssec:idun}
 Video processing pipelines demand substantial computational resources. I utilized the IDUN cluster\footnote{\url{https://www.hpc.ntnu.no/idun/}}. IDUN is a faculty-operated system at NTNU equipped with 234 NVIDIA GPU accelerators (as of April 24, 2024). Although IDUN is not NTNU's central supercomputer, its nodes, featuring Tesla H100 and A100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. Full-match videos were partitioned into fixed-duration clips and distributed workloads across multiple GPUs via data-parallel training to mitigate occasional queuing delays and VRAM limitations.
 
-Due to the high memory requirements of the \acrlong{tdeed} and software requirements of the \acrlong{s6} framework, all experiments were run on IDUN nodes equipped with modern NVIDIA GPUs. Attempts to train on GPUs with 16 GB of memory occasionally trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation were restricted to nodes meeting these hardware and software requirements to guarantee stable training and reproducible results. 
+Due to the high memory requirements of the \acrlong{tdeed} and software requirements of the \acrlong{s6} framework, all experiments were run on IDUN nodes. Attempts to train on GPUs with 16 GB of memory occasionally trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation were restricted to nodes meeting these hardware and software requirements to guarantee stable training and reproducible results. 
 % Later was run on all types of GPUs, and I have no reason why. 
 
 % \subsection{draw.io}
@@ -147,6 +147,26 @@ The authors claim the first four games are training games, and the fifth is vali
 \subsection{VideoMAE-V2}
 \label{ssec:videomae_v2}
 
+\subsubsection{Masking}
+
+The input video frames are first tokenized into spatio-temporal patches in an encoder-decoder masking setup. A binary mask tensor \(M\in\{0,1\}^{T\times H\times W}\) with masking ratio \(r\) is generated, where
+\[
+\sum_{t,h,w} M_{t,h,w} = r\,T\,H\,W.
+\]
+The visible patches \(x_\text{vis}\) are obtained by
+\[
+x_\text{vis} = x \,\odot\,(1 - M)\,,
+\]
+and fed into a lightweight transformer encoder \(E\). The decoder \(D\) takes the encoder output, plus positional embeddings and mask tokens, and attempts to reconstruct the original video:
+\[
+\hat{x} = D\bigl(E(x_\text{vis}),\,\text{mask\_tokens}\bigr).
+\]
+The training process minimizes the reconstruction loss only over masked positions:
+\[
+\mathcal{L} \;=\; \bigl\lVert\,M \,\odot\,(x - \hat{x})\bigr\rVert_2^2.
+\]
+
+
 \acrfull{vmae} by \textcite{wang_videomae_2023} is a self‑supervised masked autoencoder designed to preprocess and compress large‑scale video data before downstream experiments. Building on the original VideoMAE, it introduces a dual‑stage masking schedule: 
 
 \info{feature extractor (hyper params, masking schedule)}
@@ -246,6 +266,7 @@ I employed \acrshort{wandb} Sweeps to perform Bayesian Optimization for efficien
 
 % probabilistic model of the objective function (e.g., validation \acrshort{map}) and using an acquisition function to decide which hyperparameters to evaluate next. This approach balances exploration (trying new, uncertain areas) and exploitation (focusing on areas that yield good results).
 
+\improvement{write about parameter importance in \acrshort{wandb} https://docs.wandb.ai/guides/app/features/panels/parameter-importance/}
 
 
 

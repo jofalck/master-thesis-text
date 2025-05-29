@@ -28,6 +28,20 @@ This thesis is motivated by the opportunity to bridge advances in masked autoenc
 
 The thesis presents an experimental design for a model capable of localizing temporal actions. The system extracts features from videos using masked autoencoding.
 
+This thesis applies the \acrfull{vms} to a football video dataset to evaluate its event-spotting performance (see Chapter~\ref{chap:experiments}). The results demonstrate that \acrshort{vms} achieves not only competitive accuracy but also substantial gains in inference speed and memory efficiency, confirming the practicality of state-space models for large-scale video analytics. 
+
+\subsection{Action Spotting vs.\ Action Localization}
+Action spotting casts each event as a single time, reducing annotation to one timestamp per occurrence. By contrast, action localization requires predicting both start and end times for each action interval and is typically evaluated with temporal \acrfull{iou} metrics. Spotting simplifies supervision and evaluation (via tolerance windows around accurate timestamps), but it also challenges models to resolve events occurring in close temporal proximity without relying on segment boundaries.
+
+\subsection{Temporal vs.\ Spatiotemporal Tasks}
+Temporal event spotting focuses solely on "when" an action occurs, using global frame or clip-level features. Spatiotemporal tasks, in comparison, demand joint localization in time and space (e.g., \ frame-level bounding boxes). The SoccerNet challenge remains in the temporal domain.
+
+
+\subsection{Temporal vs.\ Spatiotemporal Tasks}
+Temporal event spotting focuses solely on "when" an action occurs, using global frame or clip-level features. Spatiotemporal tasks, in comparison, demand joint localization in time and space (e.g., \ frame-level bounding boxes). The SoccerNet challenge remains in the temporal domain.
+
+
+
 \section{Contributions}
 
 This thesis explores a novel utilization of the MAMBA \acrshort{s6} framework in the context of football. To the author's knowledge, as of June 2025, no efforts have been made in this field of study. 
