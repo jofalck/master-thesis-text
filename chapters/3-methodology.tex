@@ -8,7 +8,7 @@ This chapter describes the experimental setup used to evaluate the \acrfull{s6} 
 
 \subsection{IDUN}
 \label{ssec:idun}
-Video processing pipelines demand substantial computational resources. IDUN is a faculty-operated system at NTNU equipped with 234 NVIDIA \acrfull{gpu} accelerators (as of April 24, 2025)\footnote{\url{https://www.hpc.ntnu.no/idun/}}. Although IDUN is not NTNU's central supercomputer, its nodes, featuring Tesla H100 and A100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. Full-match videos were partitioned into fixed-duration clips and distributed workloads across multiple \acrshort{gpu}s via data-parallel training to mitigate occasional queuing delays and VRAM limitations.
+Video processing pipelines demand substantial computational resources. IDUN is a faculty-operated system at NTNU equipped with 234 NVIDIA \acrfull{gpu} accelerators (as of the 24th of April, 2025)\footnote{\url{https://www.hpc.ntnu.no/idun/}}. Although IDUN is not NTNU's central supercomputer, its nodes, featuring Tesla H100 and A100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. Full-match videos were partitioned into fixed-duration clips and distributed workloads across multiple \acrshort{gpu}s via data-parallel training to mitigate occasional queuing delays and VRAM limitations.
 
 Due to the high memory requirements of the \acrfull{tdeed} and software requirements of the \acrfull{s6} framework, all experiments run on IDUN nodes. Attempts to train on \acrshort{gpu}s with 16 GB of memory trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation are restricted to nodes that meet these hardware and software requirements to ensure stable training and reproducible results. 
 
@@ -17,7 +17,7 @@ Due to the high memory requirements of the \acrfull{tdeed} and software requirem
 \subsection{\acrfull{wandb}}
 \label{ssec:wandb}
 
-To streamline the management and reproducibility of the training experiments, I used the \acrlong{wandb} platform. Hyperparameters are logged automatically using \acrshort{wandb}'s Python client, as are training and validation metrics, model checkpoints, and \acrshort{gpu} utilization statistics. A dashboard enables real-time monitoring of experiments, as well as direct and live comparison of runs. \acrshort{wandb}'s automated hyperparameter sweep feature was used to conduct hyperparameter searches. Coordinated sweeps log performance metrics, and visualize the results. \acrshort{wandb} enhances the transparency, comparability, and reproducibility of workflows. 
+The acrlong{wandb} platform streamlined the management and reproducibility of the training experiments. Hyperparameters are logged automatically using \acrshort{wandb}'s Python client, as are training and validation metrics, model checkpoints, and \acrshort{gpu} utilization statistics. A dashboard enables real-time monitoring of experiments, as well as direct and live comparison of runs. \acrshort{wandb}'s automated hyperparameter sweep feature was used to conduct hyperparameter searches. Coordinated sweeps log performance metrics and visualized the results. \acrshort{wandb} enhances the transparency, comparability, and reproducibility of workflows. 
 
 \subsection{Bayesian Hyperparameter Search}
 
@@ -41,33 +41,23 @@ While correlation identifies linear dependencies, importance seeks for complex i
 
 \subsection{Anaconda and pip}
 \label{ssec:conda_pip}
-Python environments were managed using conda. However, all packages, including CUDA-enabled PyTorch builds, were installed via pip to follow recent PyTorch recommendations. Those recommendations favor pip over conda for \acrshort{gpu} support.
+Conda manages the Python environments. However, all packages, including CUDA-enabled PyTorch builds, were installed via pip to follow recent PyTorch recommendations. Those recommendations favor pip over conda for \acrshort{gpu} support.
 
 \section{Data Preprocessing \& Feature Extraction}
 \label{sec:preprocessing}
 
-Experiments are conducted on the SoccerNet-V2 dataset\cite{deliege_soccernet-v2_dataset_2021}. Videos are split into non-overlapping clips $V_k=\{x_t\}_{t=1}^{T_c}$ of fixed duration $T_c=60\!\times\!25$ frames (60\,s at 25\,fps). A 70-30 split and an 80-20 split were used for training and validation. The 80-20 split matches the official publication. 70-30 matches a PyTorch recommendation in the docs
-\footnote{
-\url{https://docs.pytorch.org/docs/stable/data.html}. 
-Retrieved 13th of May}
-.
-
-% 70\% of matches for training and 30\% for validation were initially used. Later, an 80\%/20\% split was favored as it matched the video splits in the original dataset.
+Experiments are conducted on the SoccerNet-V2 dataset\cite{deliege_soccernet-v2_dataset_2021}. Videos are split into non-overlapping clips $V_k=\{x_t\}_{t=1}^{T_c}$ of fixed duration $T_c=60\!\times\!25$ frames (60\,s at 25\,fps). A 70-30 split and an 80-20 split were used for training and validation. The 80-20 split matches the official publication. 70-30 matches a PyTorch recommendation in the docs \footnote{\url{https://docs.pytorch.org/docs/stable/data.html}. Retrieved the 13th of May}.
 
 
-\unsure{simplify the code and make it shorter. Only post relevant sections? (remove classes, try-except, imports, etc}
-\info{This code listing is very long. Maybe appendix?}
 \lstinputlisting[
     caption={Script to change the label-file to the THUMOS-14 format.},
     label=lst:jsonfile,
     language=Python
 ]{listings/sn_to_json.py}
-% The next section is about how the raw videos are transformed. 
-\todo{also trained with 0.8 splits and got better result}
 
 \unsure{the code uses random.random to create a train/val split. To reproduce, should I upload the used data for reproducibility?}
 
-Each full-match video is split into non-overlapping clips of a fixed duration (60 seconds). Clips are sampled at 25 fps and stored as input sequences $V_k=\{x_t\}_{t=1}^{T_c}$ where $T_c=60\times25$. \todo{edge cases(end of game)}. The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration}, which sets a default value if the duration is not explicitly set. 
+The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration}, which sets a default value if the duration is not explicitly set. The video clip at the end of each half, $V_{N}$, has a $T_c$ that refers to the length of the clip. \acrfull{vms} handles different-length inputs. 
 
 \lstinputlisting[
     caption={Part of \acrshort{vms} code used to determine the duration to be pointless. },
@@ -79,22 +69,34 @@ Each clip $V_k$ is fed through the pre‐trained VideoMAE-V2 encoder (\autoref{s
 \[
 z_k = \mathrm{VideoMAE\text{-}V2}(V_k)\;\in\;\mathbb{R}^D.
 \]
-These $D$‐dimensional vectors serve as inputs to the downstream temporal MAMBA model. The vectors are saved on IDUN as \textit{*.pt} files. Offline data eliminates redundant computations, reduces storage requirements, and significantly lowers training times. 
+These $D$‐dimensional vectors serve as inputs to the downstream temporal MAMBA model. The vectors are saved on IDUN as \textit{*.pt} files. Storing the vectors offline eliminates redundant computations, reduces storage requirements, and significantly lowers training times. 
 
-Edge-case handling at the end of match videos was addressed by fixed-length segmentation despite the model's capacity to process variable-length inputs. This simplified protocol was adopted without established guidelines for optimally splitting football footage. \info{In the literature study I did, I found nothing about this} Future research could explore overlapping windows, adaptive clip boundaries, or dynamic segmentation schemes to mitigate boundary artifacts and potentially improve temporal event localization. \unsure{write about future work here and in the end, or only in the end}
+This simplified protocol was adopted without established guidelines for optimally splitting football footage. \info{In the literature study I did, I found nothing about this} Future research could explore overlapping windows, adaptive clip boundaries, or dynamic segmentation schemes to mitigate boundary artifacts and potentially improve temporal event localization.
 
-Despite its demonstrated effectiveness in learning meaningful spatiotemporal representations, \acrlong{vmae} incurs substantial computational overhead that must be managed in large-scale experiments. The dual-stage masking strategy yields robust feature embeddings in which up to 90 \% of video tokens are hidden during training. However, it also increases the number of model parameters and the complexity of each forward pass. In practice, processing a single 60s clip at 25 fps requires on the order of tens of gigaflops\cite{wang_videomae_2023}. All \acrlong{vmae} embeddings are extracted and stored offline to mitigate these resource requirements. The heavy compute footprint of \acrlong{vmae} motivates the exploration of more lightweight architectures or more aggressive token reduction techniques in future work. \unsure{again future work}
+Despite its demonstrated effectiveness in learning meaningful spatiotemporal representations, \acrfull{vmae} incurs substantial computational overhead that must be managed in large-scale experiments. The dual-stage masking strategy yields robust feature embeddings in which up to 90 \% of video tokens are hidden during training. However, it also increases the number of model parameters and the complexity of each forward pass. In practice, processing a single 60s clip at 25 fps requires on the order of tens of gigaflops\cite{wang_videomae_2023}. All \acrshort{vmae} embeddings are extracted and stored offline to mitigate these resource requirements. The heavy compute footprint of \acrshort{vmae} motivates the exploration of more lightweight architectures or more aggressive token reduction techniques in future work.
 
-\acrlong{vmae} has been pre-trained on the large-scale Kinetics dataset\todo{write about kinetics dataset in background}, which comprises thousands of general sports clips over diverse action categories\todo{remove after written background}. Consequently, its learned representations capture broad spatiotemporal patterns common to various athletic activities but are not explicitly tailored to football. While this generic pretraining supports robust feature extraction across multiple sports domains, specialized fine-tuning on football video may improve temporal event localization performance. Future work should explore domain-specific adaptation using dedicated football datasets to bridge the semantic gap between Kinetics pretraining and match-level footage. 
+\acrshort{vmae} has been pre-trained on the large-scale Kinetics dataset. Consequently, its learned representations capture broad spatiotemporal patterns common to various athletic activities but are not explicitly tailored to football. While this generic pretraining supports robust feature extraction across multiple sports domains, specialized fine-tuning on football video may improve temporal event localization performance. Future work should explore domain-specific adaptation using dedicated football datasets to bridge the semantic gap between Kinetics pretraining and match-level footage. 
 
-InternVideo is the foundation for our comparative experiment, in which we evaluate 1,408-dimensional feature vectors extracted by a Kinetics-pretrained model against 3,302-dimensional embeddings generated by an expanded masked autoencoder. Both architectures originate from the same research group that developed VideoMAE-V2. InternVideo is a bigger, still open-source framework.
+InternVideo is the foundation for the comparative experiment, which evaluates 1,408-dimensional feature vectors extracted by a Kinetics-pretrained model against 3,302-dimensional embeddings generated. Both architectures originate from the same research group that developed \acrshort{vmae}. InternVideo is a bigger, still open-source framework.
 
-\todo{The weights from internvideo 2 are available for download from Huggingface; the link is findable. Also, vectors used in experiments}
 
 \section{Datasets}
 \label{sec:method_datasets}
 
 \subsection{THUMOS-14}
+\label{ssec:method_thumos14}
+The THUMOS-14 dataset \cite{dataset:thumos} is a widely used benchmark for temporal action localization. According to \hyperlink{https://paperswithcode.com/dataset/thumos14-1}{Papers With Code}, it is the most popular in the temporal action localization category as of the 29th of May 2025. It consists of over 13,000 temporally annotated action instances distributed across 20 distinct action classes. Its primary focus is on sports activities. The dataset provides untrimmed videos. It is suitable for evaluating models on their ability to detect and localize actions within longer video sequences. 
+
+Key characteristics of THUMOS-14 include:
+\begin{itemize}
+    \item \textbf{Action Classes}: 20 diverse action categories.
+    \item \textbf{Video Content}: Primarily sports-related, sourced from YouTube.
+    \item \textbf{Annotations}: Provides temporal annotations (start and end times) for action instances in the validation and test sets.
+    \item \textbf{Dataset Split}: Includes training, validation, and testing sets. The validation set contains 1010 videos, and the test set contains 1574 videos. Among these, there are 432 videos with temporal annotations, of which 220 are validation videos and 212 are labeled test videos. 
+    \item \textbf{Evaluation}: Performance is typically measured using mean Average Precision (mAP) at various Intersection over Union (IoU) thresholds.
+\end{itemize}
+
+In this work, THUMOS-14 is relevant as it serves as a benchmark for many temporal action localization models, including \acrshort{vms} and RDFA-S6. The \acrshort{vms} implementation used in this study provides preprocessing scripts and configurations tailored for THUMOS-14.
 
 \subsection{SoccerNet-V2}
 
@@ -115,7 +117,7 @@ The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} comprises vide
     \item An action approximately every 3 seconds. 
 \end{itemize}
 
-The data is locked behind an NDA. There are nine annotated games, of which seven are available, and the last two are related to the challenge. The nine games are from the second tier of English football, the Championship, and were played in October 2019. The games in question are: 
+The data is locked behind a non-disclosure agreement (NDA). There are nine annotated games, of which seven are available, and the last two are related to the challenge. The nine games are from the second tier of English football, the Championship, and were played in October 2019. The games in question are: 
 
 \begin{itemize}
     \item 2019-10-01 - Leeds United - West Bromwich
@@ -127,10 +129,9 @@ The data is locked behind an NDA. There are nine annotated games, of which seven
     \item 2019-10-01 - Reading - Fulham
     \item 2019-10-02 - Cardiff City - Queens Park Rangers
     \item 2019-10-01 - Wigan Athletic - Birmingham City
-    \item 
 \end{itemize}
 
-The authors claim that the first four games are training games, and the fifth is a validation game. The sixth and seventh games are test games used for testing purposes, while the last two games do not have public annotations. They are the challenge games, as mentioned above. All videos are in the *.mkv file format; one can also download features for older videos. \todo{write more academic}
+The authors claim that the first four games are training games, and the fifth is a validation game. The sixth and seventh games are test games used for testing purposes, while the last two games do not have public annotations. They are the challenge games, as mentioned above. All videos are in the *.mkv file format; one can also download features for older videos. 
 
 \begin{figure}
     \centering
@@ -139,7 +140,30 @@ The authors claim that the first four games are training games, and the fifth is
     \label{fig:soccernet_dist}
 \end{figure}
 
-\todo{how the dataset was changed to work with VMS}
+\cref{sec: preprocessing} provides a more in-depth explanation of how the SoccerNet labels are created, similar to the THUMOS labels, to align with the \acrshort{vms} model. 
+
+The SoccerNet dataset contains 500 videos with temporal annotations, related to an earlier challenge. There are 17 action classes.
+\begin{itemize}
+    \item Penalty
+    \item Kick-off
+    \item Goal
+    \item Substitution
+    \item Offside
+    \item Shots on target
+    \item Shots off target
+    \item Clearance
+    \item Ball out of play
+    \item Throw-in
+    \item Foul
+    \item Indirect free-kick
+    \item Direct free-kick
+    \item Corner
+    \item Yellow card
+    \item Red card
+    \item Yellow->red card
+\end{itemize}
+
+The actions are associated with a single timestamp, and their action-density is lower compared the the new dataset.
 
 \section{Model Architectures}
 \label{sec:model_architectures}
@@ -167,9 +191,8 @@ The training process minimizes the reconstruction loss only over masked position
 \]
 
 
-\acrfull{vmae} by \textcite{wang_videomae_2023} is a self‑supervised masked autoencoder designed to preprocess and compress large‑scale video data before downstream experiments. Building on the original VideoMAE, it introduces a dual‑stage masking schedule: 
+\acrfull{vmae} by \textcite{wang_videomae_2023} is a self‑supervised masked autoencoder designed to preprocess and compress large‑scale video data before downstream experiments. Building on the original VideoMAE\cite{tong_videomae_2022}, it introduces a dual‑stage masking schedule: 
 
-\info{feature extractor (hyper params, masking schedule)}
 \begin{itemize}
     \item \emph{Sparse spatiotemporal masking} in early epochs to encourage global context learning over long clips,
     \item \emph{Dense tube masking} in later epochs to refine local motion representations.
@@ -186,7 +209,7 @@ By dynamically varying the masking granularity, VideoMAE‑V2 achieves:
     \item robust transferability across action recognition, temporal localization, and segmentation tasks\cite{wang_videomae_2023}.
 \end{itemize}
 
-Pre-extraction of VideoMAE-V2 embeddings significantly reduces storage and computational demands. Saving compact feature vectors instead of raw video sequences lowers I/O overhead and accelerates data loading. This approach decouples frame encoding from model training, allowing for more rapid and iterative experiments. As a result, overall training time decreases, and resource utilization improves. \unsure{repetition?}
+Pre-extraction of \acrshort{vmae} embeddings significantly reduces storage and computational demands. Saving compact feature vectors instead of raw video sequences lowers I/O overhead and accelerates data loading. This approach decouples frame encoding from model training, enabling more rapid and iterative experimentation. As a result, overall training time decreases, and resource utilization improves.
 
 \subsection{\acrfull{s6}}
 \label{ssec:s6}
@@ -220,9 +243,9 @@ By preserving a compact hidden state, Mamba approximates long-range dependencies
 The \acrfull{vms} is a \acrfull{sota} implementation in the Papers with Code benchmark. It integrates a \acrlong{s6} optimized for long-range temporal dependencies and offers robust performance across various video event detection tasks. 
 
 \subsubsection{RDFA-S6}
-The RDFA-S6 architecture extends the \acrshort{vms} core with recurrent mechanisms, yielding improved temporal representation capacity in benchmarks of \acrfull{tal}. Empirical evaluations reveal that RDFA-S6 achieves slightly higher mean average precision, indicating its superior performance in event localization benchmarks on THUMOS-14, ActivityNet, FineAction, and HACS. \todo{ai}
+The RDFA-S6 architecture extends the \acrshort{vms} core with recurrent mechanisms. Empirical evaluations reveal that RDFA-S6 achieves slightly higher \acrlong{map} compared to \acrshort{vms}. This indicates a slight improvement in performance in event localization benchmarks on THUMOS-14, ActivityNet, FineAction, and HACS. 
 
-Although RDFA-S6 showed marginally improved accuracy, limited documentation hindered its adoption. Compared to the well-supported \acrlong{vms}, RDFA-S6 documentation lacked central elements, such as datasets. Consequently, \acrshort{vms} remained this study's primary model for empirical evaluation. 
+Although RDFA-S6 showed marginally improved accuracy, limited documentation hindered its adoption. Compared to the well-documented \acrlong{vms}, RDFA-S6 documentation lacked central elements, such as datasets. Consequently, \acrshort{vms} remained this study's primary model for empirical evaluation. 
 
 
 \subsection{\acrfull{tdeed}}
@@ -241,7 +264,7 @@ The encoder-decoder architecture enables processing across multiple temporal sca
 The prediction head consists of a classification head and a displacement head. The classification head predicts event occurrences per frame using a softmax function, while the displacement head improves predictions by estimating the precise event frame within a given radius. This ensures robust event localization even when slight spatial or temporal differences exist.
 
 
-T-DEED trains end-to-end using a multi-task loss. The loss comprises a weighted cross-entropy loss \(\mathcal{L}_c\) and a displacement loss \(\mathcal{L}_d\), defined as
+\acrshort{tdeed} trains end-to-end using a multi-task loss. The loss comprises a weighted cross-entropy loss \(\mathcal{L}_c\) and a displacement loss \(\mathcal{L}_d\), defined as
 
 \[
 \mathcal{L} = \frac{1}{L}\sum_{l=1}^{L}\Big(\mathcal{CE}_{w}(y_l^{c},\hat{y}_l^c) + \operatorname{MSE}(y_l^{d},\hat{y}_l^d)\Big).
@@ -249,15 +272,15 @@ T-DEED trains end-to-end using a multi-task loss. The loss comprises a weighted 
 
 Here, \(y_l^{c}\) is the one-hot encoding of the event in frame \(l\). The probability distribution at frame \(l\) is denoted by \(\hat{y}_l^c\). Similarly, \(y_l^{d}\) and \(\hat{y}_l^d\) represent the ground truth and predicted displacements, respectively.
 
-\paragraph{Implementation Details} The experiments use a T-DEED implementation adapted for the SoccerNet challenge. Embeddings are computed offline following the original method. Event spotting performance is evaluated using \acrlong{map}.
+The experiments use a T-DEED implementation adapted for the SoccerNet challenge. Videos are turned into pictures of each frame and stored offline, following the original method. Event spotting performance is evaluated using \acrlong{map}.
 
 
-\section{Training Details} \todo{ai}
+\section{Training Details} \todo
 % optimizer, learning rates, augmentation, early‐stopping, etc.
 
-In this study, we evaluated both \acrshort{vms} and RDFA-S6 architectures, striking a balance between performance and ease of use. RDFA-S6 achieved slightly higher event localization accuracy on benchmarks, yet its documentation and setup complexity introduced reproducibility challenges. By contrast, the \acrshort{vms} implementation provided comprehensive THUMOS dataset annotations, robust download links, and a well-structured run script. These features facilitated an easier integration into the experimental pipeline. Consequently, given its superior usability and reliable performance, \acrshort{vms} was chosen as the primary model.
+% In this study, we evaluated both \acrshort{vms} and RDFA-S6 architectures, striking a balance between performance and ease of use. RDFA-S6 achieved slightly higher event localization accuracy on benchmarks, yet its documentation and setup complexity introduced reproducibility challenges. By contrast, the \acrshort{vms} implementation provided comprehensive THUMOS dataset annotations, robust download links, and a well-structured run script. These features facilitated an easier integration into the experimental pipeline. Consequently, given its superior usability and reliable performance, \acrshort{vms} was chosen as the primary model.
 
-All training hyperparameters and architectural settings are specified in the experiments' external configuration files, ensuring reproducibility and transparency. An early stopping mechanism based on validation loss halts training when performance improvements plateau and/or decrease. While no explicit data augmentation pipelines are utilized during model fitting, selective augmentation techniques are available and configurable through the same files if needed.
+% All training hyperparameters and architectural settings are specified in the experiments' external configuration files, ensuring reproducibility and transparency. An early stopping mechanism based on validation loss halts training when performance improvements plateau and/or decrease. While no explicit data augmentation pipelines are utilized during model fitting, selective augmentation techniques are available and configurable through the same files if needed.
 
 \section{Bayesian Hyperparameter Optimization}
 \label{sec:bayesian_optimization}
@@ -265,9 +288,6 @@ All training hyperparameters and architectural settings are specified in the exp
 I employed \acrshort{wandb} Sweeps to perform Bayesian Optimization for efficient hyperparameter tuning. A Gaussian Process surrogate model was used to represent the validation \acrshort{map} as a function of learning rate, weight decay, and hidden dimension. Uniform and log-uniform priors were defined over each hyperparameter in the sweep configuration *.YAML file. The expected improvement acquisition function guided the selection of promising hyperparameter combinations. 70 trials were run in three iterations. The 70 runs were in parallel\footnote{All runs were run as individual training and had nothing to do with each other except the \acrshort{wandb} agent designing parameters. } across multiple GPUs to explore the search space while minimizing wall-clock time. All metrics and configuration parameters were logged to \acrshort{wandb}, enabling real-time monitoring and reproducibility. 
 
 % probabilistic model of the objective function (e.g., validation \acrshort{map}) and using an acquisition function to decide which hyperparameters to evaluate next. This approach balances exploration (trying new, uncertain areas) and exploitation (focusing on areas that yield good results).
-
-\improvement{write about parameter importance in \acrshort{wandb} https://docs.wandb.ai/guides/app/features/panels/parameter-importance/}
-
 
 
 \section{\acrshort{vms} Evaluation Protocol}
@@ -290,12 +310,12 @@ The IoU condition
 \]
 ensures that the predicted center $t_p$ lies within one second of the actual event time.
 
-I measured runtime directly from \acrshort{wandb} logs, as the platform automatically records wall-clock time for each training run. However, these values vary according to the assigned GPU model. All measurements were standardized on a single GPU type to ensure fair comparisons. 
+I measured runtime directly from \acrshort{wandb} logs, as the platform automatically records wall-clock time for each training run. However, these values vary according to the assigned \acrshort{gpu} model. All measurements were standardized on a single \acrshort{gpu} type to ensure fair comparisons. 
 
-\section{Environment} 
+\section{Environment} \todo 
 
 Multiple environments
 I used Python, but the environments also had CUDA code and C++ code. 
 Are different repositories for different experiments
 a VMS environment or a tool?
-Can I just put environments in an appendix? Environments are stored in wandb if I understand it correctly, with version control
+Can I just put environments in an appendix? Environments are stored in wandb, if I understand it correctly, with version control.
