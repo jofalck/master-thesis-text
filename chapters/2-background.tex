@@ -64,48 +64,6 @@ Kinetics-400/600/700 \cite{dataset:kinetics} provides hundreds of thousands of 1
 \subsection{FineAction}
 FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer actions annotated at the frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis.
 
-
-
-% \section{Datasets}
-% \label{sec:datasets}
-
-% \textcite
-% Several large-scale video datasets have been developed to advance action recognition research. \textcite{survey_of_survey} provides comprehensive overviews of available sports-related action datasets (see their Tables 4 & 5), while Seweryn et al.~\cite{seweryn_survey_2023} focus specifically on football-centric collections. Below, we summarize the main datasets examined in this thesis, ordered by their relevance and scale.
-
-
-% \subsection{SoccerNet-V2}
-% \label{ssec:soccernet}
-
-% The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} contains video recordings of 7 professional football matches with fine-grained annotations for 12 action classes. It provides:
-% \begin{itemize}
-%     \item 7 full matches (90 min each) at 25 fps.
-%     \item Timestamped action labels for spotting tasks.
-%     \item Team annotations for each event.
-%     \item Publicly accessible via HuggingFace\footnote{\url{https://huggingface.co/datasets/SoccerNet/SN-BAS-2025}}.
-%     \item The twelve football event classes:
-%         \begin{center}
-%             \begin{tabular}{llll}
-%                 Pass & Drive & Header & High Pass \\
-%                 Out & Cross & Throw In & Shot \\
-%                 Ball Player Block & Player Successful Tackle & Free Kick & Goal
-%             \end{tabular}
-%         \end{center}
-%     \item An action approximately every 3 seconds. 
-% \end{itemize}
-
-% The original SoccerNet dataset records 500 games with 17 action classes. 
-
-
-% \subsection{THUMOS'14}
-% \label{ssec:thumos}
-
-% The THUMOS'14 dataset \cite{dataset:thumos} comprises:
-% \begin{itemize}
-%     \item 20 action classes in sports and daily activities.
-%     \item 213 untrimmed videos for temporal detection.
-%     \item Predefined train/val/test splits for benchmarking.
-% \end{itemize}
-
 \section{Deep Learning} 
 \label{sec:deep_learning}
 
@@ -208,7 +166,7 @@ Despite their locality bias, \acrshort{cnn}-based video models remain foundation
 
 \subsubsection{\acrfull{gcn}}
 
-\acrfull{gcn} is a subsection of Graph Neural Networks (GNNs), which accomplish link prediction, graph classification, and graph generation. \acrshort{gcn}s learns node embeddings. Each node has an identity, a vector, and is connected to other nodes. The idea is to aggregate information from its neighbours \cite{kipf_gcn_2017}.
+\acrfull{gcn} is a subsection of Graph Neural Networks (GNNs), which accomplish link prediction, graph classification, and graph generation. \acrshort{gcn}s learn node embeddings. Each node has an identity, a vector, and a connection to other nodes. The idea is to aggregate information from its neighbors \cite{kipf_gcn_2017}.
 
 \subsection{Recurrent Neural Nets}
 
@@ -301,30 +259,6 @@ Together, the original \acrshort{sam} and its video-centric successor exemplify 
 \improvement{To increase readability, this section needs more figures, not only here}
 \subsection{State-Space Models}
 \label{ssec:state_space_models}
-% \acrfull{ssm} offers a continuous-time representation of sequential data via a latent state \(h(t)\in\mathbb{R}^N\):
-% \begin{align}
-%     \frac{\mathrm{d}h(t)}{\mathrm{d}t} &= A\,h(t) + B\,x(t),  \label{eq:ssm_continuous1}\\
-%     y(t) &= C\,h(t),                                    \label{eq:ssm_continuous2}
-% \end{align}
-% where \(x(t)\in\mathbb{R}^d\) is the input, \(y(t)\in\mathbb{R}^m\) the output, and \(A\in\mathbb{R}^{N\times N}, B\in\mathbb{R}^{N\times d}, C\in\mathbb{R}^{m\times N}\) are learned parameters.  Discretizing these equations with step size \(\Delta\) yields
-% \begin{align}
-%     \bar A &= \exp(\Delta\,A), 
-%     & 
-%     \bar B &= \bigl(\exp(\Delta\,A)-I\bigr)A^{-1}B,\\
-%     h_k &= \bar A\,h_{k-1} + \bar B\,x_k, 
-%     &
-%     y_k &= C\,h_k,
-%     \quad k=1,2,\dots
-% \end{align}
-% \unsure{Do I have to reference equations in the same way figures must be referenced in a text}
-% VideoMamba \cite{li_videomamba_2024} builds on this framework with a \emph{Selective Scan} (\acrshort{s6}) core.  Its parameters \((\Delta, A,B,C)\) control:
-% \begin{itemize}
-%     \item \(\Delta\): temporal resolution of the recurrence,
-%     \item \(A\): continuous dynamics matrix,
-%     \item \(B,C\): input and output mappings.
-% \end{itemize}
-
-% By preserving a compact hidden state, Mamba approximates long-range dependencies akin to self-attention but with only \(\mathcal{O}(L)\) time/memory cost rather than \(\mathcal{O}(L^2)\).  
 
 VideoMAMBA extends \acrshort{s6} to spatiotemporal video features: each frame is first embedded (e.g., \ via convolutional or patch-based encoders) into \(x_k\), then processed through the discrete \acrfull{ssm} along the temporal dimension. Prior studies \cite{lee_enhancing_mamba_s6_2024, li_videomamba_2024} report that VideoMAMBA matches transformer-based action recognition on standard benchmarks while reducing inference overhead.
 
@@ -386,7 +320,7 @@ However, distillation also has limitations:
     \label{fig:pedestrian_gradient}
 \end{figure}
 
-Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \autoref{fig:pedestrian_gradient} visualizes the gradient vectors. Similarly, action recognition in videos was addressed through the Histogram of Flow\cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept. The histogram of Flow calculates gradient descriptors at each frame.  It captures motion information through the analysis of optical flows, and then combines these per-frame descriptors into a representation that encapsulates temporal dynamics. \unsure{The HOG image is from Wikipedia, but they do not provide any source.}
+Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \autoref{fig:pedestrian_gradient} visualizes the gradient vectors. Similarly, action recognition in videos was addressed through the Histogram of Flow\cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept. The histogram of Flow calculates gradient descriptors at each frame. It captures motion information through the analysis of optical flows and then combines these per-frame descriptors into a representation that encapsulates temporal dynamics. \unsure{The HOG image is from Wikipedia, but they do not provide any source.}
 
 Despite these approaches' innovation in early computer vision, their limitations soon became apparent. The reliance on accurate handcrafted features often led to challenges in scaling to complex scenarios and achieving generalization. Deep learning, with the ability to learn data-driven representations, has mainly outpaced these manual methods.
 
@@ -458,25 +392,11 @@ By sparse sampling over long videos, TSN strikes a balance between efficiency an
 
 \subsection{Spotting-Level Metrics}
 \subsubsection{Mean Average Precision (mAP)}
-We treat each predicted timestamp $\hat t_j$ and its corresponding class $\hat c_j$ as a detection. A true positive occurs if there exists a ground-truth event $(t_i,c_i)$ such that $\hat c_j = c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1\,s). All unmatched predictions are false positives, and missed ground-truth events are false negatives. We compute precision-recall curves per class and report.
+We treat each predicted timestamp $\hat t_{j}$ and its corresponding class $\hat c_{j}$ as a detection. A true positive occurs if there exists a ground-truth event $(t_{i},c_{i})$ such that $\hat c_{j} = c_{i}$ and $|\hat t_{j} - t_{i}|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1\,s). All unmatched predictions are false positives, and missed ground-truth events are false negatives. We compute precision-recall curves per class and report.
 \[
-\mathrm{AP}_c = \int_{0}^{1} p_c(r)\,\mathrm{d}r,\quad
-\mathrm{mAP} = \frac{1}{|\mathcal{C}|}\sum_{c\in\mathcal{C}}\mathrm{AP}_c.
+\mathrm{AP}_{c} = \int_{0}^{1} p_{c}(r)\,\mathrm{d}r,\quad
+\mathrm{mAP} = \frac{1}{|\mathcal{C}|}\sum_{c\in\mathcal{C}}\mathrm{AP}_{c}
 \]
-
-
-% \subsection{Localization-Level Metrics}
-% \subsubsection{\acrfull{iou}}
-% For methods that predict temporal segments $[s_j,e_j]$, we measure overlap with ground-truth intervals $[t_i-\tfrac{\tau_i}{2},\,t_i+\tfrac{\tau_i}{2}]$ via
-% \[
-% \mathrm{IoU}([s_j,e_j],\,[g_s,g_e]) 
-% = \frac{|[s_j,e_j]\cap [g_s,g_e]|}{|[s_j,e_j]\cup [g_s,g_e]|}.
-% \]
-% A segment is correct if $\mathrm{IoU}\!\ge\theta$ and $\hat c_j=c_i$.
-
-% \subsubsection{mAP @ IoU Thresholds}
-% \acrshort{map} is computed as above, replacing the tolerance criterion $|\hat t_j - t_i|\le\Delta$ with $\mathrm{IoU}\ge\theta$ for $\theta\in\{0.3,0.5,0.7\}$. This calculation compares single-timestamp spotting to full localization performance.
-
 
 \subsection{Metrics Correlation and Importance}
 
@@ -489,7 +409,7 @@ We treat each predicted timestamp $\hat t_j$ and its corresponding class $\hat c
 
 \subsubsection{Correlation}
 
-Correlation measures the linear relationship between parameters and a selected metric. In the case of hyperparameter searches, the linear relationship between validation loss and hyperparameter value is considered. A high correlation implies that an increase or decrease in the hyperparameter value leads to a similar change in the metric. However, correlation alone does not capture second-order interactions or non-linear dependencies.
+Correlation measures the linear relationship between parameters and a selected metric. In the case of hyperparameter searches, it measures the linear relationship between the validation loss and the value of the hyperparameter. A high correlation implies that an increase or decrease in the hyperparameter value leads to a similar change in the metric. However, correlation alone does not capture second-order interactions or non-linear dependencies.
 
 \subsection{Importance}
 
@@ -502,11 +422,11 @@ To address these limitations, \acrfull{wandb} proposes an importance metric. The
 COMEDIAN \cite{denize_comedian_2024} combines self-supervised learning and knowledge distillation to initialize a transformer for action-spotting on the SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021}. The contributions from Denize et al. include a three-step training pipeline and \acrlong{sota} performance. The first step is to use self-supervised pretraining on a spatial transformer. The second step is to initialize a temporal transformer using knowledge distillation to enrich the spatial transformer's output. The final step involves training on the relevant action spotting task, specifically SoccerNet-V2 \cite{deliege_soccernet-v2_dataset_2021}.
 
 \subsubsection{\acrfull{tdeed}}
-\acrlong{tdeed} \cite{xarles_t-deed_2024} won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability ensures that each frame of the video is distinct. An encoder-decoder refers to the process of compressing and expanding video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. Enhanced discriminability is useful because sports actions can appear similar. 
+\acrlong{tdeed} \cite{xarles_t-deed_2024} won the action spotting category of SoccerNet 2024 \cite{cioppa_soccernet_2024}. The temporal part refers to looking at different lengths of time in the video. Discriminability ensures that each frame of the video is distinct and unique. An encoder-decoder refers to the process of compressing and expanding video information. The model utilizes \acrfull{sgp} to enhance its discriminability between tokens. Enhanced discriminability is useful because sports actions can appear similar. 
 
 \subsubsection{Group Activity Recognition}
 
-In 2021, \textcite{gerats_individual_same_task_2021} utilized a single static panorama camera for action-spotting and activity recognition. The authors use player snippets as model input. Inflated 3D \acrshort{cnn} extracts spatio-temporal features from the snippets. A graph attention network analyzes the relationship between players and their activities and actions.
+In 2021, \textcite{gerats_individual_same_task_2021} employed a single static panorama camera for action spotting and activity recognition. The authors use player snippets as model input. Inflated 3D \acrshort{cnn} extracts spatio-temporal features from the snippets. A graph attention network analyzes the relationship between players and their activities and actions.
 
 \section{Related Works in Action Localization}
 \label{sec:related_works_all}
@@ -528,7 +448,7 @@ In 2021, \textcite{gerats_individual_same_task_2021} utilized a single static pa
 
 \textcite{chen_children_2023} propose a combination of \acrfull{vlad} and \acrfull{dbn} to perform action recognition on football games with children. 
 
-\textcite{wang_skeleton_two-stream_2023} combines a \acrfull{gcn} with transformers to understand human actions on a skeleton version of the Kinetics dataset.  \unsure{vlad and dbn not talked about earlier}
+\textcite{wang_skeleton_two-stream_2023} combines a \acrfull{gcn} with transformers to understand human actions on a skeleton version of the Kinetics dataset.  \unsure{vlad and deep belief networks (DBN) not talked about earlier}
 
 % \textcite{radhakrishnan_bi_lstm_2023} 
 \textcite{giveki_human_2024} designs a novel \acrshort{gru} which focuses on spatial features, optical flow, and temporal dependencies to spot human actions. 
