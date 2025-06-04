@@ -140,7 +140,7 @@ The authors claim that the first four games are training games, and the fifth is
     \label{fig:soccernet_dist}
 \end{figure}
 
-\cref{sec: preprocessing} provides a more in-depth explanation of how the SoccerNet labels are created, similar to the THUMOS labels, to align with the \acrshort{vms} model. 
+\cref{sec:preprocessing} provides a more in-depth explanation of how the SoccerNet labels are created, similar to the THUMOS labels, to align with the \acrshort{vms} model. 
 
 The SoccerNet dataset contains 500 videos with temporal annotations, related to an earlier challenge. There are 17 action classes.
 \begin{itemize}
@@ -199,7 +199,6 @@ The training process minimizes the reconstruction loss only over masked position
 \end{itemize}
 
 VideoMAE has three components: embedder, encoder, and decoder. VideoMAE uses cube embedding \(\Phi_{emb}\) to transform frames into sequences of tokens. It designs a tube masking strategy with a ratio of \(\rho \simeq 90\%\). The visible tokens are encoded by a vanilla \acrshort{vit} backbone. A decoder reconstructs the masked patches using another \acrshort{vit}\cite{wang_videomae_2023}. 
-% Each frame is first partitioned into non‑overlapping $P\times P$ patches and tokenized; a binary mask tensor $M\in\{0,1\}^{T\times H/P\times W/P}$ with masking ratio up to 90\% is then generated according to the dual schedule. The visible tokens $x_{\rm vis}=x\odot(1-M)$ are encoded by a standard ViT backbone, while a lightweight three‑layer transformer decoder reconstructs only the masked patches. 
 \improvement{There is some juicy math in the paper which can help the thesis seem more professional}
 
 By dynamically varying the masking granularity, VideoMAE‑V2 achieves:
@@ -229,7 +228,7 @@ where \(x(t)\in\mathbb{R}^d\) is the input, \(y(t)\in\mathbb{R}^m\) the output, 
     y_k &= C\,h_k,
     \quad k=1,2,\dots
 \end{align}
-\unsure{Do I have to reference equations in the same way figures must be referenced in a text}
+
 VideoMamba \cite{li_videomamba_2024} builds on this framework with a \emph{Selective Scan} (\acrshort{s6}) core. Its parameters \((\Delta, A,B,C)\) control:
 \begin{itemize}
     \item \(\Delta\): temporal resolution of the recurrence,
@@ -237,10 +236,37 @@ VideoMamba \cite{li_videomamba_2024} builds on this framework with a \emph{Selec
     \item \(B,C\): input and output mappings.
 \end{itemize}
 
-By preserving a compact hidden state, Mamba approximates long-range dependencies akin to self-attention but with only \(\mathcal{O}(L)\) time/memory cost rather than \(\mathcal{O}(L^2)\) of the \acrlong{vit}.  
+By preserving a compact hidden state, Mamba approximates long-range dependencies akin to self-attention but with only \(\mathcal{O}(L)\) time/memory cost rather than \(\mathcal{O}(L^2)\) of the \acrfull{vit}.  
+
+
+\subsubsection{Mamba Block}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\linewidth]{figures/mamba_algorithm.png}
+\end{figure}
+
+Mamba\cite{gu_mamba_2024} creates a selection mechanism for compressing context into a smaller state. It introduces input-dependent parameters to allow the model to either keep or discard information. The approach enables linear scaling with respect to sequence length. The algorithm utilizes functions to update the \(B\) and \(C\) matrices, as described in the algorithm design by \textcite{gu_mamba_2024}. The Mamba blocks are hardware-aware; they use kernel fusion, parallel scan, and recomputation to address the limitations of Limited Time Invariance. SSM parameters are directly loaded into fast SRAM memory on \acrshort{gpu}s. 
+
+
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/h3_mlp_mamba.png}
+    \caption{Architecture and the components of a Mamba block.  Compared to the H3 block, Mamba replaces the first multiplicative gate with an activation function. Compared to the MLP block, Mamba adds an SSM to the main branch \cite{gu_mamba_2024}[Figure 3].} 
+    \label{fig:h3_mlp_mamba}
+\end{figure}
+
+
 
 \subsubsection{\acrfull{vms}}
-The \acrfull{vms} is a \acrfull{sota} implementation in the Papers with Code benchmark. It integrates a \acrlong{s6} optimized for long-range temporal dependencies and offers robust performance across various video event detection tasks. 
+The \acrfull{vms} is a \acrfull{sota} implementation in the Papers with Code benchmark. It integrates a \acrlong{s6} optimized for long-range temporal dependencies and offers robust performance across various video event detection tasks. \cref{fig:mamba_ssm} shows the Mamba adoption they use to extend its performance into the video domain. The \acrfull{dbm} starts with distinct linear layers to segregate forward- and backward-features. Then both features are passed through \acrshort{ssm} with bidirectional scanning. The features undergo two gating layers before they are concatenated into an output token sequence\cite{li_videomamba_2024}. 
+
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figures/mamba_ssm.png}
+    \caption{Three \acrshort{ssm} blocks. (a) is the vanilla Mamba block\cite{gu_mamba_2024}. (c) is the proposed \acrshort{dbm} block by \textcite{li_videomamba_2024}.}
+    \label{fig:mamba_ssm}
+\end{figure}
 
 \subsubsection{RDFA-S6}
 The RDFA-S6 architecture extends the \acrshort{vms} core with recurrent mechanisms. Empirical evaluations reveal that RDFA-S6 achieves slightly higher \acrlong{map} compared to \acrshort{vms}. This indicates a slight improvement in performance in event localization benchmarks on THUMOS-14, ActivityNet, FineAction, and HACS. 

@@ -29,6 +29,7 @@ The inference and training time of \acrshort{vms} must not be looked at without 
 
 In pure model inference and training speed, \acrshort{vms} is quickest. When inferring a single unseen video, \acrshort{tdeed} is quicker. Training on \acrshort{vms} is significantly faster than \acrshort{tdeed}. The computational footprint of \acrshort{vms} is very light compared to \acrshort{tdeed}, backed by its adaptability to all types of \acrshort{gpu}s at \acrshort{idun}. 
 
+
 \subsection{RQ3: Which types of adaptation can be made to the MAMBA model to increase its precision?}
 
 Experiment 5 showed \acrshort{tdeed} that pretraining on the older SoccerNet videos improved the prediction performance on the newer, differently annotated, SoccerNet videos. Experiment 3 demonstrated that increasing the feature dimensionality extracted from \acrshort{vmae} improved performance. The fourth experiment suggested the hyperparameter space of \acrshort{vms} models consists of several local minima, which are hard to find. Experiment 6 indicated that strong postprocessing techniques would increase a model's performance on the \acrshort{map} benchmark. 

@@ -28,13 +28,18 @@ All models used default hyperparameters from their original papers. Performance 
         Model & average \acrshort{map} (\%)  & validation \acrshort{map}@50 (\%) & test \acrshort{map}@50 (\%)\\
         \midrule
         \acrshort{tdeed} &  \textemdash & 20.78 & \textbf{47.65}\\
-        \acrshort{vms} (Mamba-\acrshort{s6})   &  \textbf{45.99}   & 43.62 & \textemdash \\
+        \acrshort{vms} (Mamba-\acrshort{s6})   &  \textbf{51.86}   & 50.01 & 40.57 \\
         % \acrshort{vms}-70\_30 (Mamba-\acrshort{s6})   & 48.73 & 46.46 \\
         \bottomrule
     \end{tabular}
     \caption{Accuracy comparison on SoccerNet-V2.}
     \label{tab:results_ex1}
 \end{table}
+
+\todo{update for new test results}
+\todo{update for new mAP on validation}
+
+\url{https://wandb.ai/jofalck-ntnu/video-mamba-suite/runs/wo8mqako/overview}
 
 The \acrshort{vms} model (Mamba-\acrshort{s6}) had an average \acrshort{map} achieving \textbf{45.99\%}. The \acrshort{tdeed} model's average \acrshort{map} is not calculated as there is no \acrshort{iou}, but its validation \acrshort{map}@50 was 20.78\%. In the validation \acrshort{map}@50 category, the \acrshort{vms} model significantly outperformed \acrshort{tdeed}, scoring (43.62\%) compared to \acrshort{tdeed}'s (20.78\%).
 
@@ -116,16 +121,16 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
         \toprule 
         Model & Preprocessing (1 game)  & Training(4+1 games) & Inference (1 game) \\
         \midrule
-        \acrshort{tdeed} & 13 & 3267 & 5\\
+        \acrshort{tdeed} & 13 & 3267 & 8\\
         \acrshort{vms} (Mamba-\acrshort{s6}) & 342 & 43 & 0.1$(7s)$ \\
         \bottomrule
     \end{tabular}
-    \caption{Time comparison. All times are measured in minutes. The inference time for \acrshort{vms} is also provided in seconds. The game between Blackburn Rovers and Nottingham Forest, lasting 96 minutes, took 7.47 seconds with an average of 0.08 seconds per minute-long clip. Inference time assumes the preprocessing is completed.}
+    \caption{Time comparison. All times are measured in minutes. The inference time for \acrshort{vms} is also provided in seconds. The game between Blackburn Rovers and Nottingham Forest, which lasted 96 minutes, took 7 minutes and 47 seconds, with an average of 0.08 seconds per minute-long clip. Inference time assumes the preprocessing is completed.}
     \label{tab:results_ex2}
 \end{table}
+\todo{change results for tdeed inference}
 
-
-\cref{tab:results_ex2} shows the time for each step in each model. The total training time for \acrshort{tdeed} is \(13min+3267min= 3280min\). To infer one game with \acrshort{tdeed} takes \(13min + 5min = 18min \). Concurrently, \acrshort{vms} takes \(342min+43min=385min\) to train on five games. Inference time for one game is approximately the same time as the preprocessing of that game, in this case \(342min\). In both cases, full parallelizability is assumed in preprocessing and inference. 
+\cref{tab:results_ex2} shows the time for each step in each model. The total training time for \acrshort{tdeed} is \(13min+3267min= 3280min\). To infer one game with \acrshort{tdeed} takes \(13min + 8min = 21min \)\todo{change time for inference}. Concurrently, \acrshort{vms} takes \(342min+43min=385min\)\todo{change time for inference} to train on five games. Inference time for one game is approximately the same time as the preprocessing of that game, in this case \(342min\). In both cases, full parallelizability is assumed in preprocessing and inference. 
 
 \begin{table}
     \centering
@@ -161,12 +166,11 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
 
 \subsection{Discussion}
 \label{ssec:ex2_discussion}
-\todo{run tdeed runs, rn it is haakon data}
 
 MAMBA is exceptionally quick in running inference on the games, and the bottleneck is the feature processing. Suppose the inference is parallelized over each of the $\approx90$ videos, which is possible. The inference of a game would be complete before you can blink \cite{bartoshuk_blinking_1977}. Quick. The \acrshort{vmae} preprocessing pipeline is the bottleneck. Efforts should be made to decrease this. 
 
 
-The same is not true for \acrshort{tdeed}. The model is relatively balanced between preprocessing time and inference time. A complete preprocessing and inference of a game takes 18 minutes. Comparing the full pipeline time between the two, the inference time, which is supposed to be one of the advantages of \acrlong{s6}s, is lost due to preprocessing. 
+The same is not true for \acrshort{tdeed}. The model is relatively balanced between preprocessing time and inference time. A complete preprocessing and inference of a game takes 21 minutes. Comparing the full pipeline time between the two, the inference time, which is supposed to be one of the advantages of \acrlong{s6}s, is lost due to preprocessing. 
 
 The direct comparison of preprocessing times (13 min for \acrshort{tdeed} vs. 342 min for \acrshort{vms}) is affected by the hardware difference in \acrshort{gpu}s. The actual difference in preprocessing efficiency on identical hardware might be less pronounced than these numbers suggest. \acrshort{vms} preprocessing would still be considerably longer, even if the \acrshort{gpu}s were equal. 
 
@@ -182,7 +186,7 @@ The assumption of full parallelization simplifies the comparison by looking at t
     \item \textbf{Resource Limits}: Finite number of CPU cores, \acrshort{gpu} cores, or memory bandwidth.
 \end{itemize}
 
-For research involving frequent retraining or inference on already processed data, \acrshort{vms}'s model speed is a significant advantage. For deploying a model to process new, unseen games quickly from raw video to final output, \acrshort{tdeed}'s faster preprocessing currently gives it an edge in total time, despite its slower model component. The comparison is also impacted by:
+For research involving frequent retraining or inference on already processed data, \acrshort{vms}'s model speed is a significant advantage. For deploying a model to process new, unseen games quickly from raw video to final output, \acrshort{tdeed}'s faster preprocessing currently gives it an edge in total time, despite its slower model component. The comparison is also impacted by: 
 
 \begin{itemize}
     \item The missing test \acrshort{map}@50 for \acrshort{vms}.

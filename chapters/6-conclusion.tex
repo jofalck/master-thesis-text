@@ -7,7 +7,7 @@ This thesis investigated the usefulness of the Mamba-based \acrfull{vms} model f
 
 Regarding accuracy (RQ1), a definitive comparison proved challenging. The \acrshort{tdeed} model achieved a test \acrshort{map}@50 of 47.65\%, while the \acrshort{vms} model obtained a validation \acrshort{map}@50 of 43.62\%. However, the absence of a test \acrshort{map}@50 for \acrshort{vms} and significant differences in evaluation protocols, particularly the critical role of \acrfull{snms} postprocessing for \acrshort{tdeed} (Experiment 6), hindered a direct, like-for-like comparison. The inherent differences between \acrshort{vms} as an action localization framework and \acrshort{tdeed} as an action spotting model further complicated this assessment.
 
-In terms of inference speed and computational requirements (RQ2, Experiment 2), the \acrshort{vms} model demonstrated substantially faster training times (43 minutes vs. over 54 hours for \acrshort{tdeed}) and significantly lower computational demands. \acrshort{vms} was capable of running on less powerful \acrshort{gpu}s. While \acrshort{vms}'s raw inference speed is exceptionally high, its current reliance on a lengthy \acrshort{vmae} preprocessing pipeline (342 minutes per game) makes \acrshort{tdeed} (18 minutes total per game) more practical for end-to-end processing of unseen videos.
+In terms of inference speed and computational requirements (RQ2, Experiment 2), the \acrshort{vms} model demonstrated substantially faster training times (43 minutes vs. over 54 hours for \acrshort{tdeed}) and significantly lower computational demands. \acrshort{vms} was capable of running on less powerful \acrshort{gpu}s. While \acrshort{vms}'s raw inference speed is exceptionally high, its current reliance on a lengthy \acrshort{vmae} preprocessing pipeline (342 minutes per game) makes \acrshort{tdeed} (21 minutes total per game) more practical for end-to-end processing of unseen videos.
 
 Examining adaptations to improve \acrshort{vms}'s precision (RQ3) reveals several promising avenues for improvement. Increasing feature dimensionality from 1408 to 3200 yielded a 3.2\% absolute \acrshort{map} gain on THUMOS-14 (Experiment 3), suggesting similar benefits for football data. Experiment 5, which showed \acrshort{tdeed}'s performance improvement with more extensive pretraining, implies that pretraining the \acrshort{vms} model would increase its result. Fine-tuning feature extractors, such as \acrshort{vmae}, on domain-specific data could also benefit \acrshort{vms}. Furthermore, the significant impact of postprocessing on \acrshort{tdeed} (Experiment 6) suggests that implementing robust postprocessing techniques, such as \acrshort{snms}, for \acrshort{vms} is a possible step for performance improvement. Hyperparameter optimization for \acrshort{vms} (Experiment 4) indicated that default parameters are relatively robust, with a lower learning rate showing some benefit, but extensive tuning yielded only marginal gains.
 
@@ -57,3 +57,25 @@ Explore the incorporation of other modalities, such as audio features or player/
 \subsubsection{Data Augmentation:} Develop and evaluate data augmentation techniques tailored explicitly to temporal action spotting in football videos to improve model robustness.
 
 \subsubsection{Model Interpretability:} Apply interpretability techniques to understand what features and temporal patterns the \acrshort{vms} model learns to identify different football actions, particularly how the Mamba mechanism processes long-range dependencies.
+
+\todo{Gjøre det enklere å forstå hva jeg har gjort og enklere å forstå resultater. 
+
+introduksjon -> konklusjon
+
+hva som ble gjort og hva som ble resultatet
+
+kjøre test-set mamba 
+
+metode se om det er bra nok med video-mae, tdeed,s6
+
+i metode bit, gå mer i dybden. leser får en forståelse av at jeg har forstått
+
+noen ki-setninger
+
+ki skjema begge deler funker
+
+i konklusjon
+
+klarere budskap
+
+}
