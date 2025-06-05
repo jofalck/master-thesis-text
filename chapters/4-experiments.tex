@@ -16,7 +16,7 @@ The first experiment compares accuracy from \acrfull{tdeed} and \acrfull{vms}. T
 %     \item \acrshort{tdeed} with four matches for training and one for validation (equivalent to 80\%/20\%).  
 % \end{itemize}
 
-All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm1\) s tolerance window.
+All models used default hyperparameters from their original papers. Performance was measured by mean \acrfull{map} and \acrshort{map}@50 under a \(\pm1s\) tolerance window (see \cref{sec:eval_protocol}. The dataset was edited accordingly to \cref{sec:preprocessing}, which means the annotations are not equal. 
 
 
 \subsection{Results}
@@ -28,47 +28,45 @@ All models used default hyperparameters from their original papers. Performance 
         Model & average \acrshort{map} (\%)  & validation \acrshort{map}@50 (\%) & test \acrshort{map}@50 (\%)\\
         \midrule
         \acrshort{tdeed} &  \textemdash & 20.78 & \textbf{47.65}\\
-        \acrshort{vms} (Mamba-\acrshort{s6})   &  \textbf{51.86}   & 50.01 & 40.57 \\
-        % \acrshort{vms}-70\_30 (Mamba-\acrshort{s6})   & 48.73 & 46.46 \\
+        \acrshort{vms} (Mamba-\acrshort{s6})   &  \textbf{50.60}   & 48.26 & 43.80 \\
         \bottomrule
     \end{tabular}
     \caption{Accuracy comparison on SoccerNet-V2.}
     \label{tab:results_ex1}
 \end{table}
 
-\todo{update for new test results}
-\todo{update for new mAP on validation}
+The \acrshort{vms} model (Mamba-\acrshort{s6}) had an average \acrshort{map} achieving 50.60\%. The \acrshort{tdeed} model's average \acrshort{map} is not calculated as there is no \acrshort{iou}. \acrshort{tdeed}'s validation \acrshort{map}@50 was 20.78\%. In the validation \acrshort{map}@50 category, the \acrshort{vms} model significantly outperformed \acrshort{tdeed}, scoring 48.26\% compared to \acrshort{tdeed}'s 20.78\%.
 
-\url{https://wandb.ai/jofalck-ntnu/video-mamba-suite/runs/wo8mqako/overview}
-
-The \acrshort{vms} model (Mamba-\acrshort{s6}) had an average \acrshort{map} achieving \textbf{45.99\%}. The \acrshort{tdeed} model's average \acrshort{map} is not calculated as there is no \acrshort{iou}, but its validation \acrshort{map}@50 was 20.78\%. In the validation \acrshort{map}@50 category, the \acrshort{vms} model significantly outperformed \acrshort{tdeed}, scoring (43.62\%) compared to \acrshort{tdeed}'s (20.78\%).
-
-Conversely, the \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 of \textbf{47.65\%}. The corresponding test metric for the \acrshort{vms} model is not calculated. A significant difference exists between \acrshort{tdeed}'s validation and test performance. The significant difference between the validation and test scores for \acrshort{tdeed} is further investigated in \cref{sec:experiment_6}.
+The \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 of 47.65\%. \acrshort{vms}'s correspondig metric achieved 43.80\%. There is a significant increase from the validation of \acrshort{tdeed}s to its test performance. The same difference is evident from the validation score of \acrshort{tdeed} to \acrshort{vms}'s validation score. \acrshort{tdeed} performs poorly in validation. These results are further investigated in \cref{sec:experiment_6}.
 
 \subsection{Discussion}
 \label{ssec:ex1_discussion}
 
+\acrshort{tdeed} performs $3.85\%$ in the test \acrshort{map} compared to \acrshort{vms}. However, I will show how the postprocessing is suboptimal in \acrshort{vms}. By changing a single postprocessing value to increase the test \acrshort{map} by $1.83\%$. I discuss this and other theories on why \acrshort{vms} performs poorly compared to \acrshort{tdeed}. 
+
+Compared with standard benchmarks on other datasets (see \cref{sec:datasets}), the results demonstrate that SoccerNet is neither a difficult nor an easy benchmark to evaluate. However, the Mamba-based RDFA-S6, as well as the \acrshort{vms}, perform well in all categories. The models perform best where \acrlong{sota} \acrshort{map} is lower, likely due to their superior scaling properties when there is limited data available. 
+
 The large difference in validation \acrshort{map}@50 for \acrshort{tdeed} could result from a lack of postprocessing. \acrshort{tdeed} uses two different functions for predicting the test \acrshort{map} and the validation \acrshort{map}. The test evaluator applies \acrfull{snms} to remove redundant detections, while the validation does not remove redundant predictions. Additionally, the validation is performed with a stride of \(2\), whereas the test has a stride of \(1\). With \(fps=25\) and a \(tolerance = \pm1s\), this reduction in temporal resolution hinders the predictions from hitting the tolerance window. 
 
-The \acrshort{vms} model employs a form of postprocessing. \acrshort{vms} does little preprocessing, and its only configurable parameter was the top (k) classes to predict in each step. \acrshort{vms} predicts the likelihood of different action classes being present anywhere in the video. 
-
-This "top (k)" mechanism, which uses video-level classification scores to refine predictions for temporal segments, is a postprocessing technique. It helps reduce class confusion and boost correct class assignments by leveraging global video context. \autoref{fig:topk} shows that the baseline with \(topk=2\) and the run with \(topk=12\) behaved quite similarly. The baseline with \(topk=2\) is the same run as in \autoref{tab:results_ex1}, while a run with \(topk=12\) achieved 45.85\% average \acrshort{map}.
-
-\begin{figure}
+\begin{figure}[h]
     \centering
-    \includegraphics[width=\linewidth]{figures/topk_classes.png}
-    \caption{Results from different postprocessing top \(k\) classes.}
+    \includegraphics[width=\linewidth]{figures/valid_topk_2.png}
+    \caption{Validation plotted per training epoch for the three different values for postprocessing topk. The drop at the end is attributed to the testing results. The test results are described in \cref{fig:topk_test_map}. \(topk=2\) is the default value and is the same run as in \cref{tab:results_ex1}.}
     \label{fig:topk}
 \end{figure}
 
-However, this type of postprocessing is different from the significant postprocessing that the \acrshort{tdeed} model uses for its test evaluation. \acrshort{snms} primarily addresses the issue of removing redundant or overlapping detections.
+To research if \acrshort{vms} could achieve a similar gain from validation to test by utilizing postprocessing, the postprocessing.py file was modified. The only configurable parameter was the topk. $top (k)$ predicts the $k$ most likely classes to appear within a video.\cref{fig:topk} shows the baseline, which predicts two classes and performs the worst. The increase in value when using six classes is $0.69\%$, and the increase from six to twelve classes is $1.14$. This shows, as expected, that football clips of 1 minute contain a variety of different actions. The baseline value of two likely stems from the nature of YouTube clips, which often involve broader actions. Each video focuses on a single action or two distinct actions. 
 
-The performance of the \acrshort{vms} model could be enhanced by incorporating techniques similar to \acrshort{tdeed}'s test-time postprocessing, specifically NMS or \acrshort{snms}.
+\begin{figure}
+    \centering
+    \includegraphics[width=\linewidth]{figures/topk_test_map.png}
+    \caption{The results on the test set for each of the different topk configurations. }
+    \label{fig:topk_test_map}
+\end{figure}
 
-The current "top (k)" postprocessing in \acrshort{vms} refines the classification and scoring of proposed segments.
-\acrshort{snms} would address a different aspect: filtering out redundant temporal detections.
-These two types of postprocessing are not mutually exclusive and can be complementary. Applying \acrshort{snms} after the "top (k)" refinement could potentially lead to a further increase in \acrshort{vms}'s \acrshort{map} scores, particularly for metrics like \acrshort{map}@50, where precise, non-redundant detections are crucial. This would make its evaluation more directly comparable to \acrshort{tdeed}'s test performance.
+The increase from two, to six, to twelve classes suggests the model is capable of picking up actions that are less prevalent than pass and drive. The dataset is distributed unequally (see \cref{ssec:dataset_soccernet}). An earlier version of this experiment, which was flawed at the start and end of the videos, showed that six classes performed worse, while classes 2 and 12 were equal. The setup does not handle these edge cases sufficiently, but seeing the improvement is interesting. 
 
+There is an interesting observation in \cref{fig:topk}. $topk=2$ consistently outperforms $topk=6$ on the validation set. In later epochs, $topk=2$ outperforms $topk=12$. This is likely due to the distinct nature of games. Some games will have a higher concentration of passes and drives, while others offer a more diverse range of classes.
 
 Using a shorter stride for validation is a technique to increase training speed. In the case of the \acrshort{tdeed} implemented for SoccerNet, the testing phase is weighted more heavily than validation, as it involves submitting to a challenge. A run with \(STRIDE=1\) to discuss this issue in more depth is elaborated in \cref{sec:experiment_6}. 
 
@@ -79,28 +77,26 @@ The temporal discriminability enhancer part of the \acrlong{tdeed} has strategie
     \item give accurate per frame predictions
 \end{itemize}
 
-Focusing on temporal distinctions is one key to success in tasks where variations in timing or appearance can result in different categories. 
+Focusing on temporal distinctions is one key to success in tasks where slight variations in timing or appearance result in different categories. \acrshort{tdeed} is more reactive\todo{not correct word} to small changes in input. In contrast, Mamba's design captures long-range contexts, providing a broader understanding of the video. Mamba is designed to learn more quickly with linear complexity and requires less data.
 
-In contrast, Mamba's design captures long-range contexts, providing a broader understanding of the video. It is also designed to learn more quickly with linear complexity and requires less data. It is my theory that with a stronger postprocessing pipeline, the \acrshort{map} outperforms \acrshort{tdeed}. 
+The validation set size of a single football game can be problematic. Football games can vary significantly due to factors such as team composition, play styles, event frequency, and the referee's threshold for issuing fouls. These are just a few of the variables. There is a risk of bias from the distribution of actions within the validation game. If the validation game is "easy" or "hard," that would severely influence the score. 
 
-The validation set size of a single football game can be problematic. Football games can vary significantly due to factors such as team composition, play styles, event frequency, and the referee's threshold for issuing fouls. These are just a few of the variables. There is a risk of bias from the distribution of actions within the validation game. If the validation game is "easy" or "hard," that would severely influence the score. A split of 80\% to 20\% is validated on one game and trained on four games in total. However, the validation set is more robust when the game is split into sections and randomly assigned to either the training or validation set. The result will be more transferable and generalizable. The model with joint training in \cref{fig:500_7_val_compare} exhibits significant variation in its validation performance. I assume this is because of the inherited differences in validation clips. 
+While \acrshort{tdeed}'s four matches for training and one for validation is an 80\%/20\% split, validating on a single game can be less representative and more prone to bias than an 80\%/20\% split of clips. The validation set is more robust when the game is split into sections and randomly assigned to either the training or validation set. The result will be more transferable and generalizable. The model with joint training in \cref{fig:500_7_val_compare} has significant variation in its validation performance per epoch. I assume this is because of the inherited differences in validation clips. Some are easy and receive a good validation, while others are hard and perform poorly thereafter. 
 
-\acrshort{vms} runs on any \acrshort{gpu}, but \acrshort{tdeed} needs a lot of memory and only runs on premium \acrshort{gpu}s. If computational resources (especially \acrshort{gpu} memory and type) are a limiting factor, \acrshort{vms} is the more practical choice. \acrshort{vms} has simpler postprocessing and a clearer GitHub page explaining installation steps. It is more straightforward to deploy. However, without obvious comparisons, it is difficult to identify clear advantages of one model over the other. 
+The testing set consists of two games from different stadiums. Although the validation issues are also present in testing, testing has twice the data and is more representative of a real-world scenario. Ideally, both problems are mitigated by expanding the dataset. Both extensive augmentation and expanding the dataset are mitigations to this issue, and they are explained further in \cref{sec:future_work}. The test set must also provide the fairest comparison, and therefore, it is not edited. 
 
-The most significant limitation is the absence of the test \acrshort{map}@50 score for the \acrshort{vms} model. This prevents a direct and complete comparison with \acrshort{tdeed} on this crucial metric, which is often considered the primary performance indicator on unseen test data.
-
-The \acrshort{tdeed} model was evaluated differently for validation and testing. The validation used a stride of two (halving temporal resolution) and lacked significant postprocessing (such as \acrshort{snms}). The test evaluation used a smaller stride and included such postprocessing. This inconsistency makes it difficult to:
-
-\begin{itemize}
-    \item Directly compare \acrshort{tdeed}'s validation \acrshort{map}@50 with its test \acrshort{map}@50.
-    \item Fairly compare \acrshort{tdeed}'s validation \acrshort{map}@50 with \acrshort{vms}'s validation \acrshort{map}@50, as the evaluation conditions were not equivalent.
-\end{itemize}
-
-While \acrshort{tdeed}'s "four matches for training and one for validation" is an 80\%/20\% split, validating on a single match can be less representative and more prone to bias than an 80\%/20\% split.
-
-Using default hyperparameters from their original papers" might not be optimal for the specific SoccerNet-V2 dataset or the fine-grained action spotting task. These defaults might have been tuned for different datasets or tasks, potentially disadvantaging one or both models. This is tackled in \autoref{sec:experiment4}.
+\acrshort{vms} runs on any \acrshort{gpu}, but \acrshort{tdeed} needs a lot of memory and only runs on premium \acrshort{gpu}s. If computational resources (especially \acrshort{gpu} memory and type) are a limiting factor, \acrshort{vms} is the more practical choice. \acrshort{vms} has a better GitHub page that explains the installation steps. Although installing the hardware-aware Mamba blocks, which speed up processing times, is challenging, it is a solvable one-time problem.
 
 
+The \acrshort{tdeed} model was evaluated differently for validation and testing. The validation used a stride of two (halving temporal resolution) and lacked significant postprocessing (such as \acrshort{snms}). The test evaluation used a smaller stride and included such postprocessing. 
+
+
+Using default hyperparameters from their original papers might not be optimal for the specific SoccerNet-V2 dataset. These defaults might have been tuned for different datasets or tasks, potentially disadvantaging one or both models. This is tackled in \autoref{sec:experiment4}.
+
+
+Experiment shows that \acrshort{tdeed} achieves a better test \acrshort{map}@50 compared to \acrshort{vms}. The discrepancy is a result of several reasons\improvement{better word}. The validation value of the baseline \acrshort{tdeed} model lacks crucial postprocessing steps. The stride and \acrfull{snms} are put into question. The architectural differences favor the low correctness range of the dataset. The \acrshort{vms} does not spot actions, but temporally labels them, which disfavors the model. 
+
+Experiment shows that \acrshort{tdeed} achieves a better test \acrshort{map}@50 compared to \acrshort{vms}, although \acrshort{vms} demonstrates a significantly higher validation \acrshort{map}@50. This discrepancy can be attributed to several factors. Primarily, \acrshort{tdeed}'s validation procedure differs substantially from its testing phase, lacking crucial postprocessing steps like \acrfull{snms} and employing a larger stride. Both of which negatively impact its validation score. \acrshort{vms}'s performance showed sensitivity to its `topk` postprocessing parameter, but not to the same extent as \acrshort{tdeed}'s postprocessing. Architectural differences also play a role: \acrshort{tdeed} is designed for fine-grained temporal discrimination, whereas \acrshort{vms} focuses on capturing long-range context. Furthermore, the representativeness of \acrshort{tdeed}'s single-game validation set is a concern, potentially leading to biased validation scores. Finally, the use of default hyperparameters for both models on the SoccerNet-V2 dataset might not be optimal. \acrshort{vms} is the better choice when computational resources are limited.
 
 \section{Experiment 2: Compare runtime}
 \label{sec:experiment2}

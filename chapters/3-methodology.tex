@@ -99,6 +99,7 @@ Key characteristics of THUMOS-14 include:
 In this work, THUMOS-14 is relevant as it serves as a benchmark for many temporal action localization models, including \acrshort{vms} and RDFA-S6. The \acrshort{vms} implementation used in this study provides preprocessing scripts and configurations tailored for THUMOS-14.
 
 \subsection{SoccerNet-V2}
+\label{ssec:dataset_soccernet}
 
 The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} comprises video recordings of 7 professional football matches, along with fine-grained annotations for 12 action classes. It provides:
 \begin{itemize}
@@ -135,12 +136,38 @@ The authors claim that the first four games are training games, and the fifth is
 
 \begin{figure}
     \centering
-    \includegraphics[width=1\linewidth]{figures/actions_per_class.png}
-    \caption{Action distribution for different classes in the SoccerNet dataset for action ball spotting.}
+    \includegraphics[width=1\linewidth]{figures/actions_per_class_2.png}
+    \caption{Action distribution for different classes in the SoccerNet dataset for action ball spotting. }
     \label{fig:soccernet_dist}
 \end{figure}
 
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lr}
+        \toprule
+        Action                    & Count \\
+        \midrule
+        PASS                      & 4985  \\
+        DRIVE                     & 4300  \\
+        HIGH PASS                 & 761   \\
+        HEADER                    & 713   \\
+        OUT                       & 551   \\
+        THROW IN                  & 362   \\
+        CROSS                     & 261   \\
+        BALL PLAYER BLOCK         & 223   \\
+        SHOT                      & 169   \\
+        PLAYER SUCCESSFUL TACKLE  & 74    \\
+        FREE KICK                 & 21    \\
+        GOAL                      & 13    \\
+        \bottomrule
+    \end{tabular}
+    \caption{Soccer actions and their counts}
+    \label{tab:soccer_actions}
+\end{table}
+
 \cref{sec:preprocessing} provides a more in-depth explanation of how the SoccerNet labels are created, similar to the THUMOS labels, to align with the \acrshort{vms} model. 
+
+\cref{tab:soccer_actions} and \cref{fig:soccernet_dist} show how the 12,433 different labels are distributed between the actions. There is an uneven distribution of actions. The \acrshort{map} evaluation is computed without considering the lopsided distribution.
 
 The SoccerNet dataset contains 500 videos with temporal annotations, related to an earlier challenge. There are 17 action classes.
 \begin{itemize}
@@ -163,7 +190,7 @@ The SoccerNet dataset contains 500 videos with temporal annotations, related to 
     \item Yellow->red card
 \end{itemize}
 
-The actions are associated with a single timestamp, and their action-density is lower compared the the new dataset.
+The actions are associated with a single timestamp, and their action density is lower compared to the new dataset.
 
 \section{Model Architectures}
 \label{sec:model_architectures}
@@ -317,6 +344,7 @@ I employed \acrshort{wandb} Sweeps to perform Bayesian Optimization for efficien
 
 
 \section{\acrshort{vms} Evaluation Protocol}
+\label{sec:eval_protocol}
 When evaluating \acrshort{vms} performance, the 50\% \acrshort{map} criterion from the SoccerNet benchmark is adopted, which employs a $\pm1s$ tolerance window for event matching. Since the \acrshort{vms} model is validated against fixed‐length intervals of $L = 2\,$s, achieving $\mathrm{IoU}\ge0.5$ requires an overlap of at least $L/2 = 1s\,$.
 
 Let $t^*$ denote the ground‐truth event time and $t_p$ the predicted center. The predicted interval is

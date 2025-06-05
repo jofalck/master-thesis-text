@@ -46,23 +46,22 @@ Football analytics rely on two primary data streams:
 In 2024, \textcite{deliege_soccernet-v2_dataset_2021} released seven new games annotated with 12 ball events and team annotations. There are approximately six times as many events in these seven videos as in the original 500. 
 
 \subsection{UCF101}
-UCF101 \cite{dataset:UCF101} comprises 13,320 YouTube clips spanning 101 human action categories. It serves as a standard benchmark for trimmed action recognition.
+UCF101 \cite{dataset:UCF101} comprises 13,320 YouTube clips spanning 101 human action categories. It serves as a standard benchmark for trimmed action recognition. 
 
-\subsection{THUMOS}
-THUMOS \cite{dataset:thumos} includes over 13,000 temporally annotated instances from 20 action classes. It evaluates detection in untrimmed videos.
+\subsection{THUMOS14}
+THUMOS \cite{dataset:thumos} includes over 13,000 temporally annotated instances from 20 action classes. It evaluates detection in untrimmed videos. The \acrfull{sota} implementation, AdaTad, achieves an \acrfull{map} of $76.9\%$ on \acrfull{tal}.
 
 \subsection{HACS}
-HACS \cite{dataset:hacs} comprises 1.55 million short clips across 200 action classes. It provides both trimmed classification clips and untrimmed temporal segments.
+HACS \cite{dataset:hacs} comprises 1.55 million short clips across 200 action classes. It provides both trimmed classification clips and untrimmed temporal segments. RDFA-S6 is the \acrshort{sota} implementation with $45.8\%$ \acrshort{map} on \acrshort{tal}
 
 \subsection{ActivityNet}
-The FineAction dataset \cite{dataset:fineaction} comprises 103,000 temporal instances across 106 fine-grained action categories, annotated in 17,000 untrimmed videos. It features dense, co-occurring action annotations and rich class diversity. FineAction offers a new benchmark for detailed temporal action localization.
-
+The FineAction dataset \cite{dataset:fineaction} comprises 103,000 temporal instances across 106 fine-grained action categories, annotated in 17,000 untrimmed videos. It features dense, co-occurring action annotations and rich class diversity. FineAction offers a new benchmark for detailed temporal action localization. RDFA-S6 is the \acrshort{sota} implementation here as well, with a $42.9\%$
 
 \subsection{Kinetics}
-Kinetics-400/600/700 \cite{dataset:kinetics} provides hundreds of thousands of 10-second clips, each labeled with one of 400-700 action classes. The clips are from YouTube.
+Kinetics-400/600/700 \cite{dataset:kinetics} provides hundreds of thousands of 10-second clips, each labeled with one of 400-700 action classes. The clips are from YouTube. The dataset is for action classification, and it is assigned a single label for the whole clip. 
 
 \subsection{FineAction}
-FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer actions annotated at the frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis.
+FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer actions annotated at the frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis. With a \acrshort{map} of $29.6\%$, RDFA-S6 is the \acrshort{sota} in this dataset.
 
 \section{Deep Learning} 
 \label{sec:deep_learning}
