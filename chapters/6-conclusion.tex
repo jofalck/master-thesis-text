@@ -3,17 +3,19 @@
 
 \section{Conclusion}
 \label{sec:conclusion}
-This thesis investigated the usefulness of the Mamba-based \acrfull{vms} model for temporal action spotting in football videos. It compared the model with the \acrfull{sota} \acrfull{tdeed} model on the SoccerNet benchmark. The research aimed to answer three primary questions regarding the accuracy, computational efficiency, and potential adaptations for the \acrshort{vms} model.
+This thesis investigated the usefulness of the Mamba-based \acrfull{vms} model for temporal action spotting in football videos. It compared the model with the \acrfull{sota} \acrfull{tdeed} model on the SoccerNet benchmark. The research aimed to answer three questions regarding the accuracy, computational efficiency, and potential adaptations for the \acrshort{vms} model.
 
-Regarding accuracy (RQ1), a definitive comparison proved challenging. The \acrshort{tdeed} model achieved a test \acrshort{map}@50 of 47.65\%, while the \acrshort{vms} model obtained a validation \acrshort{map}@50 of 43.62\%. However, the absence of a test \acrshort{map}@50 for \acrshort{vms} and significant differences in evaluation protocols, particularly the critical role of \acrfull{snms} postprocessing for \acrshort{tdeed} (Experiment 6), hindered a direct, like-for-like comparison. The inherent differences between \acrshort{vms} as an action localization framework and \acrshort{tdeed} as an action spotting model further complicated this assessment.
+% Regarding accuracy (RQ1), a definitive comparison proved challenging. The \acrshort{tdeed} model achieved a test \acrshort{map}@50 of 47.65\%, while the \acrshort{vms} model obtained a validation \acrshort{map}@50 of 43.62\%. However, the absence of a test \acrshort{map}@50 for \acrshort{vms} and significant differences in evaluation protocols, particularly the critical role of \acrfull{snms} postprocessing for \acrshort{tdeed} (Experiment 6), hindered a direct, like-for-like comparison. The inherent differences between \acrshort{vms} as an action localization framework and \acrshort{tdeed} as an action spotting model further complicated this assessment.
+
+\acrshort{tdeed} achieved a \acrshort{map}@50 of 47.65\%, while the \acrshort{vms} model obtained a test score of 43.80\%. However, a simple change to a postprocessing step in the \acrshort{vms} model increased the precision almost 2\%. The inherent difference between the models also gives some uncertainty to the results. \acrshort{tdeed} is an action spotting model that works directly on the frames of the video. \acrshort{vms} is an action localization model, and uses an artificially generated dataset based on the original annotations. Efforts were made to mitigate the effects, yet the difference complicates the assessment. 
 
 In terms of inference speed and computational requirements (RQ2, Experiment 2), the \acrshort{vms} model demonstrated substantially faster training times (43 minutes vs. over 54 hours for \acrshort{tdeed}) and significantly lower computational demands. \acrshort{vms} was capable of running on less powerful \acrshort{gpu}s. While \acrshort{vms}'s raw inference speed is exceptionally high, its current reliance on a lengthy \acrshort{vmae} preprocessing pipeline (342 minutes per game) makes \acrshort{tdeed} (21 minutes total per game) more practical for end-to-end processing of unseen videos.
 
-Examining adaptations to improve \acrshort{vms}'s precision (RQ3) reveals several promising avenues for improvement. Increasing feature dimensionality from 1408 to 3200 yielded a 3.2\% absolute \acrshort{map} gain on THUMOS-14 (Experiment 3), suggesting similar benefits for football data. Experiment 5, which showed \acrshort{tdeed}'s performance improvement with more extensive pretraining, implies that pretraining the \acrshort{vms} model would increase its result. Fine-tuning feature extractors, such as \acrshort{vmae}, on domain-specific data could also benefit \acrshort{vms}. Furthermore, the significant impact of postprocessing on \acrshort{tdeed} (Experiment 6) suggests that implementing robust postprocessing techniques, such as \acrshort{snms}, for \acrshort{vms} is a possible step for performance improvement. Hyperparameter optimization for \acrshort{vms} (Experiment 4) indicated that default parameters are relatively robust, with a lower learning rate showing some benefit, but extensive tuning yielded only marginal gains.
+Examining adaptations to improve \acrshort{vms}'s precision (RQ3) reveals several promising avenues for improvement. Increasing feature dimensionality from 1408 to 3200 yielded a 3.2\% absolute \acrshort{map} gain on THUMOS-14 (Experiment 3). Similar results are expected on football data. Experiment 5, which showed \acrshort{tdeed}'s performance improvement with more extensive pretraining, implies that pretraining the \acrshort{vms} model would increase its result. Fine-tuning feature extractors, such as \acrshort{vmae}, on domain-specific data could also benefit \acrshort{vms}. Hyperparameter optimization for \acrshort{vms} (Experiment 4) indicated that default parameters are relatively robust, with a lower learning rate showing some benefit, but extensive tuning yielded only marginal gains.
 
-The \acrshort{s6} architecture within \acrshort{vms} did not unequivocally outperform the established \acrshort{tdeed} model in its current configuration for this specific task. However, its significantly reduced training time and computational footprint highlight its potential, particularly in resource-constrained environments or scenarios requiring frequent retraining. The primary limitations identified were the difficulties in direct metric comparison due to differing model paradigms and evaluation setups, as well as the bottleneck imposed by the \acrshort{vmae} feature extraction.
+The \acrshort{s6} architecture within \acrshort{vms} did not unequivocally outperform the \acrshort{sota} \acrshort{tdeed} model in its current configuration for this specific task. However, its significantly reduced training time and computational footprint highlight its potential. Particularly in resource-constrained environments or scenarios requiring frequent retraining, \acrshort{vms} is identified as promising. The primary limitations identified were the difficulties in direct metric comparison due to differing model paradigms and evaluation setups, as well as the bottleneck imposed by the \acrshort{vmae} feature extraction.
 
-The findings suggest that the Mamba architecture is a promising direction for future work on video analysis, but not without further optimization and adaptation. The domain of football action spotting is a complex one, but there is no evidence that Mamba does not have huge potential. The work also highlighted sustainability considerations, favoring \acrshort{s6}'s efficiency, and noted the lack of gender diversity in the SoccerNet dataset, an area for future improvement in sports analytics.
+The findings suggest that the Mamba architecture is a promising direction for future work on video analysis, but not without further optimization and adaptation. The domain of football action spotting is a complex one, but there is no evidence to suggest that Mamba lacks the required intelligence. The work also highlighted sustainability considerations, favoring \acrshort{s6}'s efficiency, and noted the lack of gender diversity in the SoccerNet dataset, an area for future improvement in sports analytics.
 
 
 \section{Future Work}
@@ -64,20 +66,14 @@ introduksjon -> konklusjon
 
 hva som ble gjort og hva som ble resultatet
 
-kjøre test-set mamba 
-
 metode se om det er bra nok med video-mae, tdeed,s6
 
 i metode bit, gå mer i dybden. leser får en forståelse av at jeg har forstått
 
 noen ki-setninger
 
-ki skjema begge deler funker (vedlegg/inspera
-
 i konklusjon
 
 klarere budskap
-
-endringer i dataset
 
 }

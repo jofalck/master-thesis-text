@@ -516,7 +516,9 @@ The high impact from \acrshort{snms} could be because of the benchmark specifici
 
 This necessitates non-maximum suppression for a good result, as increasing $k$ reduces precision. 
 
-With validation results yielding different results, integrating postprocessing into the validation step must be discussed. Even if time-consuming, this step is necessary to conduct a thorough hyperparameter search and obtain reliable estimates of test results. Early stopping mechanisms based on validation scores might perform suboptimally. 
+% With validation results yielding different results, integrating postprocessing into the validation step must be discussed. Even if time-consuming, this step is necessary to conduct a thorough hyperparameter search and obtain reliable estimates of test results. 
+
+Early stopping mechanisms based on validation scores might perform suboptimally because of the lack of postprocessing. 
 
 The findings and the clarification about the redundant positive predictions decrease the \acrshort{map} score of validation.
 
