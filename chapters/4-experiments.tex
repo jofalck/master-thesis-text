@@ -124,9 +124,8 @@ The same runs used in \autoref{sec:experiment1} are measured. \acrlong{wandb}' m
     \caption{Time comparison. All times are measured in minutes. The inference time for \acrshort{vms} is also provided in seconds. The game between Blackburn Rovers and Nottingham Forest, which lasted 96 minutes, took 7 minutes and 47 seconds, with an average of 0.08 seconds per minute-long clip. Inference time assumes the preprocessing is completed.}
     \label{tab:results_ex2}
 \end{table}
-\todo{change results for tdeed inference}
 
-\cref{tab:results_ex2} shows the time for each step in each model. The total training time for \acrshort{tdeed} is \(13min+3267min= 3280min\). To infer one game with \acrshort{tdeed} takes \(13min + 8min = 21min \)\todo{change time for inference}. Concurrently, \acrshort{vms} takes \(342min+43min=385min\)\todo{change time for inference} to train on five games. Inference time for one game is approximately the same time as the preprocessing of that game, in this case \(342min\). In both cases, full parallelizability is assumed in preprocessing and inference. 
+\cref{tab:results_ex2} shows the time for each step in each model. The total training time for \acrshort{tdeed} is \(13min+3267min= 3280min\). To infer one game with \acrshort{tdeed} takes \(13min + 8min = 21min \). Concurrently, \acrshort{vms} takes \(342min+43min=385min\) to train on five games. Inference time for one game is approximately the same time as the preprocessing of that game, in this case \(342min\). In both cases, full parallelizability is assumed in preprocessing and inference. 
 
 \begin{table}
     \centering

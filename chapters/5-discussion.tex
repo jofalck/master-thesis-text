@@ -46,7 +46,9 @@ Experiment 5 focused on the gain in \acrshort{tdeed} when pretraining on the old
 
 Furthermore, fine-tuning \acrshort{vmae} on football data, e.g., the SoccerNet dataset, could help it extract more features. The model, which is trained on Kinetics data, is capable of extracting general representations. However, the subtle actions in football might not be distinguishable from the general representations. The downstream \acrshort{vms} can suffer potential precision loss if the features are not precise. Customizing the masked autoencoder in other ways, such as adjusting the masking ratio based on football video characteristics, could also be beneficial. 
 
-The postprocessing techniques highlighted in Experiment 6 are applied in both models. The efficiency of a $topk$ postprocessing must be evaluated, as Experiment 1 proved it didn't work as intended on a dense action-filled video. Although postprocessing techniques could yield gains, the primary improvements might lie in the feature representation and feature extraction. 
+The postprocessing techniques highlighted in Experiment 6 are applied in both models. The efficiency of a $topk$ postprocessing must be evaluated, as Experiment 1 demonstrated that it didn't work as intended on a dense, action-filled video. Although postprocessing techniques could yield gains, the primary improvements might lie in the feature representation and feature extraction. 
+
+Another postprocessing technique that could be utilized is the overlapping of clips or feature vectors. If the dataset is split into overlapping clips, the events at the start and end would have more context. 
 
 Finally, the hyperparameter sweep indicated a complex hyperparameter space for \acrshort{vms}. It suggested the default parameters offer a valuable baseline. Careful tuning might lead to marginal gains, but it did not seem to yield fundamental changes. 
 

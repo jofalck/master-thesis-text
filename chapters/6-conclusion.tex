@@ -25,7 +25,7 @@ Based on the findings and limitations identified in this thesis, it proposes new
 \subsection{Model Architecture and Adaptation}
 
 \subsubsection{Refine \acrshort{vms} for Action Spotting:} 
-Adapt the input and output layers of the \acrshort{vms} model. They should become more suited to the action spotting task rather than relying on conversion to its native temporal action localization framework. The challenge involves investigating how to effectively represent and predict single-timestamp events. Attacking this will allow for a fairer comparison to \acrshort{tdeed}
+Adapt the input and output layers of the \acrshort{vms} model. They should become more suited to the action spotting task rather than relying on conversion to its native temporal action localization framework. The challenge involves investigating how to represent and predict single-timestamp events effectively. Attacking this will allow for a fairer comparison to \acrshort{tdeed}
 
 \subsubsection{End-to-End Training:} 
 Explore end-to-end training of the \acrshort{vms} model with a learnable feature extractor. Reduce reliance on fixed, pre-extracted features, such as \acrshort{vmae}, and optimize the feature extraction process for the action spotting task.
@@ -38,6 +38,7 @@ Explore end-to-end training of the \acrshort{vms} model with a learnable feature
         \item \textbf{Reduce \acrshort{vmae} Preprocessing Time:} Investigate methods to significantly speed up the \acrshort{vmae} feature extraction pipeline or explore lighter alternative feature extractors that maintain high descriptive power.
         \item \textbf{Fine-tune \acrshort{vmae} on Football Data:} Fine-tune the \acrshort{vmae} model on the SoccerNet dataset.
         \item \textbf{Study Masking Ratios:} Experiment with different masking ratios and strategies within \acrshort{vmae} if fine-tuning or retraining it. Optimize for the characteristics of football actions.
+        \item \textbf{Overlapping clips:} Study overlapping clips instead of simple splitting. 
     \end{itemize}
     
 \subsubsection{Higher-Dimensional and Alternative Features:} 
