@@ -3,77 +3,17 @@
 This chapter describes the experimental setup used to evaluate the \acrfull{s6} model for temporal event spotting in football video. The section details the computing infrastructure, data preprocessing, and feature extraction pipeline, as well as model architectures, training protocols, and evaluation metrics. All aligned with the research questions (\autoref{sec:research_questions}).
 
 
-\section{Tools and Resources}
-\label{sec:tools_and_resources}
 
-\subsection{IDUN}
-\label{ssec:idun}
-Video processing pipelines demand substantial computational resources. IDUN is a faculty-operated system at \acrfull{ntnu} equipped with 234 NVIDIA \acrfull{gpu} accelerators (as of the 24th of April, 2025)\footnote{\url{https://www.hpc.ntnu.no/idun/}}. Although IDUN is not \acrshort{ntnu}'s central supercomputer, its nodes, featuring Tesla H100, A100, V100, and P100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. The feature extraction partitions a full match into fixed-duration clips and distributes workloads across multiple \acrshort{gpu}s via data-parallel training to mitigate queuing delays.
-
-
-Due to the high memory requirements of the \acrfull{tdeed} and software requirements of the \acrfull{s6} framework, all experiments run on IDUN nodes. Attempts to train on \acrshort{gpu}s with 16 GB of memory trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation are restricted to nodes that meet these hardware and software requirements to ensure stable training and reproducible results. 
-
-\subsection{\acrfull{wandb}}
-\label{ssec:wandb}
-
-The acrlong{wandb} platform streamlined the management and reproducibility of the training experiments. Hyperparameters are logged automatically using \acrshort{wandb}'s Python client, as are training and validation metrics, model checkpoints, and \acrshort{gpu} utilization statistics. A dashboard enables real-time monitoring of experiments, as well as direct and live comparison of runs. \acrshort{wandb}'s automated hyperparameter conducted hyperparameter searches. Coordinated sweeps logged performance metrics and visualized the results. 
-
-\subsection{Bayesian Hyperparameter Search}
-
-Bayesian optimization uses probability to tune hyperparameters. It balances exploring new hyperparameter values with exploiting known good ones. The method uses a Gaussian Process as a surrogate model to predict the \acrlong{map} performance metric.
-
-The optimization process follows these steps:
+\section{Notation}
+\label{sec:notation}
+Let
 \begin{itemize}
-    \item \textbf{Surrogate Model}: A probabilistic model estimates the objective function based on previous evaluations.
-    \item \textbf{Acquisition Function}: Determines the next hyperparameter set to evaluate by optimizing a function such as Expected Improvement or Upper Confidence Bound.
-    \item \textbf{Evaluation and Update}: The chosen hyperparameters are tested, and the surrogate model is updated with new information.
-    \item \textbf{Iteration}: The process repeats for a set number of runs.
+  \item $V=\{x_t\}_{t=1}^T$ be an input video of $T$ frames,
+  \item $\mathcal{C}=\{1,\dots,12\}$ the set of action classes,
+  \item $\mathcal{Y}=\{(t_i,c_i)\}_{i=1}^N$ the ground-truth annotations (timestamp $t_i$, class $c_i$),
+  \item $\hat{\mathcal{Y}}=\{(\hat t_j,\hat c_j,\hat s_j)\}_{j=1}^M$ the model's predicted timestamps, classes, and confidence scores.
 \end{itemize}
-
-Bayesian optimization is beneficial for deep learning models because testing each hyperparameter set requires significant computing power. It utilizes probability to determine the optimal hyperparameters, thereby reducing the number of tests needed.
-
-
-\subsection{Comparing Correlation and Importance}
-
-
-Correlation identifies linear dependencies between the parameter and output, while importance aims to determine the likelihood of a parameter affecting production. Importance seeks to find the parameters that are most likely to have an impact when tuned. Correlations are sensitive to outliers and may not accurately detect polynomial relationships. Importance can capture more complex relations, as it accounts for interactions between hyperparameters. 
-
-\subsection{Anaconda and pip}
-\label{ssec:conda_pip}
-Conda manages the Python environments. However, all packages, including CUDA-enabled PyTorch builds, were installed via Pip to follow recent PyTorch recommendations. Those recommendations favor Pip over conda for \acrshort{gpu} support.
-
-\section{Data Preprocessing \& Feature Extraction}
-\label{sec:preprocessing}
-
-The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} serves as the base for the experiments. Videos are split into non-overlapping clips $V_k=\{x_t\}_{t=1}^{T_c}$ of fixed duration $T_c=60\!\times\!25$ frames (60\,s at 25\,fps). The hyperparameter search used a 70-30 split. Training and validation used an 80-20 split. The 80-20 split matches the official publication. 70-30 matches a PyTorch recommendation in the docs \footnote{\url{https://docs.pytorch.org/docs/stable/data.html}. Retrieved the 13th of May}.
-
-\lstinputlisting[
-    caption={Script to change the label-file to the THUMOS-14 format.},
-    label=lst:jsonfile,
-    language=Python
-]{listings/sn_to_json.py}
-
-The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration}, which sets a default value if the duration is undefined. The video clip at the end of each half, $V_{N}$, has a $T_c$ that refers to the length of the clip. \acrfull{vms} handles different-length inputs. 
-
-\lstinputlisting[
-    caption={Part of \acrshort{vms} code used to determine the duration to be pointless. },
-    label=lst:uselessduration,
-    language=Python
-]{listings/useless_duration.py}
-
-Each clip $V_k$ is fed through the pre‐trained \acrshort{vmae} encoder (\cref{ssec:videomae_v2}) to extract a feature embedding
-\[
-z_k = \mathrm{VideoMAE\text{-}V2}(V_k)\;\in\;\mathbb{R}^D.
-\]
-These $D$‐dimensional vectors serve as inputs to the downstream temporal MAMBA model. \acrshort{idun} stores vectors as \textit{*.pt} files. Storing the vectors offline eliminates redundant computations, reduces storage requirements, and significantly lowers training times. 
-
-When splitting the football videos into clips, we adopted a simplified protocol rather than seeking an optimal one. Future research could explore overlapping windows, adaptive clip boundaries, or dynamic segmentation schemes to mitigate boundary artifacts and improve temporal event localization. The scope of the literature study did not cover these topics.
-
-Despite its effectiveness in learning meaningful spatiotemporal representations, \acrfull{vmae} incurs substantial computational overhead and is not managed. The dual-stage masking strategy yields robust feature embeddings in which up to 90 \% of video tokens are masked. However, it also increases the number of model parameters and the complexity of each forward pass. In practice, processing a single 60s clip at 25 fps requires on the order of tens of gigaflops \cite{wang_videomae_2023}. \acrshort{vmae} extracts and stores embeddings offline to mitigate these resource requirements. The heavy compute footprint of \acrshort{vmae} motivates the exploration of more lightweight architectures or more aggressive token reduction techniques in future work.
-
-\acrshort{vmae} has been pre-trained on the large-scale Kinetics dataset. Consequently, its learned representations capture broad spatiotemporal patterns common to various athletic activities not explicitly tailored to football. While this generic pretraining supports robust feature extraction across multiple sports domains, specialized fine-tuning on football video may improve temporal event localization performance. Future work should explore domain-specific adaptation using dedicated football datasets to bridge the gap between Kinetics footage and match-level footage. 
-
-InternVideo is the foundation for the comparative experiment, which evaluates 1,408-dimensional feature vectors extracted by a Kinetics-pretrained model against 3,302-dimensional embeddings generated. Both architectures originate from the same research group that developed \acrshort{vmae}. InternVideo is a bigger, still open-source framework.
+We consider a prediction $(\hat t_j,\hat c_j)$ correct if $\hat c_j=c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1 s). Performance is measured by \acrfull{map} over all classes under the chosen $\Delta$.
 
 
 \section{Datasets}
@@ -189,6 +129,41 @@ The SoccerNet dataset contains 500 videos with temporal annotations related to a
 
 The actions are associated with a single timestamp, and their action density is lower compared to the new dataset. The videos are available behind the NDA, and they also provide extracted features for these. 
 
+\section{Data Preprocessing \& Feature Extraction}
+\label{sec:preprocessing}
+
+The SoccerNet-V2 dataset \cite{deliege_soccernet-v2_dataset_2021} serves as the base for the experiments. Videos are split into non-overlapping clips $V_k=\{x_t\}_{t=1}^{T_c}$ of fixed duration $T_c=60\!\times\!25$ frames (60\,s at 25\,fps). The hyperparameter search used a 70-30 split. Training and validation used an 80-20 split. The 80-20 split matches the official publication. 70-30 matches a PyTorch recommendation in the docs \footnote{\url{https://docs.pytorch.org/docs/stable/data.html}. Retrieved the 13th of May}.
+
+\lstinputlisting[
+    caption={Script to change the label-file to the THUMOS-14 format.},
+    label=lst:jsonfile,
+    language=Python
+]{listings/sn_to_json.py}
+
+The duration key is unnecessary in the case of temporal action localization, as shown in the \autoref{lst:uselessduration}, which sets a default value if the duration is undefined. The video clip at the end of each half, $V_{N}$, has a $T_c$ that refers to the length of the clip. \acrfull{vms} handles different-length inputs. 
+
+\lstinputlisting[
+    caption={Part of \acrshort{vms} code used to determine the duration to be pointless. },
+    label=lst:uselessduration,
+    language=Python
+]{listings/useless_duration.py}
+
+Each clip $V_k$ is fed through the pre‐trained \acrshort{vmae} encoder (\cref{ssec:videomae_v2}) to extract a feature embedding
+\[
+z_k = \mathrm{VideoMAE\text{-}V2}(V_k)\;\in\;\mathbb{R}^D.
+\]
+These $D$‐dimensional vectors serve as inputs to the downstream temporal MAMBA model. \acrshort{idun} stores vectors as \textit{*.pt} files. Storing the vectors offline eliminates redundant computations, reduces storage requirements, and significantly lowers training times. 
+
+When splitting the football videos into clips, we adopted a simplified protocol rather than seeking an optimal one. Future research could explore overlapping windows, adaptive clip boundaries, or dynamic segmentation schemes to mitigate boundary artifacts and improve temporal event localization. The scope of the literature study did not cover these topics.
+
+Despite its effectiveness in learning meaningful spatiotemporal representations, \acrfull{vmae} incurs substantial computational overhead and is not managed. The dual-stage masking strategy yields robust feature embeddings in which up to 90 \% of video tokens are masked. However, it also increases the number of model parameters and the complexity of each forward pass. In practice, processing a single 60s clip at 25 fps requires on the order of tens of gigaflops \cite{wang_videomae_2023}. \acrshort{vmae} extracts and stores embeddings offline to mitigate these resource requirements. The heavy compute footprint of \acrshort{vmae} motivates the exploration of more lightweight architectures or more aggressive token reduction techniques in future work.
+
+\acrshort{vmae} has been pre-trained on the large-scale Kinetics dataset. Consequently, its learned representations capture broad spatiotemporal patterns common to various athletic activities not explicitly tailored to football. While this generic pretraining supports robust feature extraction across multiple sports domains, specialized fine-tuning on football video may improve temporal event localization performance. Future work should explore domain-specific adaptation using dedicated football datasets to bridge the gap between Kinetics footage and match-level footage. 
+
+InternVideo is the foundation for the comparative experiment, which evaluates 1,408-dimensional feature vectors extracted by a Kinetics-pretrained model against 3,302-dimensional embeddings generated. Both architectures originate from the same research group that developed \acrshort{vmae}. InternVideo is a bigger, still open-source framework.
+
+
+
 \section{Model Architectures}
 \label{sec:model_architectures}
 
@@ -223,7 +198,6 @@ The training process minimizes the reconstruction loss only over masked position
 \end{itemize}
 
 VideoMAE has three components: embedder, encoder, and decoder. VideoMAE uses cube embedding \(\Phi_{emb}\) to transform frames into sequences of tokens. It designs a tube masking strategy with a ratio of \(\rho \simeq 90\%\). A vanilla \acrshort{vit} backbone encodes the visible tokens. A decoder reconstructs the masked patches using another \acrshort{vit}\cite{wang_videomae_2023}. 
-\improvement{There is some juicy math in the paper which can help the thesis seem more professional}
 
 By dynamically varying the masking granularity, VideoMAE‑V2 achieves:
 \begin{itemize}
@@ -333,7 +307,7 @@ Here, \(y_l^{c}\) is the one-hot encoding of the event in frame \(l\). The proba
 The experiments use a T-DEED implementation adapted for the SoccerNet challenge. Videos are turned into pictures of each frame and stored offline, following the original method. Event spotting performance is evaluated using \acrlong{map}.
 
 
-\section{Pipeline} 
+\section{Event Spotting Pipeline} 
 
 \begin{figure}
     \centering
@@ -351,7 +325,7 @@ The system logs all training and inference through \acrfull{wandb}, ensuring tha
 \section{Bayesian Hyperparameter Optimization}
 \label{sec:bayesian_optimization}
 
-d \acrshort{wandb} sweeps perform Bayesian Optimization for efficient hyperparameter tuning. A Gaussian Process surrogate model was used to represent the validation \acrshort{map} as a function of the hyperparameters. Uniform and log-uniform priors were defined over each hyperparameter in the sweep configuration *.YAML file. The expected improvement function guided the selection of hyperparameter combinations. 70 trials were run in three iterations. The 70 runs were in parallel\footnote{All runs were run as individual training and had nothing to do with each other except the \acrshort{wandb} agent designing parameters.} across multiple \acrshort{gpu}s to explore the search space. All metrics and configuration parameters were logged to \acrshort{wandb}, enabling real-time monitoring and reproducibility. 
+\acrshort{wandb} sweeps perform Bayesian Optimization for efficient hyperparameter tuning. A Gaussian Process surrogate model was used to represent the validation \acrshort{map} as a function of the hyperparameters. Uniform and log-uniform priors were defined over each hyperparameter in the sweep configuration *.YAML file. The expected improvement function guided the selection of hyperparameter combinations. 70 trials were run in three iterations. The 70 runs were in parallel\footnote{All runs were run as individual training and had nothing to do with each other except the \acrshort{wandb} agent designing parameters.} across multiple \acrshort{gpu}s to explore the search space. All metrics and configuration parameters were logged to \acrshort{wandb}, enabling real-time monitoring and reproducibility. 
 
 
 \section{\acrshort{vms} Evaluation Protocol}
@@ -377,6 +351,44 @@ The IoU condition
 ensures that the predicted center $t_p$ lies within one second of the actual event time.
 
 Runtime was measured from \acrshort{wandb} logs, as the platform automatically records wall-clock time for each training run and from scripts. However, these values vary according to the assigned \acrshort{gpu} model. All measurements were standardized on a single A100 \acrshort{gpu} type to ensure fair comparisons. 
+\section{Tools and Resources}
+\label{sec:tools_and_resources}
+
+\subsection{IDUN}
+\label{ssec:idun}
+Video processing pipelines demand substantial computational resources. IDUN is a faculty-operated system at \acrfull{ntnu} equipped with 234 NVIDIA \acrfull{gpu} accelerators (as of the 24th of April, 2025)\footnote{\url{https://www.hpc.ntnu.no/idun/}}. Although IDUN is not \acrshort{ntnu}'s central supercomputer, its nodes, featuring Tesla H100, A100, V100, and P100 \acrshort{gpu}s, with up to 80 GB of RAM, provided the necessary throughput for feature extraction and model training. The feature extraction partitions a full match into fixed-duration clips and distributes workloads across multiple \acrshort{gpu}s via data-parallel training to mitigate queuing delays.
+
+
+Due to the high memory requirements of the \acrfull{tdeed} and software requirements of the \acrfull{s6} framework, all experiments run on IDUN nodes. Attempts to train on \acrshort{gpu}s with 16 GB of memory trigger out-of-memory errors with \acrshort{tdeed}. Moreover, MAMBA \acrshort{s6} requires specific CUDA versions and matching libraries, which older driver stacks do not support. Model development and evaluation are restricted to nodes that meet these hardware and software requirements to ensure stable training and reproducible results. 
+
+\subsection{\acrfull{wandb}}
+\label{ssec:wandb}
+
+The acrlong{wandb} platform streamlined the management and reproducibility of the training experiments. Hyperparameters are logged automatically using \acrshort{wandb}'s Python client, as are training and validation metrics, model checkpoints, and \acrshort{gpu} utilization statistics. A dashboard enables real-time monitoring of experiments, as well as direct and live comparison of runs. \acrshort{wandb}'s automated hyperparameter conducted hyperparameter searches. Coordinated sweeps logged performance metrics and visualized the results. 
+
+\subsection{Bayesian Hyperparameter Search}
+
+Bayesian optimization uses probability to tune hyperparameters. It balances exploring new hyperparameter values with exploiting known good ones. The method uses a Gaussian Process as a surrogate model to predict the \acrlong{map} performance metric.
+
+The optimization process follows these steps:
+\begin{itemize}
+    \item \textbf{Surrogate Model}: A probabilistic model estimates the objective function based on previous evaluations.
+    \item \textbf{Acquisition Function}: Determines the next hyperparameter set to evaluate by optimizing a function such as Expected Improvement or Upper Confidence Bound.
+    \item \textbf{Evaluation and Update}: The chosen hyperparameters are tested, and the surrogate model is updated with new information.
+    \item \textbf{Iteration}: The process repeats for a set number of runs.
+\end{itemize}
+
+Bayesian optimization is beneficial for deep learning models because testing each hyperparameter set requires significant computing power. It utilizes probability to determine the optimal hyperparameters, thereby reducing the number of tests needed.
+
+
+\subsection{Comparing Correlation and Importance}
+
+
+Correlation identifies linear dependencies between the parameter and output, while importance aims to determine the likelihood of a parameter affecting production. Importance seeks to find the parameters that are most likely to have an impact when tuned. Correlations are sensitive to outliers and may not accurately detect polynomial relationships. Importance can capture more complex relations, as it accounts for interactions between hyperparameters. 
+
+\subsection{Anaconda and pip}
+\label{ssec:conda_pip}
+Conda manages the Python environments. However, all packages, including CUDA-enabled PyTorch builds, were installed via Pip to follow recent PyTorch recommendations. Those recommendations favor Pip over conda for \acrshort{gpu} support.
 
 \section{Environment} 
 

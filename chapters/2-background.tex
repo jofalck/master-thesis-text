@@ -129,6 +129,42 @@ Kinetics-400/600/700 \cite{dataset:kinetics} provides hundreds of thousands of 1
 \subsection{FineAction}
 FineAction \cite{dataset:fineaction} provides 10,000+ short clips of soccer actions annotated at the frame level with player bounding boxes. It enables fine-grained event spotting and player-centric analysis. With a \acrshort{map} of $29.6\%$, RDFA-S6 is the \acrshort{sota} in this dataset.
 
+\section{Computer Vision} 
+\label{sec:computer_vision}
+
+\acrfull{cv} is a subset of machine learning that focuses on letting computers interpret and understand digital images and videos. The aim of \acrlong{cv} is to enable computers to see. Some tasks relating to computer vision, extracted from Papers with Code\footnote{\url{https://paperswithcode.com/datasets}}, are Action Recognition, Object Detection, Semantic Segmentation, Classification, and Question Similarity.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\linewidth]{figures/Pedestrian_gradient.jpg}
+    \caption{An image of a pedestrian and gradient calculated by \acrshort{hog}. Image from \url{https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients}, retrieved 9th of June.}
+    \label{fig:pedestrian_gradient}
+\end{figure}
+
+Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \cref{fig:pedestrian_gradient} visualizes the gradient vectors. Similarly, action recognition in videos was addressed through the Histogram of Flow \cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept to the time dimension. The Histogram of Flow calculates gradient descriptors at each frame. It captures motion information through the analysis of optical flows and then combines these per-frame descriptors into a representation that encapsulates temporal dynamics. 
+
+Despite these approaches' innovation in early computer vision, their limitations are apparent. The reliance on accurate handcrafted features often led to challenges in scaling to complex scenarios and achieving generalization. Deep learning, with the ability to learn data-driven representations, has replaced these manual methods.
+
+\subsection{Skeleton and Posture Estimation}
+\label{ssec:skeleton_posture_estimation}
+
+Skeleton and posture estimation techniques recover 2D or 3D joint coordinates from video frames to model player kinematics and pose dynamics \cite{elaoud_skeleton-based_2020, wang_skeleton_two-stream_2023, reilly__skeleton_just_pi_2023}. Common pipelines include:
+
+\begin{itemize}
+    \item Top-down methods: detect each player via bounding boxes, then apply a single-person pose estimator.
+    \item Bottom-up methods: predict all joint candidates first and group them into skeletons.
+    \item Graph-based models: use Spatio-Temporal \acrlong{gcn} (ST-\acrshort{gcn}) to capture joint correlations over time\cite{yan_spatial_temporal_graph_convolutional_2018}.
+\end{itemize}
+
+These approaches extract features such as joint angles, stride length, and posture transitions for performance analysis and injury risk assessment. In football scenarios, however, they face:
+
+\begin{itemize}
+    \item Severe occlusions and player overlaps in crowded penalty areas.
+    \item Varying camera angles, resolutions, and lens distortions.
+    \item Fast motions causing motion blur and tracking drift\cite{survey_of_survey}.
+\end{itemize} 
+
+
 \section{Deep Learning} 
 \label{sec:deep_learning}
 
@@ -231,6 +267,15 @@ Despite their locality bias, \acrshort{cnn}-based video models remain foundation
 
 \acrfull{gcn} is a subsection of \acrfull{gnn}s, which accomplish link prediction, graph classification, and graph generation. \acrshort{gcn}s learn node embeddings. Each node has an identity, a vector, and a connection to other nodes. The idea is to aggregate information from its neighbors \cite{kipf_gcn_2017}.
 
+\begin{figure}
+    \centering
+    \includegraphics[width=1\linewidth]{figures/tacticai_graph.png}
+    \caption{How \textcite{wang_tactic_ai_2024} convert corner kicks to graphs. Each player is a node. The edges are player interactions, not positions.}
+    \label{fig:graph_corner}
+\end{figure}
+
+\textcite{wang_tactic_ai_2024} uses graphs to model positional relations (edges) between the players (nodes), see \cref{fig:graph_corner}. Utilizing the relationships/actions between players rather than distance is a design choice that improves performance. The \acrshort{gnn} updates the players' representation based on messages from neighboring nodes. This allows the system to predict key events, such as which player will receive the ball or if a player will shoot. 
+
 \subsection{Recurrent Neural Nets}
 
 \acrfull{rnn} are deep learning models designed to handle sequential data. \acrshort{rnn}s maintain a memory of previous inputs through feedback loops. It allows for information to persist across multiple time steps, unlike, for example, \acrshort{cnn}s and simple neural nets. The persistence of information makes \acrshort{rnn}s useful for tasks requiring temporal dependencies, such as natural language processing, speech recognition, and time-series forecasting \cite{ibm_rnn_2025}. In the context of \acrfull{cv}, \acrshort{rnn}s are applied to various applications, such as image captioning and video analysis \cite{agyeman_soccer_2019}. 
@@ -261,7 +306,6 @@ In football analytics, this approach is helpful because events (e.g., goals, pas
 \label{ssec:vision_transformers}
 
 \acrlong{vit} adapts the transformer architecture \cite{vaswani_attention_2017} 
-\change{Does transformers by themselves deserve a section?} 
 to images by splitting each image into $P\times P$ patches, projecting them to $D$-dimensional embeddings, and adding positional encodings \cite{dosovitskiy_image_transformer_2021}. Given an image of size $H\times W$, one obtains
 \[
 \mathbf{x}_0 = [x_{\text{cls}};\,z_1,\dots,z_N] + E_{\text{pos}},
@@ -291,42 +335,43 @@ Limitations of vision transformers include:
 \end{itemize}
 
 
-\subsubsection{META \acrlong{sam}}
-\label{ssec:meta_sam2}
-\unsure{Move to the back of the chapter, or reference this part in the back of the chapter?}
-The \acrfull{sam} was first introduced by \textcite{kirillov_segment_2023} in 2023 as a promptable, foundation segmentation model. Its core design splits the task into three components:
-\begin{itemize}
-    \item \textbf{Image Encoder:} A vision transformer (ViT) pre-trained on masked autoencoding produces dense feature maps for any input image.
-    \item \textbf{Prompt Encoder:} A lightweight module that maps interactive prompts (points, bounding boxes, or free-form masks) into positional embeddings.
-    \item \textbf{Mask Decoder:} A small transformer that fuses image and prompt embeddings to output segmentation masks at multiple scales.
-\end{itemize}
-SAM was trained on the SA-1B dataset (over 11 million images and 1.1 billion masks) in a semi-automated pipeline, yielding strong zero-shot performance across diverse domains without fine-tuning \cite{ravi_sam_nodate}.
 
-Building on this success, \textcite{ravi_sam_nodate} proposed \acrfull{sam} (sometimes called Video \acrshort{sam}), which extends \acrshort{sam} to sequential video data via a \emph{memory-augmented attention} mechanism:
-\begin{itemize}
-    \item \textbf{Frame-wise Encoding:} Each video frame is encoded by the same ViT backbone used in image \acrshort{sam}.
-    \item \textbf{Memory Attention:} A cross-frame attention layer that retains a compact set of "memory tokens" summarizing past masks, enabling consistent tracking of object masks over time.
-    \item \textbf{Interactive Prompts in Video:} Mouse clicks and bounding-box prompts can be applied on any frame and propagated forward or backward via the memory bank.
-\end{itemize}
+% \subsection{State-Space Models}
+% \label{ssec:state_space_models}
 
-The authors also released SA-V, a large video-segmentation dataset with millions of frame-mask pairs. Results on this dataset demonstrate that \acrshort{sam} achieves near real-time inference (15-30 fps) and high temporal consistency on benchmarks. \cref{fig:sa-v} shows masks in the dataset. 
+% \acrfull{ssm}s model dynamic systems via state variables. \acrshort{ssm} takes an input over time \(x(t)\), transforms it using a hidden state \(h(t)\) to produce a sequence of outputs \(y(t)\) \cite{gu_mamba_2024}. The system that transforms the input to output is made up of 4 matrices. \textbf{A} is the state matrix, \textbf{B} is the control matrix, \textbf{C} is the output matrix, and \textbf{D} is the command matrix. \textbf{D} is often mitigated as it is seen as a computable skip connection \cite{gu_mamba_2024}. To work with computers, the input is transformed into a recurrent discrete representation. \textcite{gu_mamba_2024} introduces the bar over the matrix to indicate that it is discretized, denoted as $ \bar{A} $.
+
+\subsection{\acrlong{ssm}}
+\label{ssec:state_space_models}
+
+\acrfull{ssm}s offers a framework for modeling dynamic systems, where the system's behavior evolves. The core idea behind an SSM is to represent the underlying, often unobserved, dynamics of a system through a \textit{state} variable. This state encapsulates information from the past to predict the future behavior of the system, independent of the past observations or inputs that led to the current state.
+
+An \acrshort{ssm} consists of two main equations:
+
+\begin{enumerate}
+    \item \textbf{The State Equation:} This equation describes how the internal state of the system, denoted as \(x_t\) at time \(t\), evolves from the previous state \(x_{t-1}\). \(u_t\) is external input. For a linear time-invariant system, shown in \cref{fig:ssm_continious}, this is written:
+    \begin{equation}
+        x_t = A x_{t-1} + B u_t
+        \label{eq:state_equation}
+    \end{equation}
+
+    \item \textbf{The Observation Equation (or Measurement Equation):} This equation defines how the observed output or measurement \(y_t\) at time \(t\) is generated from the current internal state \(x_t\). It can also include the influence of inputs \(u_t\). For a linear time-invariant system, this is:
+    \begin{equation}
+        y_t = C x_t + D u_t
+        \label{eq:observation_equation}
+    \end{equation}
+\end{enumerate}
+
+\textbf{A} is the state matrix, \textbf{B} is the control matrix, \textbf{C} is the output matrix, and \textbf{D} is the command matrix. \textbf{D} is often mitigated as it is seen as a computable skip connection \cite{gu_mamba_2024}. To work with computers, the input is transformed into a recurrent discrete representation. \textcite{gu_mamba_2024} introduces the bar over the matrix to indicate that it is discretized, denoted as $ \bar{A} $.
+
+\acrshort{ssm}s can model a range of systems, from physical processes to abstract sequences in machine learning. In the context of sequential data, such as video analysis, \acrshort{ssm} can capture temporal dependencies and provide a structured way to understand how information propagates through a sequence.
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/sam_2.png}
-    \caption{Examples from the SA-V dataset. Figure 4 in the \acrshort{sam} paper\cite{ravi_sam_nodate}.}
-    \label{fig:sa-v}
+    \includegraphics[width=0.5\linewidth]{smm_time_invariant.png}
+    \caption{View of a continuous, time-invariant \acrshort{ssm} (Retrieved the 13th of June from: \url{https://en.wikipedia.org/wiki/State-space_representation})}
+    \label{fig:ssm_continious}
 \end{figure}
-
-Together, the original SAM and \acrshort{sam} exemplify a new paradigm in segmentation: a single, promptable transformer that can be deployed off-the-shelf. The model is adaptable to novel objects or domains with little human supervision. 
-
-\subsection{State-Space Models}
-\label{ssec:state_space_models}
-
-\acrfull{ssm}s model dynamic systems via state variables. \acrshort{ssm} takes an input over time \(x(t)\), transforms it using a hidden state \(h(t)\) to produce a sequence of outputs \(y(t)\) \cite{gu_mamba_2024}. The system that transforms the input to output is made up of 4 matrices. \textbf{A} is the state matrix, \textbf{B} is the control matrix, \textbf{C} is the output matrix, and \textbf{D} is the command matrix. \textbf{D} is often mitigated as it is seen as a computable skip connection \cite{gu_mamba_2024}. To work with computers, the input is transformed into a recurrent discrete representation. \textcite{gu_mamba_2024} introduces the bar over the matrix to indicate that it is discretized, denoted as $ \bar{A} $.
-
-% VideoMAMBA extends \acrshort{s6} to spatiotemporal video features: each frame is first embedded into \(x_k\), then processed through the discrete \acrfull{ssm} along the temporal dimension. Prior studies \cite{lee_enhancing_mamba_s6_2024, li_videomamba_2024} report that VideoMAMBA matches transformer-based action recognition on standard benchmarks while reducing inference overhead.
-
 
 \subsection{Training Strategies}
 \label{ssec:training_stratergies}
@@ -372,53 +417,38 @@ However, distillation also has limitations:
     \item Some fine-grained knowledge may not transfer fully, which can hinder the student's ability to generalize to new data.
 \end{itemize}
 
+\subsubsection{META \acrlong{sam}}
+\label{ssec:meta_sam2}
+The \acrfull{sam} was first introduced by \textcite{kirillov_segment_2023} in 2023 as a promptable, foundation segmentation model. Its core design splits the task into three components:
+\begin{itemize}
+    \item \textbf{Image Encoder:} A vision transformer (ViT) pre-trained on masked autoencoding produces dense feature maps for any input image.
+    \item \textbf{Prompt Encoder:} A lightweight module that maps interactive prompts (points, bounding boxes, or free-form masks) into positional embeddings.
+    \item \textbf{Mask Decoder:} A small transformer that fuses image and prompt embeddings to output segmentation masks at multiple scales.
+\end{itemize}
+SAM was trained on the SA-1B dataset (over 11 million images and 1.1 billion masks) in a semi-automated pipeline, yielding strong zero-shot performance across diverse domains without fine-tuning \cite{ravi_sam_nodate}.
 
-\section{Computer Vision} 
-\label{sec:computer_vision}
+Building on this success, \textcite{ravi_sam_nodate} proposed \acrfull{sam} (sometimes called Video \acrshort{sam}), which extends \acrshort{sam} to sequential video data via a \emph{memory-augmented attention} mechanism:
+\begin{itemize}
+    \item \textbf{Frame-wise Encoding:} Each video frame is encoded by the same ViT backbone used in image \acrshort{sam}.
+    \item \textbf{Memory Attention:} A cross-frame attention layer that retains a compact set of "memory tokens" summarizing past masks, enabling consistent tracking of object masks over time.
+    \item \textbf{Interactive Prompts in Video:} Mouse clicks and bounding-box prompts can be applied on any frame and propagated forward or backward via the memory bank.
+\end{itemize}
 
-\acrfull{cv} is a subset of machine learning that focuses on letting computers interpret and understand digital images and videos. The aim of \acrlong{cv} is to enable computers to see. Some tasks relating to computer vision, extracted from Papers with Code\footnote{\url{https://paperswithcode.com/datasets}}, are Action Recognition, Object Detection, Semantic Segmentation, Classification, and Question Similarity.
+The authors also released SA-V, a large video-segmentation dataset with millions of frame-mask pairs. Results on this dataset demonstrate that \acrshort{sam} achieves near real-time inference (15-30 fps) and high temporal consistency on benchmarks. \cref{fig:sa-v} shows masks in the dataset. 
 
 \begin{figure}
     \centering
-    \includegraphics[width=0.5\linewidth]{figures/Pedestrian_gradient.jpg}
-    \caption{An image of a pedestrian and gradient calculated by \acrshort{hog}. Image from \url{https://en.wikipedia.org/wiki/Histogram_of_oriented_gradients}, retrieved 9th of June.}
-    \label{fig:pedestrian_gradient}
+    \includegraphics[width=0.5\linewidth]{figures/sam_2.png}
+    \caption{Examples from the SA-V dataset. Figure 4 in the \acrshort{sam} paper\cite{ravi_sam_nodate}.}
+    \label{fig:sa-v}
 \end{figure}
 
-Before the rise of deep learning, early computer vision research predominantly relied on manually engineered features. One of the influential approaches was the \acrfull{hog} introduced by \textcite{dalal_histogram_of_gradients}. \textcite{dalal_histogram_of_gradients} designed this method to detect humans in static images by partitioning an image into small regions, computing gradient directions within each patch, and ultimately assembling these measurements into a descriptive feature vector. \cref{fig:pedestrian_gradient} visualizes the gradient vectors. Similarly, action recognition in videos was addressed through the Histogram of Flow \cite{dalal_histogram_of_flow}. This technique extends the \acrshort{hog} concept to the time dimension. The Histogram of Flow calculates gradient descriptors at each frame. It captures motion information through the analysis of optical flows and then combines these per-frame descriptors into a representation that encapsulates temporal dynamics. 
+Together, the original SAM and \acrshort{sam} exemplify a new paradigm in segmentation: a single, promptable transformer that can be deployed off-the-shelf. The model is adaptable to novel objects or domains with little human supervision. 
 
-Despite these approaches' innovation in early computer vision, their limitations are apparent. The reliance on accurate handcrafted features often led to challenges in scaling to complex scenarios and achieving generalization. Deep learning, with the ability to learn data-driven representations, has replaced these manual methods.
-
-\subsection{Skeleton and Posture Estimation}
-\label{ssec:skeleton_posture_estimation}
-
-Skeleton and posture estimation techniques recover 2D or 3D joint coordinates from video frames to model player kinematics and pose dynamics \cite{elaoud_skeleton-based_2020, wang_skeleton_two-stream_2023, reilly__skeleton_just_pi_2023}. Common pipelines include:
-
-\begin{itemize}
-    \item Top-down methods: detect each player via bounding boxes, then apply a single-person pose estimator.
-    \item Bottom-up methods: predict all joint candidates first and group them into skeletons.
-    \item Graph-based models: use Spatio-Temporal \acrlong{gcn} (ST-\acrshort{gcn}) to capture joint correlations over time\cite{yan_spatial_temporal_graph_convolutional_2018}.
-\end{itemize}
-
-These approaches extract features such as joint angles, stride length, and posture transitions for performance analysis and injury risk assessment. In football scenarios, however, they face:
-
-\begin{itemize}
-    \item Severe occlusions and player overlaps in crowded penalty areas.
-    \item Varying camera angles, resolutions, and lens distortions.
-    \item Fast motions causing motion blur and tracking drift\cite{survey_of_survey}.
-\end{itemize} 
+\acrshort{sam} has the potential to be a strong preprocessing step in an action spotting pipeline. Its ability to segment players and the ball in each frame can help the model mask the uninteresting parts of the video. \acrshort{sam} gives spatial localization of where key actors are. The extracted features from precisely segmented objects have the potential to be more descriptive for action recognition than bounding boxes. A feature vector from a precisely segmented object contains valueable information. 
 
 
-\section{Notation}
-\label{sec:notation}
-Let
-\begin{itemize}
-  \item $V=\{x_t\}_{t=1}^T$ be an input video of $T$ frames,
-  \item $\mathcal{C}=\{1,\dots,12\}$ the set of action classes,
-  \item $\mathcal{Y}=\{(t_i,c_i)\}_{i=1}^N$ the ground-truth annotations (timestamp $t_i$, class $c_i$),
-  \item $\hat{\mathcal{Y}}=\{(\hat t_j,\hat c_j,\hat s_j)\}_{j=1}^M$ the model's predicted timestamps, classes, and confidence scores.
-\end{itemize}
-We consider a prediction $(\hat t_j,\hat c_j)$ correct if $\hat c_j=c_i$ and $|\hat t_j - t_i|\le\Delta$, where $\Delta$ is a fixed tolerance window (e.g.\ 1 s). Performance is measured by \acrfull{map} over all classes under the chosen $\Delta$.
+
 
 \section{Temporal Modeling Techniques}
 \label{sec:temporal_models}

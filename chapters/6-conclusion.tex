@@ -27,8 +27,6 @@ Based on the findings and limitations identified in this thesis, it proposes new
 \subsubsection{Refine \acrshort{vms} for Action Spotting:} 
 Adapt the input and output layers of the \acrshort{vms} model. They should become more suited to the action spotting task rather than relying on conversion to its native temporal action localization framework. The challenge involves investigating how to represent and predict single-timestamp events effectively. Attacking this will allow for a fairer comparison to \acrshort{tdeed}
 
-\todo{replace TDEED SGP architecture with Mamba blocks}
-
 \subsubsection{End-to-End Training:} 
 Explore end-to-end training of the \acrshort{vms} model with a learnable feature extractor. Reduce reliance on fixed, pre-extracted features, such as \acrshort{vmae}, and optimize the feature extraction process for the action spotting task.
 
@@ -62,17 +60,3 @@ Explore the incorporation of other modalities, such as audio features or player/
 \subsubsection{Data Augmentation:} Develop and evaluate data augmentation techniques tailored explicitly to temporal action spotting in football videos to improve model robustness.
 
 \subsubsection{Model Interpretability:} Apply interpretability techniques to understand what features and temporal patterns the \acrshort{vms} model learns to identify different football actions, particularly how the Mamba mechanism processes long-range dependencies.
-
-\todo{Gjøre det enklere å forstå hva jeg har gjort og enklere å forstå resultater. 
-
-introduksjon -> konklusjon
-
-hva som ble gjort og hva som ble resultatet
-
-metode se om det er bra nok med video-mae, tdeed,s6
-
-i metode bit, gå mer i dybden. leser får en forståelse av at jeg har forstått
-
-klarere budskap
-
-}
