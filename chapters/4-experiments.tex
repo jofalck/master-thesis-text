@@ -35,6 +35,8 @@ All models used default hyperparameters from their original papers. Performance 
     \label{tab:results_ex1}
 \end{table}
 
+\unsure{ActionFormer results are not discussed. It isn't able to generalize the data, it seems, and uses more time than VMS. Twice as much on training and 1min 20sec on inference.}
+
 The \acrshort{vms} model (Mamba-\acrshort{s6}) had an average \acrshort{map} achieving 50.60\%. The \acrshort{tdeed} model's average \acrshort{map} is not calculated as there is no \acrshort{iou}. \acrshort{tdeed}'s validation \acrshort{map}@50 was 20.78\%. In the validation \acrshort{map}@50 category, the \acrshort{vms} model significantly outperformed \acrshort{tdeed}, scoring 48.26\% compared to \acrshort{tdeed}'s 20.78\%.
 
 The \acrshort{tdeed} model achieved a higher test \acrshort{map}@50 of 47.65\%. \acrshort{vms}'s correspondig metric achieved 43.80\%. There is a significant increase from the validation of \acrshort{tdeed}s to its test performance. The same difference is evident from the validation score of \acrshort{tdeed} to \acrshort{vms}'s validation score. \acrshort{tdeed} performs poorly in validation. These results are further investigated in \cref{sec:experiment_6}.
@@ -520,6 +522,45 @@ This necessitates non-maximum suppression for a good result, as increasing $k$ r
 Early stopping mechanisms based on validation scores might perform suboptimally because of the lack of postprocessing. 
 
 The findings and the clarification about the redundant positive predictions decrease the \acrshort{map} score of validation.
+
+\section{Experiment 7: Comparing ActionFormer and \acrlong{vms}}
+\label{sec:experiment_7}
+
+Experiment 7 compares ActionFormer to \acrshort{vms}. The only difference between the model is that \acrshort{vms} has switched out the transformer blocks to mamba blocks.
+
+\subsection{Setup}
+
+The setup of the models is identical in every aspect except for the transformer/Mamba block. SoccerNet data features, annotations, hyperparameters, and postprocessing are equal. It is a direct comparison between a Mamba block and a transformer.
+
+\subsection{Results}
+
+\begin{table}[ht]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        Metric & \acrshort{vms} (Mamba-\acrshort{s6}) & ActionFormer \\
+        \midrule
+        average \acrshort{map} (\%) & 50.60 & 49.86 \\
+        validation \acrshort{map}@50 (\%) & 48.26 & 47.59 \\
+        test \acrshort{map}@50 (\%) & 43.80 & 36.84 \\
+        Training Time & 42 min & 1h23min \\
+        Inference Time & 0.1 min & 0.3 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparison between \acrshort{vms} and ActionFormer.}
+    \label{tab:results_ex7}
+\end{table}
+
+\cref{tab:results_ex7} puts \acrshort{vms} next to ActionFormer to compare their results from training on the SoccerNet dataset. While their training metrics are equal, the test results and time to train and infer favor \acrshort{vms}. The Mamba block on this specific dataset is roughly twice as fast as ActionFormer.
+
+
+\subsection{Discussion}
+
+This experiment confirms what \textcite{li_videomamba_2024} has proved on other datasets. \acrshort{vms} is quicker and slightly more precise than ActionFormer. Running twice as fast is a significant, but if one recalls \acrshort{tdeed} in \cref{sec:experiment2}, both models are relatively fast. The same principle applies when inferring, with near-instantaneous inference. 
+
+There is a big difference between the validation and the test accuracy of the ActionFormer model. I believe this is because the transformer operates on too little data and is therefore unable to generalize effectively. Both models exhibit a similar drop from training to validation, suggesting that neither suffers from overfitting. This aligns with the theory, which indicates that Mamba performs better on smaller datasets. 
+
+The precision of ActionFormer confirms that \acrfull{tal} models are not ideal for the action spotting domain out of the box. Recall \cref{tab:results_ex1}, where \acrshort{tdeed} outperforms \acrshort{vms}. The fact that \acrshort{vms} outperforms ActionFormer shows that the better results from \acrshort{tdeed} might be from more architectural decisions and postprocessing, as opposed to the performance of the Mamba block itself. 
 
 \section{Summary}
 

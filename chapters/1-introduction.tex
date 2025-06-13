@@ -1,9 +1,9 @@
 \chapter{Introduction}
 \label{chap:intro}
 
-The global sports industry is a significant part of the entertainment sector. In 2022, sports betting alone generated over 400 billion USD in revenue. By 2028, the revenue is expected to exceed 680 billion USD \cite{gough_value_2024}. Top-level football clubs and analytics firms invest heavily in data and technology to gain a competitive edge\footnote{\hyperlink{https://www.linkedin.com/posts/hadisotudeh_hiring-data-architect-activity-7293916472295231488-AwiE/}{FIFA}}\footnote{\hyperlink{https://careers.arsenal.com/jobs/5434108-research-engineer}{Arsenal}}\footnote{\hyperlink{https://www.linkedin.com/posts/hadisotudeh_hiring-dataanalyst-recruitment-activity-7291477919799939072-FhMy/?utm_source=social_share_send&utm_medium=member_desktop_web}{Aston Villa}}. For example, Liverpool FC has integrated advanced AI tools into their corner preparation \cite{wang_tactic_ai_2024}. In Norway, Bodø/Glimt, in collaboration with \hyperlink{https://fokus.ing}{fokus.ing}, has enhanced player recruitment using machine learning and achieved European success.
+The global sports industry is a significant part of the entertainment sector. In 2022, sports betting alone generated over 400 billion USD in revenue. By 2028, \textcite{gough_value_2024} expects revenue to exceed 680 billion USD \cite{gough_value_2024}. Top-level football clubs and analytics firms invest heavily in data and technology to gain a competitive edge\footnote{\hyperlink{https://www.linkedin.com/posts/hadisotudeh_hiring-data-architect-activity-7293916472295231488-AwiE/}{FIFA}}\footnote{\hyperlink{https://careers.arsenal.com/jobs/5434108-research-engineer}{Arsenal}}\footnote{\hyperlink{https://www.linkedin.com/posts/hadisotudeh_hiring-dataanalyst-recruitment-activity-7291477919799939072-FhMy/?utm_source=social_share_send&utm_medium=member_desktop_web}{Aston Villa}}. For example, Liverpool FC has integrated advanced AI tools into their corner preparation \cite{wang_tactic_ai_2024}. In Norway, Bodø/Glimt, in collaboration with \hyperlink{https://fokus.ing}{fokus.ing}, has enhanced player recruitment using machine learning and achieved European success.
 
-Despite these advances, annotating football games remains a manual and costly process handled by a few specialized companies. This limits clubs' ability to build and own their datasets. In today's "data-driven" world, exclusive access to high-quality labels can create a competitive advantage. SoccerNet hosts annual challenges on tasks such as ball action spotting to stimulate progress and provide public benchmarks, as well as annotated videos, for the research community.
+To annotate football games is a labor-intensive process. There are specialized companies that \acrfull{rbk} spend money on to get the data from. The labor-intensive process of creating a dataset and the need for specialized workers to utilize the data stop clubs from building and owning datasets. In the data-driven world, access to high-quality labels will create competetive advantages \cite{toma_differences_in_football_2023}. SoccerNet hosts annual challenges on tasks such as ball action spotting to stimulate progress and provide public benchmarks, as well as annotated videos, for the research community.
 
 This thesis investigates whether recent methods from other areas of \acrfull{cv}, specifically masked autoencoders, and \acrfull{s6} from \acrfull{nlp}, can enhance temporal action localization in football videos. The thesis uses a \acrfull{vmae} that extracts spatiotemporal features from raw footage and uses \acrfull{vms} to evaluate it against \acrfull{sota} baselines. Accuracy and runtime are measured. 
 
@@ -12,15 +12,15 @@ Football has entered a new era in which data-driven decision-making is no longer
 
 Video data, by contrast, is abundant and impartial. Every Eliteserien match is filmed from multiple angles and stored, accessible to all Eliteserien clubs. Presenting a resource for extracting rich data to create competetive edges. Automated video analysis unlocks insights into player positioning, tactical patterns, and event dynamics. It democratizes access to high-quality data. High-quality data is critical in a world where "data is the new oil," and owning proprietary datasets can translate directly into on-pitch success and financial return.  
 
-Competitions such as SoccerNet's annual challenges have driven progress in temporal action spotting by providing standardized benchmarks and annotated corpora. Nevertheless, the \acrlong{sota} still struggles with fine-grained action spotting under real-world conditions: varied camera motions, crowded scenes, and subtle player interactions define the beautiful game. Developing more robust and generalizable methods will advance the academic field of \acrshort{cv} in video analysis, delivering practical tools for clubs, scouts, brokers, and broadcasters.  
+Competitions such as SoccerNet's annual challenges have driven progress in temporal action spotting by providing standardized benchmarks and annotated corpora. Nevertheless, the \acrlong{sota} still struggles with fine-grained action spotting under real-world conditions: varied camera motions, crowded scenes, and subtle player interactions define games. Developing more robust and generalizable methods will advance the academic field of \acrshort{cv} in video analysis, delivering practical tools for clubs, scouts, brokers, and broadcasters.  
 
+
+\section{Goal and Research Questions}
 This thesis is motivated by the opportunity to bridge advances in masked autoencoding and self-supervised learning with the specific demands of football video analysis. By leveraging large video corpora without manual labels, the aim is to (1) reduce annotation costs, (2) improve the accuracy and speed of action spotting, and (3) enable clubs of all sizes to harness video analytics for player recruitment, tactical preparation, and fan engagement.  
-
-\section{Research Questions}
 \label{sec:research_questions}
 \begin{itemize}
     \item \textbf{RQ1:} How does the accuracy of the masked-autoencoder and mamba temporal action spotting model compare to existing \acrlong{sota} methods on the SoccerNet benchmark?
-    \item \textbf{RQ2:} What are the model's inference speed and computational requirements compared to T-DEED?
+    \item \textbf{RQ2:} What are the Mamba model's inference speed and computational requirements compared to T-DEED?
     \item \textbf{RQ3:} Which types of adaptation can be made to the MAMBA model to increase its precision?
 \end{itemize}
 
@@ -30,19 +30,27 @@ The thesis presents an experimental design for a model capable of localizing tem
 
 This thesis applies the \acrlong{vms} to a football video dataset to evaluate its event-spotting performance (see Chapter~\ref{chap:experiments}). The results demonstrate that \acrshort{vms} achieves not only competitive accuracy but also substantial gains in inference speed and memory efficiency, confirming the practicality of \acrfull{ssm}s for large-scale video analytics. 
 
+
+\section{Contributions}
 \subsection{Action Spotting vs.\ Action Localization}
-Action spotting casts each event as a single instance, reducing annotation to a single timestamp per occurrence. By contrast, action localization requires predicting both start and end times for each action interval and is typically evaluated over different temporal \acrfull{iou} metrics. Spotting simplifies supervision and evaluation (via tolerance windows around accurate timestamps), but it also challenges models to resolve events occurring in close temporal proximity without relying on segment boundaries.
+Action spotting casts each event as a single instance, reducing annotation to a single timestamp per occurrence. By contrast, action localization requires predicting both start and end times for each action interval and evaluating the results over different temporal \acrfull{iou} metrics. Spotting simplifies supervision and evaluation (via tolerance windows around accurate timestamps), but it also challenges models to resolve events occurring in close temporal proximity without relying on segment boundaries.
 
 \subsection{Temporal vs.\ Spatiotemporal Tasks}
 Temporal event spotting focuses solely on \emph{when} an action occurs, using global frame or clip-level features. Spatiotemporal tasks, in comparison, demand joint localization in time and space (e.g., \ frame-level bounding boxes). The SoccerNet challenge remains in the temporal domain.
 
-\section{Contributions}
 
-This thesis explores a novel utilization of the MAMBA \acrshort{s6} framework in the context of football. To the author's knowledge, as of June 2025, no efforts have been made in this field of study. 
+This thesis makes the following contributions to the field of automated football video analysis:
+\begin{itemize}
+    \item \textbf{Novel Application of Mamba (\acrshort{s6}) Architecture:} It investigates the first-time application of the \acrfull{vms} model, for the task of temporal action spotting in football videos. To the author's knowledge, as of June 2025, this specific framework has not been previously explored in this domain.
 
-The speed and accuracy of \acrlong{vms} are measured against the benchmark task provided by SoccerNet. A translation of the dataset into the \acrfull{tal} domain is provided. 
+    \item \textbf{Comparative Benchmarking on SoccerNet:} It provides a comprehensive empirical evaluation of the \acrshort{vms} model against the current \acrlong{sota} \acrshort{tdeed} model using the SoccerNet-v2 action spotting benchmark. This comparison covers key performance aspects, including spotting accuracy (mean \acrlong{map}@50), model inference speed, training duration, and computational resource demands.
 
-A sustainability issue with the dataset is discussed. 
+    \item \textbf{Methodology for Adapting Spotting Datasets for TAL Models:} It details an approach for translating action spotting annotations from datasets like SoccerNet into a format suitable for \acrfull{tal} models such as \acrshort{vms}. This facilitates broader comparisons between models with different native task formulations.
 
-% \section{Thesis Outline}
+    \item \textbf{Analysis of Mamba-based Model Characteristics in Sports Video:} It offers insights into the performance characteristics of Mamba-based architectures in the context of football video analysis. Notably, \acrshort{vms} demonstrated significantly faster training convergence and lower GPU memory requirements during training compared to \acrshort{tdeed}. However, the study also identifies challenges, such as the computational cost of the \acrshort{vmae} feature extraction pipeline and the overall spotting accuracy achieved relative to \acrshort{tdeed}.
 
+    \item \textbf{Exploration of Performance Enhancement Strategies for \acrshort{vms}:} It examines several strategies to improve the precision of the \acrshort{vms} model. This includes investigating the impact of input feature dimensionality, conducting hyperparameter optimization, and analyzing the role of postprocessing techniques in refining prediction outputs.
+
+    \item \textbf{Discussion on Sustainability:} It incorporates a discussion on computational sustainability, social sustainability, and environmental considerations.
+    
+\end{itemize}

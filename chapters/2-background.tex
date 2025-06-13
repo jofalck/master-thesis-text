@@ -9,8 +9,6 @@ This chapter introduces the theoretical foundation and specialized terminology i
 \subsection{Continuous Nature of Football}
 Unlike sports with discrete plays, such as baseball or cricket, football is a continuous and dynamic domain. For example, a goalkeeper's pass during an uninterrupted sequence of play has an infinite number of possible temporal sequences and starting conditions. If the catcher catches the pitch in baseball, the play stops. In football, it can continue indefinitely. This constant flow of possible outcomes and play challenges event-based models. 
 
-% They\todo{what are they?} identify individual occurrences and sequence-based models, which analyze ordered temporal inputs. Consequently, traditional discrete frameworks must be extended to preserve contextual data across continuous match sequences. \todo{rewrite}
-
 
 \subsection{Data Sources and Key Metrics}
 Football analytics rely on two primary data streams:
@@ -20,8 +18,7 @@ Football analytics rely on two primary data streams:
     \begin{itemize}
         \item \acrfull{xg}: estimates shot quality using spatial and contextual features with XGBoost trained on large historic datasets \cite{mead_xg_2023}.
         \item Set pieces (corners, free kicks, penalties): naturally bounded events suitable for end-to-end predictive models.
-        \item Ball actions (Passes, shots): counts occurrences during game, typically not related to timestamps
-        \item \autoref{fig:fotmob_stats} shows a selection of commercially available statistics. 
+        \item Ball actions (Passes, shots): counts occurrences during game, typically not related to timestamps. \autoref{fig:fotmob_stats} shows a selection of commercially available statistics. 
     \end{itemize}
     \item Tracking data: high-frequency player trajectories from GPS vests or manual optical systems.
     \begin{itemize}
@@ -30,19 +27,83 @@ Football analytics rely on two primary data streams:
     \end{itemize}
 \end{itemize}
 
-\begin{figure}
+\begin{figure}[h]
     \centering
     \includegraphics[width=\linewidth]{figures/fotmob_rbk.png}
     \caption{Commercially available stats from a football game. Event data exists for both players and the team as a whole. Retrieved from FotMob\cite{fotmob_game}.}
     \label{fig:fotmob_stats}
 \end{figure}
 
-\textcite{wang_tactic_ai_2024} applies deep \acrfull{gnn} to corners. Corners are a discrete sub-event of play, where there are just four possible starting conditions for the ball. Left and right on the pitch, inswing and outswing (right-footed or left-footed). They deliver strong predictive and generalizable performance and have helped Liverpool FC succeed. 
+\textcite{wang_tactic_ai_2024} applies deep \acrfull{gnn} to corners together with Liverpool FC. Corners are a discrete sub-event of play, where there are just four possible starting conditions for the ball. Left and right on the pitch, inswing and outswing (right-footed or left-footed). They deliver strong predictive and generalizable performance and have helped Liverpool FC succeed. 
 
 \section{Datasets}
 \label{sec:datasets}
 
-\textcite{survey_of_survey} presents comprehensive tables of sports action datasets. \textcite{seweryn_survey_2023} detail football-specific collections.
+\textcite{survey_of_survey} presents comprehensive tables of sports action datasets. \cref{tab:datasets_summary} shows a comprehensive view of the datasets for general action recognition. \textcite{seweryn_survey_2023} detail football-specific collections in \cref{table:datasets}.
+
+\begin{table}
+    \centering
+    \begin{tabular}{|l|l|l|l|l|}
+        \hline
+        \textbf{Dataset} & \textbf{References} & \textbf{Year} & \textbf{\#class} & \textbf{\#instances} \\ \hline
+        KTH & \textcite{dataset:schuldt_kth_2004} & 2004 & 6 & 2.4K \\ \hline
+        Weizmann & \textcite{dataset:blank_weizmann_2005} & 2005 & 10 & 90 \\ \hline
+        Hollywood-1 & \textcite{dataset:laptev_hollywood_2008} & 2008 & 8 & 32 \\ \hline
+        UCF YouTube Action (UCF11) & \textcite{dataset:liu_ucf11_2009} & 2009 & 11 & 1.2K \\ \hline
+        Hollywood-2 & \textcite{dataset:marszalek_hollywood2_2009} & 2009 & 12 & 3.7K \\ \hline
+        MSR-Action3D & \textcite{dataset:li_msr3d_2010} & 2010 & 20 & 0.6K \\ \hline
+        HMDB51 & \textcite{dataset:HMDB51} & 2011 & 51 & 31K \\ \hline
+        UCF50 & \textcite{dataset:reddy_recognizing_2013} & 2012 & 50 & 6.7K \\ \hline
+        UCF101 & \textcite{dataset:UCF101} & 2012 & 101 & 13.3K \\ \hline
+        THUMOS’14 & \textcite{dataset:thumos} & 2014 & 20 & 2.6K \\ \hline
+        THUMOS’15 & \textcite{dataset:thumos} & 2015 & 20 & 6.3K \\ \hline
+        Multi-THUMOS & \textcite{dataset:yeung_multithumos_2017} & 2015 & 65 & 38.7K \\ \hline
+        ActivityNet & \textcite{dataset:activitynet} & 2015 & 203 & 28K \\ \hline
+        UTD-MHAD & \textcite{dataset:chen_utdmhad_2015} & 2015 & 27 & 0.9K \\ \hline
+        YouTube-8 M & \textcite{dataset:abu_youtube8m_2016} & 2016 & 3862 & 8M \\ \hline
+        Charades & \textcite{dataset:sigurdsson_charades_2016} & 2016 & 157 & 9.8K \\ \hline
+        NTU RGB+D & \textcite{dataset:shahroudy_ntu_2016} & 2016 & 60 & 56K \\ \hline
+        Hollywood3D & \textcite{dataset:hadfield_hollywood3_2017} & 2017 & 14 & 0.7K \\ \hline
+        Kinetics400 & \textcite{dataset:kinetics} & 2017 & 400 & 306K \\ \hline
+        Sth-Sth V1 & \textcite{dataset:something_something} & 2017 & 174 & 108.5K \\ \hline
+        AVA & \textcite{gu2018avavideodatasetspatiotemporally} & 2017 & 80 & 385K \\ \hline
+        Kinetics600 & \textcite{carreira_2017_i3d_quo_vadis} & 2018 & 600 & 482K \\ \hline
+        Sth-Sth v2 & \textcite{dataset:something_something} & 2018 & 174 & 220.8K \\ \hline
+        MIT & \textcite{monfort2021multimomentstimelearninginterpreting} & 2018 & 339 & 1M \\ \hline
+        Kinetics700 & \textcite{carreira2022shortnotekinetics700human} & 2019 & 700 & 650K \\ \hline
+        Muilti-MIT & \textcite{monfort2021multimomentstimelearninginterpreting} & 2019 & 549 & 1M \\ \hline
+        HACS & \textcite{dataset:hacs} & 2019 & 200 & 1.55M \\ \hline
+        NTU RGB+D 120 & \textcite{Liu_2020} & 2019 & 120 & 114K \\ \hline
+        AVA-Kinetics & \textcite{li2020avakineticslocalizedhumanactions} & 2020 & 90 & 624K \\ \hline
+        HUV & \textcite{diba2020largescaleholisticvideo} & 2020 & 3K & 577K \\ \hline
+        CZU-MHAD & \textcite{9707787} & 2022 & 22 & 1.5K \\ \hline
+    \end{tabular}
+    \caption{Summary of various datasets with corresponding references, year, number of classes, and instances from \textcite{survey_of_survey}.}
+    \label{tab:datasets_summary}
+\end{table}
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{lcccccc}
+        \hline
+        \textbf{Dataset}  & \textbf{Video/Photo} & \textbf{Audio} & \textbf{Publicly Available} \\
+        \hline
+        SoccerNet \textcite{giancola_soccernet_2018}  & \checkmark & \checkmark & Yes \\
+        SoccerNet-v2 [\textcite{deliege_soccernet-v2_dataset_2021}]  & \checkmark & \checkmark & Yes \\
+        SoccerNet-v3 [\textcite{cioppa2021cameracalibrationplayerlocalization}]  & \checkmark & \checkmark & Yes \\
+        Football Action [\textcite{8014759}]  & \checkmark & ? & No \\
+        Comprehensive Soccer [\textcite{8397046}]  & \checkmark & $\times$ & Yes \\
+        SSET [\textcite{10.1007/s11042-020-09414-3}]  & \checkmark & $\times$ & Yes \\
+        SoccerDB [\textcite{10.1145/3422844.3423051}] & \checkmark & $\times$ & Yes \\
+        Soccer-Logs [\textcite{pappalardo_public_2019}] & $\times$ & $\times$ & Yes \\
+        VisAudSoccer [\textcite{9106051}] &  \checkmark & \checkmark & No \\
+        SEV [\textcite{karimi2021soccereventdetectionusing}] & \checkmark & \checkmark & Yes \\
+        EIGD-S [\textcite{10.1145/3475722.3482792}] &  \checkmark & \checkmark & Yes \\
+        \hline
+    \end{tabular}
+    \caption{Datasets for Soccer with their availability from \textcite{seweryn_survey_2023}.}
+    \label{table:datasets}
+\end{table}
 
 \subsection{SoccerNet}
 
