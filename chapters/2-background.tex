@@ -18,7 +18,7 @@ Football analytics rely on two primary data streams:
     \begin{itemize}
         \item \acrfull{xg}: estimates shot quality using spatial and contextual features with XGBoost trained on large historic datasets \cite{mead_xg_2023}.
         \item Set pieces (corners, free kicks, penalties): naturally bounded events suitable for end-to-end predictive models.
-        \item Ball actions (Passes, shots): counts occurrences during game, typically not related to timestamps. \autoref{fig:fotmob_stats} shows a selection of commercially available statistics. 
+        \item Ball actions (Passes, shots): counts occurrences during a game, typically not related to timestamps. \autoref{fig:fotmob_stats} shows a selection of commercially available statistics. 
     \end{itemize}
     \item Tracking data: high-frequency player trajectories from GPS vests or manual optical systems.
     \begin{itemize}
@@ -71,7 +71,7 @@ Football analytics rely on two primary data streams:
         Sth-Sth v2 & \textcite{dataset:something_something} & 2018 & 174 & 220.8K \\ \hline
         MIT & \textcite{monfort2021multimomentstimelearninginterpreting} & 2018 & 339 & 1M \\ \hline
         Kinetics700 & \textcite{carreira2022shortnotekinetics700human} & 2019 & 700 & 650K \\ \hline
-        Muilti-MIT & \textcite{monfort2021multimomentstimelearninginterpreting} & 2019 & 549 & 1M \\ \hline
+        Multi-MIT & \textcite{monfort2021multimomentstimelearninginterpreting} & 2019 & 549 & 1M \\ \hline
         HACS & \textcite{dataset:hacs} & 2019 & 200 & 1.55M \\ \hline
         NTU RGB+D 120 & \textcite{Liu_2020} & 2019 & 120 & 114K \\ \hline
         AVA-Kinetics & \textcite{li2020avakineticslocalizedhumanactions} & 2020 & 90 & 624K \\ \hline
@@ -274,7 +274,7 @@ Despite their locality bias, \acrshort{cnn}-based video models remain foundation
     \label{fig:graph_corner}
 \end{figure}
 
-\textcite{wang_tactic_ai_2024} uses graphs to model positional relations (edges) between the players (nodes), see \cref{fig:graph_corner}. Utilizing the relationships/actions between players rather than distance is a design choice that improves performance. The \acrshort{gnn} updates the players' representation based on messages from neighboring nodes. This allows the system to predict key events, such as which player will receive the ball or if a player will shoot. 
+\textcite{wang_tactic_ai_2024} uses graphs to model positional relations (edges) between the players (nodes), see \cref{fig:graph_corner}. Utilizing the relationships and actions between players rather than distance is a design choice that improves performance. The \acrshort{gnn} updates the players' representation based on messages from neighboring nodes. This allows the system to predict key events, such as which player will receive the ball or if a player will shoot. 
 
 \subsection{Recurrent Neural Nets}
 
@@ -443,9 +443,9 @@ The authors also released SA-V, a large video-segmentation dataset with millions
     \label{fig:sa-v}
 \end{figure}
 
-Together, the original SAM and \acrshort{sam} exemplify a new paradigm in segmentation: a single, promptable transformer that can be deployed off-the-shelf. The model is adaptable to novel objects or domains with little human supervision. 
+Together, the original SAM and \acrshort{sam} exemplify a new paradigm in segmentation: a single, promptable transformer that can be deployed off the shelf. The model is adaptable to novel objects or domains with little human supervision. 
 
-\acrshort{sam} has the potential to be a strong preprocessing step in an action spotting pipeline. Its ability to segment players and the ball in each frame can help the model mask the uninteresting parts of the video. \acrshort{sam} gives spatial localization of where key actors are. The extracted features from precisely segmented objects have the potential to be more descriptive for action recognition than bounding boxes. A feature vector from a precisely segmented object contains valueable information. 
+\acrshort{sam} has the potential to be a strong preprocessing step in an action spotting pipeline. Its ability to segment players and the ball in each frame can help the model mask the uninteresting parts of the video. \acrshort{sam} gives spatial localization of where key actors are. The extracted features from precisely segmented objects have the potential to be more descriptive for action recognition than bounding boxes. A feature vector from a precisely segmented object contains valuable information. 
 
 
 
@@ -541,10 +541,9 @@ In 2021, \textcite{gerats_individual_same_task_2021} employed a single static pa
 % \subsubsection{ActionFormer}
 \textcite{zhang_actionformer_2022} utilized ActionFormer, which employed self-attention video transformers in 2022, to achieve a quantum leap in terms of \acrfull{tal} performance on THUMOS14. 
 
-% \subsubsection{\acrfull{i3d} for Action Localization}
 \textcite{host_handball_2023} uses \acrlong{i3d}s to detect actions in handball videos. 
 
-\textcite{chen_children_2023} propose a combination of \acrfull{vlad} and \acrfull{dbn} to perform action recognition on football games with children. \acrshort{vlad} clusters feature descriptors and stores the difference from frames to a centroid\cite{jegou_vlad_2010}. \acrshort{dbn}s are generative deep learning models, which can probabilistically recreate input, and work as feature extractors\cite{hinton_dbn_2006}.
+\textcite{chen_children_2023} propose a combination of \acrfull{vlad} and \acrfull{dbn} to perform action recognition on football games with children. \acrshort{vlad} clusters feature descriptors and stores the difference from frames to a centroid\cite{jegou_vlad_2010}. \acrshort{dbn}s are generative deep learning models, which can probabilistically recreate input and work as feature extractors\cite{hinton_dbn_2006}.
 
 \textcite{wang_skeleton_two-stream_2023} combines a \acrfull{gcn} with transformers to understand human actions on a skeleton version of the Kinetics dataset.  
 

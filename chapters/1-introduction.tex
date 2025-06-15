@@ -12,7 +12,7 @@ Football has entered a new era in which data-driven decision-making is no longer
 
 Video data, by contrast, is abundant and impartial. Every Eliteserien match is filmed from multiple angles and stored, accessible to all Eliteserien clubs. Presenting a resource for extracting rich data to create competetive edges. Automated video analysis unlocks insights into player positioning, tactical patterns, and event dynamics. It democratizes access to high-quality data. High-quality data is critical in a world where "data is the new oil," and owning proprietary datasets can translate directly into on-pitch success and financial return.  
 
-Competitions such as SoccerNet's annual challenges have driven progress in temporal action spotting by providing standardized benchmarks and annotated corpora. Nevertheless, the \acrlong{sota} still struggles with fine-grained action spotting under real-world conditions: varied camera motions, crowded scenes, and subtle player interactions define games. Developing more robust and generalizable methods will advance the academic field of \acrshort{cv} in video analysis, delivering practical tools for clubs, scouts, brokers, and broadcasters.  
+Competitions such as SoccerNet's annual challenges have driven progress in temporal action spotting by providing standardized benchmarks and annotated corpora. Nevertheless, the \acrlong{sota} still struggles with fine-grained action spotting under real-world conditions: varied camera motions, crowded scenes, and subtle player interactions are common in games. Developing more robust and generalizable methods will advance the academic field of \acrshort{cv} in video analysis, delivering practical tools for clubs, scouts, brokers, and broadcasters.  
 
 
 \section{Goal and Research Questions}
@@ -41,15 +41,15 @@ Temporal event spotting focuses solely on \emph{when} an action occurs, using gl
 
 This thesis makes the following contributions to the field of automated football video analysis:
 \begin{itemize}
-    \item \textbf{Novel Application of Mamba (\acrshort{s6}) Architecture:} It investigates the first-time application of the \acrfull{vms} model, for the task of temporal action spotting in football videos. To the author's knowledge, as of June 2025, this specific framework has not been previously explored in this domain.
+    \item \textbf{Novel Application of Mamba (\acrshort{s6}) Architecture:} It investigates the first-time application of the \acrfull{vms} model for the task of temporal action spotting in football videos. To the author's knowledge, as of June 2025, this specific framework has not been previously explored in this domain.
 
     \item \textbf{Comparative Benchmarking on SoccerNet:} It provides a comprehensive empirical evaluation of the \acrshort{vms} model against the current \acrlong{sota} \acrshort{tdeed} model using the SoccerNet-v2 action spotting benchmark. This comparison covers key performance aspects, including spotting accuracy (mean \acrlong{map}@50), model inference speed, training duration, and computational resource demands.
 
-    \item \textbf{Methodology for Adapting Spotting Datasets for TAL Models:} It details an approach for translating action spotting annotations from datasets like SoccerNet into a format suitable for \acrfull{tal} models such as \acrshort{vms}. This facilitates broader comparisons between models with different native task formulations.
+    \item \textbf{Methodology for Adapting Spotting Datasets for TAL Models:} It details an approach for translating action spotting annotations from datasets like SoccerNet into a format suitable for \acrfull{tal} models such as \acrshort{vms}. 
 
     \item \textbf{Analysis of Mamba-based Model Characteristics in Sports Video:} It offers insights into the performance characteristics of Mamba-based architectures in the context of football video analysis. Notably, \acrshort{vms} demonstrated significantly faster training convergence and lower GPU memory requirements during training compared to \acrshort{tdeed}. However, the study also identifies challenges, such as the computational cost of the \acrshort{vmae} feature extraction pipeline and the overall spotting accuracy achieved relative to \acrshort{tdeed}.
 
-    \item \textbf{Exploration of Performance Enhancement Strategies for \acrshort{vms}:} It examines several strategies to improve the precision of the \acrshort{vms} model. This includes investigating the impact of input feature dimensionality, conducting hyperparameter optimization, and analyzing the role of postprocessing techniques in refining prediction outputs.
+    \item \textbf{Exploration of Performance Enhancement Strategies for \acrshort{vms}:} It examines several strategies to improve the precision of the \acrshort{vms} model. The strategies include investigating the impact of input feature dimensionality, conducting hyperparameter optimization, and analyzing the role of postprocessing techniques in refining prediction outputs.
 
     \item \textbf{Discussion on Sustainability:} It incorporates a discussion on computational sustainability, social sustainability, and environmental considerations.
     
